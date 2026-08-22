@@ -1,47 +1,38 @@
-import { Truck, Shield, RotateCcw, Headphones } from "lucide-react";
+import { Globe, Shield, CreditCard } from "lucide-react";
 
 const features = [
   {
-    icon: Truck,
-    title: "Free Shipping",
-    description: "On orders over $500",
+    icon: Globe,
+    title: "SHIPPING WORLDWIDE",
+    description: "We are shipping all over the world.",
   },
   {
     icon: Shield,
-    title: "Secure Payment",
-    description: "100% protected checkout",
+    title: "100% PREMIUM",
+    description: "All of our products are of high quality.",
   },
   {
-    icon: RotateCcw,
-    title: "Easy Returns",
-    description: "30-day return policy",
-  },
-  {
-    icon: Headphones,
-    title: "24/7 Support",
-    description: "Expert jewelry consultants",
+    icon: CreditCard,
+    title: "SECURE PAYMENT",
+    description: "All of your payments are secure with us.",
   },
 ];
 
 export default function TrustBar() {
   return (
-    <section className="border-y border-border bg-muted/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+    <section className="border-y border-[#eee] bg-white">
+      <div className="max-w-[1400px] mx-auto px-4 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="flex items-center gap-4 justify-center lg:justify-start"
+              className="flex flex-col items-center text-center"
             >
-              <div className="w-12 h-12 rounded-full bg-gold/10 flex items-center justify-center flex-shrink-0">
-                <feature.icon className="w-5 h-5 text-gold" />
-              </div>
-              <div>
-                <h3 className="font-medium text-sm">{feature.title}</h3>
-                <p className="text-xs text-muted-foreground">
-                  {feature.description}
-                </p>
-              </div>
+              <feature.icon className="w-8 h-8 text-[#a2937c] mb-3" strokeWidth={1.5} />
+              <h3 className="text-xs font-medium uppercase tracking-widest mb-1">
+                {feature.title}
+              </h3>
+              <p className="text-xs text-[#666]">{feature.description}</p>
             </div>
           ))}
         </div>

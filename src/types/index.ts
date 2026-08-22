@@ -1,4 +1,16 @@
-export type Category = "rings" | "necklaces" | "earrings" | "bracelets";
+export type Category =
+  | "necklace-sets"
+  | "earrings"
+  | "bangles"
+  | "finger-ring"
+  | "bracelet"
+  | "bridal-sets"
+  | "chains"
+  | "anklets"
+  | "bindiya-jhumar"
+  | "matha-pati"
+  | "nose-ring"
+  | "accessories";
 
 export interface Product {
   id: string;
@@ -8,13 +20,25 @@ export interface Product {
   originalPrice?: number;
   category: Category;
   image: string;
+  hoverImage?: string;
   images?: string[];
   material: string;
+  reviews: number;
+  rating?: number;
   isNew?: boolean;
   isBestseller?: boolean;
+  soldOut?: boolean;
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
+}
+
+export interface CategoryInfo {
+  slug: Category;
+  name: string;
+  description: string;
+  productCount: number;
+  image: string;
 }

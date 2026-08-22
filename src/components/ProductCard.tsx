@@ -1,116 +1,131 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Heart, ShoppingBag, Eye } from "lucide-react";
 import { Product } from "@/types";
 import { formatPrice } from "@/data/products";
-import { useWishlist } from "@/context/WishlistContext";
-import { useCart } from "@/context/CartContext";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import StarRating from "./StarRating";
 
 interface ProductCardProps {
   product: Product;
+  onQuickView?: (product: Product) => void;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  const { addToCart } = useCart();
-  const wishlisted = isInWishlist(product.id);
+export default function ProductCard({ product, onQuickView }: ProductCardProps) {
+  const [activeImage, setActiveImage] = useState(product.image);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (wishlisted) {
-      removeFromWishlist(product.id);
-      toast.info("Removed from wishlist");
-    } else {
-      addToWishlist(product);
-      toast.success("Added to wishlist");
-    }
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    addToCart(product);
-    toast.success("Added to cart", {
-      description: product.name,
-    });
-  };
+  const hoverImg = product.hoverImage ?? product.image;
+  const thumbnails = [product.image, hoverImg].filter(
+    (img, i, arr) => arr.indexOf(img) === i
+  );
 
   return (
-    <div className="group relative">
-      <Link href={`/products/${product.id}`}>
-        <div className="relative aspect-square overflow-hidden bg-muted rounded-lg mb-4">
+    <div
+      className="group"
+      onMouseEnter={() => {
+        setIsHovered(true);
+        setActiveImage(product.hoverImage ?? product.image);
+      }}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setActiveImage(product.image);
+      }}
+    >
+      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#ece6dc] mb-3">
+        <Link href={`/products/${product.id}`} className="block absolute inset-0">
           <Image
             src={product.image}
             alt={product.name}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className={`object-cover transition-opacity duration-500 ${
+              isHovered ? "opacity-0" : "opacity-100"
+            }`}
+            sizes="(max-width: 640px) 50vw, 25vw"
           />
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-            {product.isNew && (
-              <Badge className="bg-charcoal text-cream rounded-none uppercase text-[10px] tracking-wider">
-                New
-              </Badge>
-            )}
-            {product.isBestseller && (
-              <Badge className="bg-gold text-white rounded-none uppercase text-[10px] tracking-wider">
-                Bestseller
-              </Badge>
-            )}
-          </div>
-          {product.originalPrice && (
-            <Badge className="absolute top-3 right-3 bg-rose-gold text-white rounded-none uppercase text-[10px] tracking-wider">
-              Sale
-            </Badge>
-          )}
+          <Image
+            src={hoverImg}
+            alt={`${product.name} alternate view`}
+            fill
+            className={`object-cover transition-opacity duration-500 ${
+              isHovered ? "opacity-100" : "opacity-0"
+            }`}
+            sizes="(max-width: 640px) 50vw, 25vw"
+          />
+        </Link>
 
-          <div className="absolute inset-x-0 bottom-0 p-4 flex gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-            <Button
-              size="sm"
-              className="flex-1 bg-gold hover:bg-gold-dark text-white uppercase text-xs tracking-wider h-9"
-              onClick={handleAddToCart}
-            >
-              <ShoppingBag className="w-3.5 h-3.5 mr-1.5" />
-              Add to Cart
-            </Button>
-            <Link
-              href={`/products/${product.id}`}
-              className="inline-flex items-center justify-center h-9 w-9 bg-white/90 hover:bg-white rounded-lg"
-            >
-              <Eye className="w-4 h-4" />
-            </Link>
-          </div>
+        {/* Brand watermark */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none">
+          <span className="text-[9px] tracking-[0.2em] text-white/90 uppercase font-light drop-shadow">
+            Lumière
+          </span>
         </div>
-      </Link>
 
-      <button
-        onClick={toggleWishlist}
-        className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white"
-        aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-      >
-        <Heart
-          className={`w-4 h-4 ${wishlisted ? "fill-rose-gold text-rose-gold" : "text-charcoal"}`}
-        />
-      </button>
+        {product.soldOut && (
+          <span className="absolute top-3 left-3 bg-black/70 text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded">
+            Sold out
+          </span>
+        )}
 
-      <Link href={`/products/${product.id}`} className="block space-y-1">
-        <p className="text-xs text-muted-foreground uppercase tracking-wider">
-          {product.material}
-        </p>
-        <h3 className="font-serif text-base text-foreground group-hover:text-gold transition-colors">
+        {/* Quick view button - maroon like Zeesy */}
+        {onQuickView && !product.soldOut && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              onQuickView(product);
+            }}
+            className={`absolute bottom-0 left-0 right-0 bg-[#6d2135] text-white text-sm py-3.5 transition-all duration-300 ${
+              isHovered
+                ? "opacity-100 translate-y-0"
+                : "opacity-0 translate-y-full"
+            }`}
+          >
+            Quick view
+          </button>
+        )}
+
+        {/* Thumbnail dots on hover */}
+        {isHovered && thumbnails.length > 1 && (
+          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-2">
+            {thumbnails.map((thumb, i) => (
+              <button
+                key={i}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setActiveImage(thumb);
+                }}
+                className={`w-8 h-8 rounded-full overflow-hidden border-2 transition-all ${
+                  activeImage === thumb
+                    ? "border-white scale-110"
+                    : "border-white/50 opacity-70"
+                }`}
+              >
+                <Image
+                  src={thumb}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="object-cover w-full h-full"
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Link href={`/products/${product.id}`} className="block px-1">
+        <h3 className="text-[15px] text-[#1a1a1a] leading-snug mb-2 font-normal hover:underline">
           {product.name}
         </h3>
-        <div className="flex items-center gap-2">
-          <span className="font-medium">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
-            <span className="text-muted-foreground line-through text-sm">
-              {formatPrice(product.originalPrice)}
-            </span>
-          )}
+        <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
+        <div className="flex items-center gap-2 mt-2">
+          <p className="text-[15px] font-medium text-[#1a1a1a]">
+            {formatPrice(product.price)}
+          </p>
+          <span className="inline-flex items-center gap-1 text-[10px] text-[#888] border border-[#ddd] rounded px-1.5 py-0.5">
+            🇵🇰 PKR
+          </span>
         </div>
       </Link>
     </div>

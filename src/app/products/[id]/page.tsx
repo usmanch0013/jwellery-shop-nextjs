@@ -1,11 +1,9 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import AddToCartButton from "@/components/AddToCartButton";
 import ProductCard from "@/components/ProductCard";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import StarRating from "@/components/StarRating";
 import { getProductById, products, formatPrice } from "@/data/products";
 
 interface ProductPageProps {
@@ -27,120 +25,80 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .slice(0, 4);
 
   return (
-    <div className="py-12 lg:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-10 bg-[#faf7f2]">
+      <div className="max-w-[1400px] mx-auto px-4">
         <Breadcrumbs
           items={[
             { label: "Shop", href: "/shop" },
             {
-              label: product.category,
+              label: product.category.replace("-", " "),
               href: `/categories/${product.category}`,
             },
             { label: product.name },
           ]}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-          <div className="relative aspect-square bg-muted rounded-lg overflow-hidden">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute top-4 left-4 flex gap-2">
-              {product.isNew && (
-                <Badge className="bg-charcoal text-cream rounded-none uppercase">
-                  New
-                </Badge>
-              )}
-              {product.isBestseller && (
-                <Badge className="bg-gold text-white rounded-none uppercase">
-                  Bestseller
-                </Badge>
-              )}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#ece6dc] col-span-2">
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                className="object-cover"
+                priority
+              />
             </div>
+            {product.hoverImage && (
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-[#ece6dc]">
+                <Image
+                  src={product.hoverImage}
+                  alt={`${product.name} alternate`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col justify-center">
-            <p className="text-gold uppercase tracking-[0.3em] text-sm mb-2 capitalize">
-              {product.category}
+            <p className="text-[10px] text-[#999] uppercase tracking-widest mb-2">
+              {product.category.replace("-", " ")}
             </p>
-            <h1 className="text-3xl lg:text-4xl font-serif font-semibold mb-4">
+            <h1 className="font-serif text-2xl lg:text-3xl mb-3 text-[#2a2a2a]">
               {product.name}
             </h1>
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-2xl font-medium">
-                {formatPrice(product.price)}
-              </span>
-              {product.originalPrice && (
-                <>
-                  <span className="text-muted-foreground line-through">
-                    {formatPrice(product.originalPrice)}
-                  </span>
-                  <Badge variant="secondary" className="text-rose-gold">
-                    Save{" "}
-                    {Math.round(
-                      ((product.originalPrice - product.price) /
-                        product.originalPrice) *
-                        100
-                    )}
-                    %
-                  </Badge>
-                </>
-              )}
-            </div>
-            <p className="text-muted-foreground leading-relaxed mb-8">
+            <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
+            <p className="text-2xl font-medium mt-4 mb-6">
+              {formatPrice(product.price)}
+            </p>
+            <p className="text-sm text-[#666] leading-relaxed mb-8">
               {product.description}
             </p>
 
-            <div className="grid grid-cols-2 gap-4 mb-8 p-6 bg-muted/50 rounded-lg">
+            <div className="grid grid-cols-2 gap-4 mb-8 p-5 bg-white rounded-xl text-sm border border-[#ece6dc]">
               <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                  Material
-                </p>
-                <p className="font-medium">{product.material}</p>
+                <p className="text-[#999] text-xs uppercase mb-1">Material</p>
+                <p>{product.material}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                  Category
+                <p className="text-[#999] text-xs uppercase mb-1">Category</p>
+                <p className="capitalize">
+                  {product.category.replace("-", " ")}
                 </p>
-                <p className="font-medium capitalize">{product.category}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                  Shipping
-                </p>
-                <p className="font-medium">Free over $500</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">
-                  Warranty
-                </p>
-                <p className="font-medium">Lifetime</p>
               </div>
             </div>
 
-            <AddToCartButton product={product} />
-
-            <Separator className="my-8" />
-
-            <div className="text-sm text-muted-foreground space-y-2">
-              <p>✓ Complimentary gift wrapping</p>
-              <p>✓ 30-day hassle-free returns</p>
-              <p>✓ Lifetime craftsmanship warranty</p>
-            </div>
+            {!product.soldOut && <AddToCartButton product={product} />}
           </div>
         </div>
 
         {relatedProducts.length > 0 && (
-          <div className="mt-24">
-            <h2 className="text-2xl font-serif font-semibold mb-8 text-center">
+          <div className="mt-16">
+            <h2 className="font-serif text-2xl text-center mb-8">
               You May Also Like
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

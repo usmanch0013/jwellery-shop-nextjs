@@ -1,47 +1,40 @@
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import ProductGrid from "@/components/ProductGrid";
-import { categories, getProductsByCategory } from "@/data/products";
+import CategoryPageClient from "./CategoryPageClient";
+import { getCategoryInfo, getProductsByCategory } from "@/data/products";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
 export async function generateStaticParams() {
+  const { categories } = await import("@/data/products");
   return categories.map((cat) => ({ slug: cat.slug }));
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = categories.find((c) => c.slug === slug);
+  const category = getCategoryInfo(slug);
 
   if (!category) notFound();
 
   const categoryProducts = getProductsByCategory(slug);
 
   return (
-    <div className="py-12 lg:py-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="py-10 bg-[#faf7f2]">
+      <div className="max-w-[1400px] mx-auto px-4">
         <Breadcrumbs
-          items={[
-            { label: "Shop", href: "/shop" },
-            { label: category.name },
-          ]}
+          items={[{ label: "Shop", href: "/shop" }, { label: category.name }]}
         />
-        <div className="text-center mb-4">
-          <p className="text-gold uppercase tracking-[0.3em] text-sm mb-2">
-            Collection
-          </p>
-          <h1 className="text-4xl lg:text-5xl font-serif font-semibold mb-4">
-            {category.name}
-          </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            {category.description}
-          </p>
-        </div>
+        <h1 className="font-serif text-2xl lg:text-3xl text-center mb-2 capitalize">
+          {category.name}
+        </h1>
+        <p className="text-sm text-[#999] text-center mb-2">
+          {category.productCount} products
+        </p>
       </div>
 
-      <ProductGrid products={categoryProducts} />
+      <CategoryPageClient products={categoryProducts} />
     </div>
   );
 }

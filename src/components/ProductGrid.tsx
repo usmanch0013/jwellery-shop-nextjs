@@ -4,34 +4,29 @@ import ProductCard from "./ProductCard";
 interface ProductGridProps {
   products: Product[];
   title?: string;
-  subtitle?: string;
+  onQuickView?: (product: Product) => void;
 }
 
 export default function ProductGrid({
   products,
   title,
-  subtitle,
+  onQuickView,
 }: ProductGridProps) {
   return (
-    <section className="py-16 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {(title || subtitle) && (
-          <div className="text-center mb-12">
-            {subtitle && (
-              <p className="text-gold uppercase tracking-[0.3em] text-sm mb-2">
-                {subtitle}
-              </p>
-            )}
-            {title && (
-              <h2 className="text-3xl lg:text-4xl font-serif font-semibold text-charcoal">
-                {title}
-              </h2>
-            )}
-          </div>
+    <section className="py-8 bg-[#faf7f2]">
+      <div className="max-w-[1400px] mx-auto px-4">
+        {title && (
+          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-[#2a2a2a] capitalize">
+            {title}
+          </h2>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              onQuickView={onQuickView}
+            />
           ))}
         </div>
       </div>

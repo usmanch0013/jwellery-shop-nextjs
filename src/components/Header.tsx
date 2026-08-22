@@ -2,20 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import {
-  ShoppingBag,
-  Menu,
-  Search,
-  Heart,
-  User,
-  ChevronDown,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { ShoppingBag, Menu, Search, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
 import { categories } from "@/data/products";
-import AnnouncementBar from "@/components/AnnouncementBar";
+import TopBar from "@/components/TopBar";
+import Logo from "@/components/Logo";
 import SearchDialog from "@/components/SearchDialog";
 import CartSheet from "@/components/CartSheet";
 import { Button } from "@/components/ui/button";
@@ -26,133 +17,81 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
+const navLinks = [
+  { label: "Home", href: "/" },
+  { label: "Shop", href: "/shop" },
+  { label: "Best selling products", href: "/shop?filter=bestseller" },
+  { label: "New Arrivals", href: "/shop?filter=new" },
+  { label: "Collections", href: "/shop" },
+  { label: "Track Order", href: "/account" },
+  { label: "Client Reviews", href: "/#reviews" },
+];
+
 export default function Header() {
   const { totalItems } = useCart();
-  const { totalItems: wishlistCount } = useWishlist();
-  const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [categoryOpen, setCategoryOpen] = useState(false);
 
   return (
     <>
-      <AnnouncementBar />
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-[72px]">
-            <div className="flex items-center gap-3 lg:hidden">
+      <TopBar />
+      <header className="sticky top-0 z-50 bg-[#fcfaf5]">
+        <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
+          <div className="grid grid-cols-[140px_1fr_120px] items-center h-[70px] lg:h-[76px]">
+            <div className="flex items-center">
               <Button
                 variant="ghost"
                 size="icon"
+                className="lg:hidden -ml-2 mr-1"
                 onClick={() => setMobileMenuOpen(true)}
-                aria-label="Open menu"
+                aria-label="Menu"
               >
                 <Menu className="w-5 h-5" />
               </Button>
+              <Logo />
             </div>
 
-            <Link href="/" className="flex items-center gap-2 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-              <span className="text-2xl lg:text-3xl font-serif font-semibold tracking-wide">
-                Lumière
-              </span>
-            </Link>
-
-            <nav className="hidden lg:flex items-center gap-8 flex-1">
-              <Link
-                href="/shop"
-                className="text-sm uppercase tracking-widest text-foreground/70 hover:text-gold transition-colors"
-              >
-                Shop
-              </Link>
-              <div
-                className="relative"
-                onMouseEnter={() => setCategoryOpen(true)}
-                onMouseLeave={() => setCategoryOpen(false)}
-              >
-                <button className="flex items-center gap-1 text-sm uppercase tracking-widest text-foreground/70 hover:text-gold transition-colors">
-                  Categories
-                  <ChevronDown className="w-3.5 h-3.5" />
-                </button>
-                {categoryOpen && (
-                  <div className="absolute top-full left-0 pt-2">
-                    <div className="bg-background border border-border shadow-lg rounded-lg py-2 min-w-[180px]">
-                      {categories.map((cat) => (
-                        <Link
-                          key={cat.slug}
-                          href={`/categories/${cat.slug}`}
-                          className="block px-4 py-2.5 text-sm hover:bg-muted hover:text-gold transition-colors"
-                        >
-                          {cat.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <Link
-                href="/about"
-                className="text-sm uppercase tracking-widest text-foreground/70 hover:text-gold transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/contact"
-                className="text-sm uppercase tracking-widest text-foreground/70 hover:text-gold transition-colors"
-              >
-                Contact
-              </Link>
+            <nav className="hidden lg:flex items-center justify-center gap-4 xl:gap-6">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href + link.label}
+                  href={link.href}
+                  className="text-[13px] text-[#333] hover:text-black whitespace-nowrap transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
 
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                aria-label="Toggle theme"
-                className="hidden sm:flex"
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
+            <div className="flex items-center justify-end gap-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
+                className="hover:bg-transparent"
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />
               </Button>
               <Link
-                href="/wishlist"
-                aria-label="Wishlist"
-                className="hidden sm:inline-flex items-center justify-center size-8 rounded-lg hover:bg-muted relative"
-              >
-                <Heart className="w-5 h-5" />
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-gold text-white text-[10px] rounded-full flex items-center justify-center">
-                    {wishlistCount}
-                  </span>
-                )}
-              </Link>
-              <Link
                 href="/account"
+                className="inline-flex items-center justify-center size-9 hover:bg-[#f0ebe3] rounded-full"
                 aria-label="Account"
-                className="hidden sm:inline-flex items-center justify-center size-8 rounded-lg hover:bg-muted"
               >
-                <User className="w-5 h-5" />
+                <User className="w-[18px] h-[18px]" strokeWidth={1.5} />
               </Link>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setCartOpen(true)}
-                aria-label="Shopping cart"
-                className="relative"
+                className="relative hover:bg-transparent"
+                aria-label="Cart"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.5} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-gold text-white text-xs font-medium rounded-full flex items-center justify-center">
-                    {totalItems > 9 ? "9+" : totalItems}
+                  <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#6d2135] text-white text-[8px] rounded-full flex items-center justify-center">
+                    {totalItems}
                   </span>
                 )}
               </Button>
@@ -165,49 +104,34 @@ export default function Header() {
       <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-80">
+        <SheetContent side="left" className="w-80 overflow-y-auto bg-[#faf7f2]">
           <SheetHeader>
             <SheetTitle className="font-serif text-2xl">Lumière</SheetTitle>
           </SheetHeader>
-          <nav className="flex flex-col gap-1 mt-8">
-            <Link
-              href="/shop"
-              className="py-3 text-sm uppercase tracking-widest hover:text-gold"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Shop All
-            </Link>
+          <nav className="flex flex-col gap-0 mt-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                className="py-3 text-sm border-b border-[#ece6dc] hover:text-[#6d2135]"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <p className="text-[10px] uppercase tracking-widest text-[#999] mt-4 mb-2">
+              Categories
+            </p>
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/categories/${cat.slug}`}
-                className="py-3 text-sm uppercase tracking-widest hover:text-gold"
+                className="py-2.5 text-sm text-[#555] hover:text-[#6d2135]"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {cat.name}
               </Link>
             ))}
-            <Link
-              href="/about"
-              className="py-3 text-sm uppercase tracking-widest hover:text-gold"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              className="py-3 text-sm uppercase tracking-widest hover:text-gold"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
-            <Link
-              href="/wishlist"
-              className="py-3 text-sm uppercase tracking-widest hover:text-gold"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Wishlist ({wishlistCount})
-            </Link>
           </nav>
         </SheetContent>
       </Sheet>

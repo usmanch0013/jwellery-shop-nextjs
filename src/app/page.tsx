@@ -1,124 +1,162 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import CategoryCard from "@/components/CategoryCard";
-import ProductGrid from "@/components/ProductGrid";
-import HeroSlider from "@/components/HeroSlider";
+import { Product } from "@/types";
+import ProductShowcase from "@/components/ProductShowcase";
+import ProductCard from "@/components/ProductCard";
+import QuickViewDialog from "@/components/QuickViewDialog";
 import TrustBar from "@/components/TrustBar";
 import Testimonials from "@/components/Testimonials";
-import Newsletter from "@/components/Newsletter";
-import { products } from "@/data/products";
+import StoreLocator from "@/components/StoreLocator";
+import BlogSection from "@/components/BlogSection";
+import FAQ from "@/components/FAQ";
+import CategoryCard from "@/components/CategoryCard";
+import { categories, products } from "@/data/products";
+import HeroSection from "@/components/HeroSection";
+import MarqueeBar from "@/components/MarqueeBar";
 
-const categoryImages = {
-  rings: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=800&fit=crop",
-  necklaces:
-    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop",
-  earrings:
-    "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=800&fit=crop",
-  bracelets:
-    "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=800&fit=crop",
-};
+export default function HomePage() {
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
+    null
+  );
 
-export default function Home() {
-  const featuredProducts = products
-    .filter((p) => p.isBestseller || p.isNew)
-    .slice(0, 8);
+  const necklaceProducts = products.filter(
+    (p) => p.category === "necklace-sets"
+  );
+  const earringProducts = products.filter((p) => p.category === "earrings");
+  const braceletProducts = products.filter((p) => p.category === "bracelet");
+  const bridalProducts = products.filter((p) => p.category === "bridal-sets");
+  const bestSelling = products.filter((p) => p.isBestseller);
+  const newArrivals = products.filter((p) => p.isNew);
+  const mostLoved = products.filter(
+    (p) => p.isBestseller || p.reviews > 20
+  );
 
   return (
     <>
-      <HeroSlider />
-      <TrustBar />
+      <HeroSection />
+      <MarqueeBar />
 
-      <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-gold uppercase tracking-[0.3em] text-sm mb-2">
-              Collections
-            </p>
-            <h2 className="text-3xl lg:text-4xl font-serif font-semibold">
-              Shop by Category
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <CategoryCard
-              slug="rings"
-              name="Rings"
-              description="Timeless bands & statement rings"
-              image={categoryImages.rings}
-            />
-            <CategoryCard
-              slug="necklaces"
-              name="Necklaces"
-              description="Elegant chains & pendants"
-              image={categoryImages.necklaces}
-            />
-            <CategoryCard
-              slug="earrings"
-              name="Earrings"
-              description="Studs, hoops & drops"
-              image={categoryImages.earrings}
-            />
-            <CategoryCard
-              slug="bracelets"
-              name="Bracelets"
-              description="Delicate cuffs & bangles"
-              image={categoryImages.bracelets}
-            />
-          </div>
-        </div>
-      </section>
-
-      <ProductGrid
-        products={featuredProducts}
-        subtitle="Curated for You"
-        title="Featured Pieces"
+      <ProductShowcase
+        title="Necklace Sets"
+        products={necklaceProducts}
+        categorySlug="necklace-sets"
+        categoryCount={445}
+        onQuickView={setQuickViewProduct}
+      />
+      <ProductShowcase
+        title="Earrings"
+        products={earringProducts}
+        categorySlug="earrings"
+        categoryCount={345}
+        onQuickView={setQuickViewProduct}
       />
 
-      <section className="py-16 lg:py-24 bg-charcoal text-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <p className="text-gold uppercase tracking-[0.3em] text-sm mb-4">
-                Our Heritage
-              </p>
-              <h2 className="text-3xl lg:text-4xl font-serif font-semibold mb-6">
-                70+ Years of Golden Craftsmanship
-              </h2>
-              <p className="text-cream/70 leading-relaxed mb-8">
-                Since 1954, Lumière has been creating exceptional jewelry that
-                celebrates life&apos;s most meaningful moments. Each piece is
-                handcrafted by master artisans using ethically sourced
-                materials.
-              </p>
-              <Link
-                href="/about"
-                className="inline-flex items-center justify-center bg-gold hover:bg-gold-dark text-white h-9 px-4 rounded-lg text-sm font-medium uppercase tracking-widest"
-              >
-                Discover Our Story
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { number: "70+", label: "Years of Excellence" },
-                { number: "50K+", label: "Happy Customers" },
-                { number: "100%", label: "Ethically Sourced" },
-                { number: "24/7", label: "Expert Support" },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="p-6 border border-cream/10 text-center"
-                >
-                  <p className="text-3xl font-serif text-gold mb-1">
-                    {stat.number}
-                  </p>
-                  <p className="text-cream/60 text-sm">{stat.label}</p>
-                </div>
-              ))}
-            </div>
+      <section className="py-8 lg:py-12 bg-[#faf7f2]">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-[#2a2a2a]">
+            Our Most Loved Products
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+            {mostLoved.slice(0, 4).map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onQuickView={setQuickViewProduct}
+              />
+            ))}
           </div>
         </div>
       </section>
 
-      <Testimonials />
-      <Newsletter />
+      <ProductShowcase
+        title="Best selling products"
+        products={bestSelling}
+        onQuickView={setQuickViewProduct}
+      />
+      <ProductShowcase
+        title="Bracelet"
+        products={braceletProducts}
+        categorySlug="bracelet"
+        categoryCount={292}
+        onQuickView={setQuickViewProduct}
+      />
+      <ProductShowcase
+        title="Bridal Jewellery Sets"
+        products={bridalProducts}
+        categorySlug="bridal-sets"
+        categoryCount={167}
+        onQuickView={setQuickViewProduct}
+      />
+      <ProductShowcase
+        title="What's New"
+        products={newArrivals}
+        categorySlug="earrings"
+        categoryCount={370}
+        onQuickView={setQuickViewProduct}
+      />
+
+      <section className="py-14 bg-[#faf7f2]">
+        <div className="max-w-[800px] mx-auto px-4 text-center">
+          <h2 className="font-serif text-2xl lg:text-3xl mb-4 text-[#2a2a2a]">
+            Artificial Jewellery in Pakistan
+          </h2>
+          <p className="text-sm text-[#666] leading-relaxed">
+            We as the growing and customer&apos;s favourite Artificial Jewellery
+            Brand in Pakistan have a huge collection of precious jewels made from
+            highest grade of materials and attention to detail.
+          </p>
+        </div>
+      </section>
+
+      <section className="py-6">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Link
+              href="/shop?max=1000"
+              className="relative aspect-[2.5/1] bg-[#c4a35a] flex items-center justify-center overflow-hidden group"
+            >
+              <h3 className="font-serif text-3xl lg:text-4xl text-white uppercase tracking-wider">
+                Under 1000
+              </h3>
+            </Link>
+            <Link
+              href="/shop?max=2000"
+              className="relative aspect-[2.5/1] bg-[#b8944d] flex items-center justify-center overflow-hidden group"
+            >
+              <h3 className="font-serif text-3xl lg:text-4xl text-white uppercase tracking-wider">
+                Under 2000
+              </h3>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12 bg-[#faf7f2]">
+        <div className="max-w-[1400px] mx-auto px-4">
+          <h2 className="font-serif text-2xl text-center mb-8">Our Collections</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {categories.slice(0, 6).map((cat) => (
+              <CategoryCard key={cat.slug} category={cat} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div id="reviews">
+        <Testimonials />
+      </div>
+      <StoreLocator />
+      <BlogSection />
+      <TrustBar />
+      <FAQ />
+
+      <QuickViewDialog
+        product={quickViewProduct}
+        open={!!quickViewProduct}
+        onOpenChange={(open) => !open && setQuickViewProduct(null)}
+      />
     </>
   );
 }

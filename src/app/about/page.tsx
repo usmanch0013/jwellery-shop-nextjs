@@ -1,7 +1,5 @@
 import Image from "next/image";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import Newsletter from "@/components/Newsletter";
-
 export default function AboutPage() {
   return (
     <div className="py-12 lg:py-16">
@@ -62,7 +60,6 @@ export default function AboutPage() {
           ))}
         </div>
       </div>
-      <Newsletter />
     </div>
   );
 }

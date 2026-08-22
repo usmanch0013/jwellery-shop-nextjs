@@ -35,7 +35,7 @@ export default function CartPage() {
     );
   }
 
-  const shipping = totalPrice >= 500 ? 0 : 15;
+  const shipping = totalPrice >= 5000 ? 0 : 200;
 
   return (
     <div className="py-12 lg:py-16">
@@ -143,9 +143,9 @@ export default function CartPage() {
                     </span>
                   </div>
                 </div>
-                {totalPrice < 500 && (
+                {totalPrice < 5000 && (
                   <p className="text-muted-foreground text-xs">
-                    Add {formatPrice(500 - totalPrice)} more for free shipping
+                    Add {formatPrice(5000 - totalPrice)} more for free shipping
                   </p>
                 )}
                 <Button className="w-full bg-gold hover:bg-gold-dark text-white h-12 uppercase tracking-wider">

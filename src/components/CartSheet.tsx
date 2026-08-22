@@ -108,13 +108,13 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
-                  <span>{totalPrice >= 500 ? "Free" : formatPrice(15)}</span>
+                  <span>{totalPrice >= 5000 ? "Free" : "Rs. 200"}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between font-medium">
                   <span>Total</span>
-                  <span className="text-gold">
-                    {formatPrice(totalPrice + (totalPrice >= 500 ? 0 : 15))}
+                  <span>
+                    {formatPrice(totalPrice + (totalPrice >= 5000 ? 0 : 200))}
                   </span>
                 </div>
               </div>
