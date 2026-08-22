@@ -36,7 +36,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${cormorant.variable} ${greatVibes.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#fcfaf5] text-[#1a1a1a] font-sans">
+      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         <CartProvider>
           <WishlistProvider>
             <Header />

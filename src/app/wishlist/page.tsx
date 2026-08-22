@@ -26,7 +26,7 @@ export default function WishlistPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex items-center justify-center bg-gold hover:bg-gold-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
+          className="inline-flex items-center justify-center bg-primary hover:bg-emerald-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
         >
           Explore Collection
         </Link>
@@ -69,7 +69,7 @@ export default function WishlistPage() {
               <p className="font-medium mb-3">{formatPrice(product.price)}</p>
               <Button
                 size="sm"
-                className="w-full bg-gold hover:bg-gold-dark text-white"
+                className="w-full bg-primary hover:bg-emerald-dark text-white"
                 onClick={() => {
                   addToCart(product);
                   toast.success("Added to cart");

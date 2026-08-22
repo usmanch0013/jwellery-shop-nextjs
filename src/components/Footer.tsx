@@ -3,12 +3,12 @@ import { categories } from "@/data/products";
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-[#eee] mt-auto">
+    <footer className="bg-background border-t border-border mt-auto">
       <div className="max-w-[1400px] mx-auto px-4 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <h3 className="text-lg font-semibold mb-4">Lumière.pk</h3>
-            <p className="text-sm text-[#666] leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               Pakistan&apos;s award winning artificial jewellery brand. Premium
               quality pieces for every occasion since 2009.
             </p>
@@ -30,7 +30,7 @@ export default function Footer() {
                 <li key={item}>
                   <Link
                     href="#"
-                    className="text-sm text-[#666] hover:text-black transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {item}
                   </Link>
@@ -48,7 +48,7 @@ export default function Footer() {
                 <li key={cat.slug}>
                   <Link
                     href={`/categories/${cat.slug}`}
-                    className="text-sm text-[#666] hover:text-black transition-colors uppercase"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors uppercase"
                   >
                     {cat.name}
                   </Link>
@@ -72,7 +72,7 @@ export default function Footer() {
                 <li key={item}>
                   <a
                     href="#"
-                    className="text-sm text-[#666] hover:text-black transition-colors"
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
                     {item}
                   </a>
@@ -82,18 +82,18 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-[#eee] mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-[#999]">
+        <div className="border-t border-border mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Lumière.pk. All rights reserved.
           </p>
-          <div className="flex gap-4 text-xs text-[#999]">
-            <Link href="#" className="hover:text-black">
+          <div className="flex gap-4 text-xs text-muted-foreground">
+            <Link href="#" className="hover:text-primary">
               Terms of Service
             </Link>
-            <Link href="#" className="hover:text-black">
+            <Link href="#" className="hover:text-primary">
               Refund Policy
             </Link>
-            <Link href="#" className="hover:text-black">
+            <Link href="#" className="hover:text-primary">
               Privacy Policy
             </Link>
           </div>

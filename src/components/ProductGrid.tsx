@@ -13,10 +13,10 @@ export default function ProductGrid({
   onQuickView,
 }: ProductGridProps) {
   return (
-    <section className="py-8 bg-[#faf7f2]">
+    <section className="py-8 bg-background">
       <div className="max-w-[1400px] mx-auto px-4">
         {title && (
-          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-[#2a2a2a] capitalize">
+          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-foreground capitalize">
             {title}
           </h2>
         )}

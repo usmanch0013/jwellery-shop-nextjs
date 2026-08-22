@@ -26,7 +26,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex items-center justify-center bg-gold hover:bg-gold-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
+          className="inline-flex items-center justify-center bg-primary hover:bg-emerald-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
         >
           Continue Shopping
           <ArrowRight className="w-4 h-4 ml-2" />
@@ -63,7 +63,7 @@ export default function CartPage() {
                       <div>
                         <Link
                           href={`/products/${item.product.id}`}
-                          className="font-serif text-lg hover:text-gold transition-colors"
+                          className="font-serif text-lg hover:text-primary transition-colors"
                         >
                           {item.product.name}
                         </Link>
@@ -148,7 +148,7 @@ export default function CartPage() {
                     Add {formatPrice(5000 - totalPrice)} more for free shipping
                   </p>
                 )}
-                <Button className="w-full bg-gold hover:bg-gold-dark text-white h-12 uppercase tracking-wider">
+                <Button className="w-full bg-primary hover:bg-emerald-dark text-white h-12 uppercase tracking-wider">
                   Proceed to Checkout
                 </Button>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">

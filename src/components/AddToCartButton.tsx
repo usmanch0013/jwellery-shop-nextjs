@@ -29,7 +29,7 @@ export default function AddToCartButton({
     <button
       onClick={handleAdd}
       disabled={added || product.soldOut}
-      className={`flex items-center justify-center gap-2 w-full bg-[#6d2135] text-white text-sm py-3.5 hover:bg-[#5a1b2c] transition-colors disabled:opacity-70 ${className}`}
+      className={`flex items-center justify-center gap-2 w-full bg-primary text-white text-sm py-3.5 hover:bg-emerald-dark transition-colors disabled:opacity-70 ${className}`}
     >
       <Plus className="w-4 h-4" />
       {added ? "Added to Cart" : "Add to Cart"}

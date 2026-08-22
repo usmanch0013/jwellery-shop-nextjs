@@ -105,7 +105,7 @@ export default function ContactPage() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-gold hover:bg-gold-dark text-white h-11 uppercase tracking-wider"
+              className="w-full bg-primary hover:bg-emerald-dark text-white h-11 uppercase tracking-wider"
             >
               Send Message
             </Button>

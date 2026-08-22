@@ -15,7 +15,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
     <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
       <Link
         href="/"
-        className="hover:text-gold transition-colors flex items-center gap-1"
+        className="hover:text-primary transition-colors flex items-center gap-1"
       >
         <Home className="w-3.5 h-3.5" />
       </Link>
@@ -23,7 +23,7 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
         <span key={index} className="flex items-center gap-2">
           <ChevronRight className="w-3.5 h-3.5" />
           {item.href ? (
-            <Link href={item.href} className="hover:text-gold transition-colors">
+            <Link href={item.href} className="hover:text-primary transition-colors">
               {item.label}
             </Link>
           ) : (

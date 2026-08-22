@@ -33,7 +33,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         setActiveImage(product.image);
       }}
     >
-      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#ece6dc] mb-3">
+      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted mb-3">
         <Link href={`/products/${product.id}`} className="block absolute inset-0">
           <Image
             src={product.image}
@@ -68,14 +68,14 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           </span>
         )}
 
-        {/* Quick view button - maroon like Zeesy */}
+        {/* Quick view button */}
         {onQuickView && !product.soldOut && (
           <button
             onClick={(e) => {
               e.preventDefault();
               onQuickView(product);
             }}
-            className={`absolute bottom-0 left-0 right-0 bg-[#6d2135] text-white text-sm py-3.5 transition-all duration-300 ${
+            className={`absolute bottom-0 left-0 right-0 bg-primary text-white text-sm py-3.5 transition-all duration-300 ${
               isHovered
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-full"
@@ -115,12 +115,12 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       </div>
 
       <Link href={`/products/${product.id}`} className="block px-1">
-        <h3 className="text-[15px] text-[#1a1a1a] leading-snug mb-2 font-normal hover:underline">
+        <h3 className="text-[15px] text-foreground leading-snug mb-2 font-normal hover:underline">
           {product.name}
         </h3>
         <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
         <div className="flex items-center gap-2 mt-2">
-          <p className="text-[15px] font-medium text-[#1a1a1a]">
+          <p className="text-[15px] font-medium text-foreground">
             {formatPrice(product.price)}
           </p>
           <span className="inline-flex items-center gap-1 text-[10px] text-[#888] border border-[#ddd] rounded px-1.5 py-0.5">

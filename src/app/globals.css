@@ -5,24 +5,45 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --cream: #faf7f2;
-  --maroon: #6d2135;
-  --gold: #c9a962;
-  --background: #faf7f2;
-  --foreground: #1a1a1a;
-  --primary: #6d2135;
+  /* Brand palette */
+  --emerald: #0b3d35;
+  --emerald-dark: #092f29;
+  --champagne: #c9a96e;
+  --champagne-dark: #b89858;
+  --ivory: #f7f3ea;
+  --charcoal: #202321;
+  --rose: #c98f96;
+  --sage: #a8b9a6;
+
+  /* Semantic tokens */
+  --background: var(--ivory);
+  --foreground: var(--charcoal);
+  --primary: var(--emerald);
   --primary-foreground: #ffffff;
-  --secondary: #f0ebe3;
-  --muted: #f6f4f2;
-  --muted-foreground: #666666;
-  --border: #ece6dc;
+  --secondary: var(--champagne);
+  --secondary-foreground: var(--charcoal);
+  --accent: var(--rose);
+  --accent-foreground: var(--charcoal);
+  --muted: #efe9de;
+  --muted-foreground: #5a5e5c;
+  --border: #e5dfd3;
+  --popover: var(--ivory);
+  --popover-foreground: var(--charcoal);
   --radius: 0px;
 }
 
 @theme inline {
-  --color-cream: var(--cream);
-  --color-maroon: var(--maroon);
-  --color-gold: var(--gold);
+  --color-emerald: var(--emerald);
+  --color-emerald-dark: var(--emerald-dark);
+  --color-champagne: var(--champagne);
+  --color-champagne-dark: var(--champagne-dark);
+  --color-ivory: var(--ivory);
+  --color-charcoal: var(--charcoal);
+  --color-rose: var(--rose);
+  --color-sage: var(--sage);
+  --color-gold: var(--champagne);
+  --color-gold-dark: var(--champagne-dark);
+  --color-rose-gold: var(--rose);
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
   --font-script: var(--font-script), cursive;
@@ -31,9 +52,14 @@
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --animate-marquee: marquee 30s linear infinite;
 }
 
@@ -47,8 +73,8 @@
 }
 
 body {
-  background: #fcfaf5;
-  color: #1a1a1a;
+  background: var(--ivory);
+  color: var(--charcoal);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 

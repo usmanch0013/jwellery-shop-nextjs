@@ -79,7 +79,7 @@ const socials = [
 
 export default function TopBar() {
   return (
-    <div className="bg-[#1a1a1a] text-white relative">
+    <div className="bg-primary text-white relative">
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8 flex items-center justify-between h-[38px]">
         <div className="flex items-center gap-3.5">
           {socials.map(({ icon: Icon, label }) => (

@@ -7,7 +7,7 @@ const HERO_IMAGE =
 
 export default function HeroSection() {
   return (
-    <section className="bg-[#fcfaf5] px-4 lg:px-8 pt-1 pb-3">
+    <section className="bg-background px-4 lg:px-8 pt-1 pb-3">
       <div className="max-w-[1400px] mx-auto">
         <div className="relative w-full h-[380px] sm:h-[440px] lg:h-[500px] rounded-[18px] lg:rounded-[22px] overflow-hidden">
           <Image
@@ -27,7 +27,7 @@ export default function HeroSection() {
             <h1 className="font-serif text-[28px] sm:text-[36px] lg:text-[44px] xl:text-[50px] text-white leading-[1.15] font-normal">
               Jewels That Celebrate
             </h1>
-            <p className="font-script text-[36px] sm:text-[48px] lg:text-[58px] xl:text-[64px] text-[#d4a843] leading-[0.95] -mt-1 ml-0">
+            <p className="font-script text-[36px] sm:text-[48px] lg:text-[58px] xl:text-[64px] text-champagne leading-[0.95] -mt-1 ml-0">
               Togetherness.
             </p>
           </div>

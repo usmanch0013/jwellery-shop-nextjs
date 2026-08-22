@@ -32,7 +32,7 @@ export default function ShopContent() {
 
   return (
     <>
-      <div className="py-10 bg-[#faf7f2]">
+      <div className="py-10 bg-background">
         <div className="max-w-[1400px] mx-auto px-4">
           <Breadcrumbs items={[{ label: "Shop" }]} />
           <h1 className="font-serif text-2xl lg:text-3xl text-center mb-8 capitalize">
@@ -44,8 +44,8 @@ export default function ShopContent() {
               onClick={() => setActiveCategory("all")}
               className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                 activeCategory === "all"
-                  ? "bg-[#6d2135] text-white border-[#6d2135]"
-                  : "border-[#ddd] text-[#555] hover:border-[#6d2135]"
+                  ? "bg-primary text-white border-primary"
+                  : "border-[#ddd] text-[#555] hover:border-primary"
               }`}
             >
               All
@@ -56,8 +56,8 @@ export default function ShopContent() {
                 onClick={() => setActiveCategory(cat.slug)}
                 className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                   activeCategory === cat.slug
-                    ? "bg-[#6d2135] text-white border-[#6d2135]"
-                    : "border-[#ddd] text-[#555] hover:border-[#6d2135]"
+                    ? "bg-primary text-white border-primary"
+                    : "border-[#ddd] text-[#555] hover:border-primary"
                 }`}
               >
                 {cat.name}

@@ -9,7 +9,7 @@ interface CategoryCardProps {
 export default function CategoryCard({ category }: CategoryCardProps) {
   return (
     <Link href={`/categories/${category.slug}`} className="group block">
-      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-[#ece6dc]">
+      <div className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-muted">
         <Image
           src={category.image}
           alt={category.name}

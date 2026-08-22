@@ -53,9 +53,9 @@ export default function HomePage() {
         onQuickView={setQuickViewProduct}
       />
 
-      <section className="py-8 lg:py-12 bg-[#faf7f2]">
+      <section className="py-8 lg:py-12 bg-background">
         <div className="max-w-[1400px] mx-auto px-4">
-          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-[#2a2a2a]">
+          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-foreground">
             Our Most Loved Products
           </h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
@@ -97,12 +97,12 @@ export default function HomePage() {
         onQuickView={setQuickViewProduct}
       />
 
-      <section className="py-14 bg-[#faf7f2]">
+      <section className="py-14 bg-background">
         <div className="max-w-[800px] mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl lg:text-3xl mb-4 text-[#2a2a2a]">
+          <h2 className="font-serif text-2xl lg:text-3xl mb-4 text-foreground">
             Artificial Jewellery in Pakistan
           </h2>
-          <p className="text-sm text-[#666] leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed">
             We as the growing and customer&apos;s favourite Artificial Jewellery
             Brand in Pakistan have a huge collection of precious jewels made from
             highest grade of materials and attention to detail.
@@ -115,7 +115,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-4">
             <Link
               href="/shop?max=1000"
-              className="relative aspect-[2.5/1] bg-[#c4a35a] flex items-center justify-center overflow-hidden group"
+              className="relative aspect-[2.5/1] bg-champagne flex items-center justify-center overflow-hidden group"
             >
               <h3 className="font-serif text-3xl lg:text-4xl text-white uppercase tracking-wider">
                 Under 1000
@@ -123,7 +123,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/shop?max=2000"
-              className="relative aspect-[2.5/1] bg-[#b8944d] flex items-center justify-center overflow-hidden group"
+              className="relative aspect-[2.5/1] bg-primary flex items-center justify-center overflow-hidden group"
             >
               <h3 className="font-serif text-3xl lg:text-4xl text-white uppercase tracking-wider">
                 Under 2000
@@ -133,7 +133,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="py-12 bg-[#faf7f2]">
+      <section className="py-12 bg-background">
         <div className="max-w-[1400px] mx-auto px-4">
           <h2 className="font-serif text-2xl text-center mb-8">Our Collections</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">

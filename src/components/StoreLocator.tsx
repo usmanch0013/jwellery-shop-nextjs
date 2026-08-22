@@ -3,25 +3,25 @@ import { MapPin } from "lucide-react";
 
 export default function StoreLocator() {
   return (
-    <section className="py-14 lg:py-20 bg-white">
+    <section className="py-14 lg:py-20 bg-background">
       <div className="max-w-[1400px] mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stores.map((store) => (
             <div
               key={store.name}
-              className="border border-[#eee] p-6 hover:border-[#ccc] transition-colors"
+              className="border border-border p-6 hover:border-sage transition-colors"
             >
-              <div className="w-10 h-10 rounded-full bg-[#f6f4f2] flex items-center justify-center mb-4">
-                <MapPin className="w-5 h-5 text-[#a2937c]" />
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-4">
+                <MapPin className="w-5 h-5 text-champagne" />
               </div>
               <h3 className="font-medium mb-2">{store.name}</h3>
-              <p className="text-sm text-[#666] mb-3">{store.address}</p>
-              <p className="text-xs text-[#999] mb-4">
+              <p className="text-sm text-muted-foreground mb-3">{store.address}</p>
+              <p className="text-xs text-muted-foreground mb-4">
                 <strong>Timings:</strong> {store.timings}
               </p>
               <a
                 href="#"
-                className="text-xs uppercase tracking-wider text-[#a2937c] hover:underline"
+                className="text-xs uppercase tracking-wider text-champagne hover:underline"
               >
                 Get Direction →
               </a>

@@ -21,7 +21,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryProducts = getProductsByCategory(slug);
 
   return (
-    <div className="py-10 bg-[#faf7f2]">
+    <div className="py-10 bg-background">
       <div className="max-w-[1400px] mx-auto px-4">
         <Breadcrumbs
           items={[{ label: "Shop", href: "/shop" }, { label: category.name }]}
@@ -29,7 +29,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <h1 className="font-serif text-2xl lg:text-3xl text-center mb-2 capitalize">
           {category.name}
         </h1>
-        <p className="text-sm text-[#999] text-center mb-2">
+        <p className="text-sm text-muted-foreground text-center mb-2">
           {category.productCount} products
         </p>
       </div>

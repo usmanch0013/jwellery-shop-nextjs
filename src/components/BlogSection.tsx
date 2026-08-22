@@ -15,7 +15,7 @@ export default function BlogSection() {
               href="#"
               className="group"
             >
-              <div className="relative aspect-[3/2] bg-[#f6f4f2] overflow-hidden mb-4">
+              <div className="relative aspect-[3/2] bg-muted overflow-hidden mb-4">
                 <Image
                   src={post.image}
                   alt={post.title}
@@ -26,10 +26,10 @@ export default function BlogSection() {
               <h3 className="text-sm font-medium mb-2 group-hover:underline leading-snug">
                 {post.title}
               </h3>
-              <p className="text-xs text-[#666] mb-3 line-clamp-2">
+              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
                 {post.excerpt}
               </p>
-              <span className="text-xs text-[#999] flex items-center gap-1 group-hover:text-black transition-colors">
+              <span className="text-xs text-muted-foreground flex items-center gap-1 group-hover:text-primary transition-colors">
                 Read more <ArrowRight className="w-3 h-3" />
               </span>
             </Link>

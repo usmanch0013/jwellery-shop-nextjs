@@ -43,7 +43,7 @@ export default function QuickViewDialog({
           <DialogTitle>{product.name}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2">
-          <div className="relative aspect-square bg-[#ece6dc]">
+          <div className="relative aspect-square bg-muted">
             <Image
               src={product.image}
               alt={product.name}
@@ -51,18 +51,18 @@ export default function QuickViewDialog({
               className="object-cover"
             />
           </div>
-          <div className="p-6 lg:p-8 flex flex-col justify-center bg-[#faf7f2]">
-            <p className="text-[10px] text-[#999] uppercase tracking-widest mb-2">
+          <div className="p-6 lg:p-8 flex flex-col justify-center bg-background">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-2">
               {product.category.replace("-", " ")}
             </p>
-            <h2 className="font-serif text-xl lg:text-2xl mb-3 text-[#2a2a2a]">
+            <h2 className="font-serif text-xl lg:text-2xl mb-3 text-foreground">
               {product.name}
             </h2>
             <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
             <p className="text-xl font-medium mt-4 mb-4">
               {formatPrice(product.price)}
             </p>
-            <p className="text-sm text-[#666] mb-6 line-clamp-4 leading-relaxed">
+            <p className="text-sm text-muted-foreground mb-6 line-clamp-4 leading-relaxed">
               {product.description}
             </p>
             {product.soldOut ? (
@@ -72,7 +72,7 @@ export default function QuickViewDialog({
             ) : (
               <button
                 onClick={handleAdd}
-                className="flex items-center justify-center gap-2 bg-[#6d2135] text-white text-sm py-3.5 hover:bg-[#5a1b2c] transition-colors"
+                className="flex items-center justify-center gap-2 bg-primary text-white text-sm py-3.5 hover:bg-emerald-dark transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Add to cart
@@ -81,7 +81,7 @@ export default function QuickViewDialog({
             <Link
               href={`/products/${product.id}`}
               onClick={() => onOpenChange(false)}
-              className="text-center text-sm text-[#666] mt-4 hover:text-[#6d2135] underline"
+              className="text-center text-sm text-muted-foreground mt-4 hover:text-primary underline"
             >
               View full details
             </Link>

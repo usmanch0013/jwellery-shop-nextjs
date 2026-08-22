@@ -10,7 +10,7 @@ export default function StarRating({ rating = 5, reviews }: StarRatingProps) {
         {Array.from({ length: 5 }).map((_, i) => (
           <svg
             key={i}
-            className={`w-3.5 h-3.5 ${i < rating ? "text-[#e8a317]" : "text-[#ddd]"}`}
+            className={`w-3.5 h-3.5 ${i < rating ? "text-champagne" : "text-[#ddd]"}`}
             fill="currentColor"
             viewBox="0 0 20 20"
           >

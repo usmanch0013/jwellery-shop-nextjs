@@ -36,7 +36,7 @@ export default function Header() {
   return (
     <>
       <TopBar />
-      <header className="sticky top-0 z-50 bg-[#fcfaf5]">
+      <header className="sticky top-0 z-50 bg-background">
         <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
           <div className="grid grid-cols-[140px_1fr_120px] items-center h-[70px] lg:h-[76px]">
             <div className="flex items-center">
@@ -57,7 +57,7 @@ export default function Header() {
                 <Link
                   key={link.href + link.label}
                   href={link.href}
-                  className="text-[13px] text-[#333] hover:text-black whitespace-nowrap transition-colors"
+                  className="text-[13px] text-foreground/80 hover:text-primary whitespace-nowrap transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -76,7 +76,7 @@ export default function Header() {
               </Button>
               <Link
                 href="/account"
-                className="inline-flex items-center justify-center size-9 hover:bg-[#f0ebe3] rounded-full"
+                className="inline-flex items-center justify-center size-9 hover:bg-muted rounded-full"
                 aria-label="Account"
               >
                 <User className="w-[18px] h-[18px]" strokeWidth={1.5} />
@@ -90,7 +90,7 @@ export default function Header() {
               >
                 <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.5} />
                 {totalItems > 0 && (
-                  <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#6d2135] text-white text-[8px] rounded-full flex items-center justify-center">
+                  <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] rounded-full flex items-center justify-center">
                     {totalItems}
                   </span>
                 )}
@@ -104,7 +104,7 @@ export default function Header() {
       <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-80 overflow-y-auto bg-[#faf7f2]">
+        <SheetContent side="left" className="w-80 overflow-y-auto bg-background">
           <SheetHeader>
             <SheetTitle className="font-serif text-2xl">Lumière</SheetTitle>
           </SheetHeader>
@@ -113,20 +113,20 @@ export default function Header() {
               <Link
                 key={link.href + link.label}
                 href={link.href}
-                className="py-3 text-sm border-b border-[#ece6dc] hover:text-[#6d2135]"
+                className="py-3 text-sm border-b border-border hover:text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <p className="text-[10px] uppercase tracking-widest text-[#999] mt-4 mb-2">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 mb-2">
               Categories
             </p>
             {categories.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/categories/${cat.slug}`}
-                className="py-2.5 text-sm text-[#555] hover:text-[#6d2135]"
+                className="py-2.5 text-sm text-[#555] hover:text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {cat.name}

@@ -8,9 +8,9 @@ import "swiper/css";
 
 export default function Testimonials() {
   return (
-    <section className="py-14 lg:py-20 bg-[#f9f9f9] overflow-hidden">
+    <section className="py-14 lg:py-20 bg-muted/60 overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-center text-[#999] mb-2">
+        <p className="text-xs uppercase tracking-[0.3em] text-center text-muted-foreground mb-2">
           Testimonials
         </p>
         <h2 className="text-2xl font-medium text-center mb-10">
@@ -30,8 +30,8 @@ export default function Testimonials() {
         >
           {testimonials.map((t) => (
             <SwiperSlide key={t.id}>
-              <div className="bg-white p-6 border border-[#eee] h-full">
-                <p className="text-sm text-[#555] leading-relaxed mb-6">
+              <div className="bg-background p-6 border border-border h-full">
+                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
                   &ldquo;{t.content}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
