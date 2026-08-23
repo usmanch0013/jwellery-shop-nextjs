@@ -10,46 +10,62 @@ export const heroSlides = [
   },
 ];
 
+export const videoFeatures = [
+  { title: "Jewellery Exchanges", icon: "exchange" as const },
+  { title: "The Purity Guarantee", icon: "scale" as const },
+  { title: "Complete Transparent", icon: "diamond" as const },
+  { title: "Lifetime Maintenance", icon: "maintenance" as const },
+];
+
 export const testimonials = [
   {
     id: "1",
-    name: "Maya Ali",
+    name: "Kavya Shah",
+    role: "Working Professional",
     content:
-      "I received so many compliments—Lumière really knows how to make a piece stand out.",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
+      "Absolutely loved the quality and design! The jewellery looks even more stunning in real life. I've received so many compliments. Premium quality at a great price. I keep coming back for more because the collection is always fresh and stylish.!",
+    image: "/testimonial-author-1.jpg",
+    rating: 5,
   },
   {
     id: "2",
     name: "Laiba Khan",
+    role: "Fashion Influencer",
     content:
-      "The quality and finishing genuinely impressed me. I wore Lumière for a special occasion, and it added the perfect finishing touch to my look.",
+      "The quality and finishing genuinely impressed me. I wore Lumière for a special occasion, and it added the perfect finishing touch to my look. Premium quality at a great price.",
     image:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
+    rating: 5,
   },
   {
     id: "3",
     name: "Rabeeca Khan",
+    role: "Working Professional",
     content:
-      "Lumière has such beautiful pieces—I can wear them casually or dress them up for an event.",
+      "Lumière has such beautiful pieces—I can wear them casually or dress them up for an event. I keep coming back for more because the collection is always fresh and stylish!",
     image:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
+    rating: 5,
   },
   {
     id: "4",
     name: "Sanam Jung",
+    role: "Television Host",
     content:
-      "A breath of fresh air in artificial jewellery! Lumière stands out with its trendy styles.",
+      "A breath of fresh air in artificial jewellery! Lumière stands out with its trendy styles. Every piece feels thoughtfully crafted and perfect for Pakistani celebrations.",
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
+    rating: 5,
   },
   {
     id: "5",
     name: "Nida Yasir",
+    role: "Morning Show Host",
     content:
-      "Love Lumière's unique designs and high-quality pieces at an affordable price!",
+      "Love Lumière's unique designs and high-quality pieces at an affordable price! The bridal sets are especially gorgeous—my go-to brand for artificial jewellery in Pakistan.",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
+    rating: 5,
   },
 ];
 

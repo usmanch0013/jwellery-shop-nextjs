@@ -1,11 +1,15 @@
 import Link from "next/link";
 
-export default function Logo() {
+interface LogoProps {
+  light?: boolean;
+}
+
+export default function Logo({ light = false }: LogoProps) {
   return (
-    <Link href="/" className="flex flex-col items-center leading-none group min-w-[90px]">
+    <Link href="/" className="flex flex-col items-center leading-none group min-w-[84px]">
       <svg
-        width="40"
-        height="32"
+        width="34"
+        height="28"
         viewBox="0 0 40 32"
         fill="none"
         className="mb-0.5"
@@ -24,10 +28,18 @@ export default function Logo() {
           fill="#E8D5A8"
         />
       </svg>
-      <span className="text-[17px] font-bold text-foreground tracking-tight lowercase">
+      <span
+        className={`text-[15px] font-bold tracking-tight lowercase ${
+          light ? "text-white" : "text-foreground"
+        }`}
+      >
         lumière
       </span>
-      <span className="text-[7px] tracking-[0.4em] text-muted-foreground uppercase mt-1 font-medium">
+      <span
+        className={`text-[6px] tracking-[0.38em] uppercase mt-0.5 font-medium ${
+          light ? "text-white/70" : "text-muted-foreground"
+        }`}
+      >
         Jewellery
       </span>
     </Link>

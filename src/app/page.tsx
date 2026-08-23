@@ -7,14 +7,14 @@ import ProductShowcase from "@/components/ProductShowcase";
 import ProductCard from "@/components/ProductCard";
 import QuickViewDialog from "@/components/QuickViewDialog";
 import TrustBar from "@/components/TrustBar";
+import VideoSection from "@/components/VideoSection";
 import Testimonials from "@/components/Testimonials";
 import StoreLocator from "@/components/StoreLocator";
 import BlogSection from "@/components/BlogSection";
 import FAQ from "@/components/FAQ";
 import CategoryCard from "@/components/CategoryCard";
 import { categories, products } from "@/data/products";
-import HeroSection from "@/components/HeroSection";
-import MarqueeBar from "@/components/MarqueeBar";
+import HeroSection from "@/components/hero/HeroSection";
 
 export default function HomePage() {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
@@ -36,7 +36,6 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <MarqueeBar />
 
       <ProductShowcase
         title="Necklace Sets"
@@ -58,7 +57,7 @@ export default function HomePage() {
           <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-foreground">
             Our Most Loved Products
           </h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 lg:gap-2">
             {mostLoved.slice(0, 4).map((product) => (
               <ProductCard
                 key={product.id}
@@ -69,6 +68,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <VideoSection />
 
       <ProductShowcase
         title="Best selling products"
@@ -136,7 +137,7 @@ export default function HomePage() {
       <section className="py-12 bg-background">
         <div className="max-w-[1400px] mx-auto px-4">
           <h2 className="font-serif text-2xl text-center mb-8">Our Collections</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-1.5 lg:gap-2">
             {categories.slice(0, 6).map((cat) => (
               <CategoryCard key={cat.slug} category={cat} />
             ))}

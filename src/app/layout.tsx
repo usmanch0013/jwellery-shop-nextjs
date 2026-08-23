@@ -34,13 +34,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${cormorant.variable} ${greatVibes.variable} h-full antialiased`}
+      className={`${inter.variable} ${cormorant.variable} ${greatVibes.variable} h-full w-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+      <body className="min-h-full w-full flex flex-col bg-background text-foreground font-sans">
         <CartProvider>
           <WishlistProvider>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 w-full">{children}</main>
             <Footer />
             <Toaster position="bottom-right" />
           </WishlistProvider>

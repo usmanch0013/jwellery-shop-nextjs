@@ -77,10 +77,14 @@ const socials = [
   { icon: IconLinkedin, label: "LinkedIn" },
 ];
 
-export default function TopBar() {
+export default function TopBar({ transparent = false }: { transparent?: boolean }) {
   return (
-    <div className="bg-primary text-white relative">
-      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 flex items-center justify-between h-[38px]">
+    <div
+      className={`w-full text-white relative transition-all duration-300 ${
+        transparent ? "bg-primary/40 backdrop-blur-md" : "bg-primary"
+      }`}
+    >
+      <div className="max-w-[var(--site-max)] mx-auto px-[var(--site-px)] flex items-center justify-between h-[var(--topbar-height)]">
         <div className="flex items-center gap-3.5">
           {socials.map(({ icon: Icon, label }) => (
             <a
