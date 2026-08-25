@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/products/format";
 
 export default function CartPage() {
   const { items, updateQuantity, removeFromCart, totalPrice, clearCart } =
@@ -62,7 +62,7 @@ export default function CartPage() {
                     <div className="flex-1 flex flex-col justify-between">
                       <div>
                         <Link
-                          href={`/products/${item.product.id}`}
+                          href={`/products/${item.product.slug ?? item.product.id}`}
                           className="font-serif text-lg hover:text-primary transition-colors"
                         >
                           {item.product.name}
@@ -148,9 +148,12 @@ export default function CartPage() {
                     Add {formatPrice(5000 - totalPrice)} more for free shipping
                   </p>
                 )}
-                <Button className="w-full bg-primary hover:bg-emerald-dark text-white h-12 uppercase tracking-wider">
+                <Link
+                  href="/checkout"
+                  className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 uppercase tracking-wider rounded-lg text-sm font-medium"
+                >
                   Proceed to Checkout
-                </Button>
+                </Link>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground justify-center">
                   <Shield className="w-3.5 h-3.5" />
                   Secure checkout

@@ -1,47 +1,78 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProductGrid from "@/components/ProductGrid";
 import QuickViewDialog from "@/components/QuickViewDialog";
+import Pagination from "@/components/Pagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
-import { products, categories } from "@/data/products";
 import { Product } from "@/types";
+import type { CategoryInfo } from "@/types";
+import type { PaginatedProducts } from "@/lib/products/types";
 
-export default function ShopContent() {
-  const searchParams = useSearchParams();
-  const filter = searchParams.get("filter");
-  const maxPrice = searchParams.get("max");
+interface ShopContentProps {
+  initialData: PaginatedProducts;
+  categories: CategoryInfo[];
+  searchParams: Record<string, string | undefined>;
+}
 
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+export default function ShopContent({
+  initialData,
+  categories,
+  searchParams,
+}: ShopContentProps) {
+  const router = useRouter();
+  const urlParams = useSearchParams();
+  const activeCategory = searchParams.category ?? "all";
+
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
     null
   );
 
-  const filteredProducts = useMemo(() => {
-    let result = products;
-    if (activeCategory !== "all") {
-      result = result.filter((p) => p.category === activeCategory);
-    }
-    if (filter === "new") result = result.filter((p) => p.isNew);
-    if (filter === "bestseller") result = result.filter((p) => p.isBestseller);
-    if (filter === "sale") result = result.filter((p) => p.originalPrice);
-    if (maxPrice) result = result.filter((p) => p.price <= Number(maxPrice));
-    return result;
-  }, [activeCategory, filter, maxPrice]);
+  function setCategory(slug: string) {
+    const params = new URLSearchParams(urlParams.toString());
+    if (slug === "all") params.delete("category");
+    else params.set("category", slug);
+    params.delete("page");
+    router.push(`/shop?${params.toString()}`);
+  }
+
+  function setSort(sort: string) {
+    const params = new URLSearchParams(urlParams.toString());
+    params.set("sort", sort);
+    params.delete("page");
+    router.push(`/shop?${params.toString()}`);
+  }
 
   return (
     <>
       <div className="py-10 bg-background">
         <div className="max-w-[1400px] mx-auto px-4">
           <Breadcrumbs items={[{ label: "Shop" }]} />
-          <h1 className="font-serif text-2xl lg:text-3xl text-center mb-8 capitalize">
+          <h1 className="font-serif text-2xl lg:text-3xl text-center mb-4 capitalize">
             Shop All Jewellery
           </h1>
+          <p className="text-center text-sm text-muted-foreground mb-6">
+            {initialData.total} products
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-2 mb-6">
+            <select
+              className="border px-3 py-2 text-xs uppercase tracking-wider"
+              value={searchParams.sort ?? "newest"}
+              onChange={(e) => setSort(e.target.value)}
+              aria-label="Sort products"
+            >
+              <option value="newest">Newest</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="popular">Most Popular</option>
+            </select>
+          </div>
 
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             <button
-              onClick={() => setActiveCategory("all")}
+              onClick={() => setCategory("all")}
               className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                 activeCategory === "all"
                   ? "bg-primary text-white border-primary"
@@ -53,7 +84,7 @@ export default function ShopContent() {
             {categories.map((cat) => (
               <button
                 key={cat.slug}
-                onClick={() => setActiveCategory(cat.slug)}
+                onClick={() => setCategory(cat.slug)}
                 className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                   activeCategory === cat.slug
                     ? "bg-primary text-white border-primary"
@@ -68,8 +99,14 @@ export default function ShopContent() {
       </div>
 
       <ProductGrid
-        products={filteredProducts}
+        products={initialData.products}
         onQuickView={setQuickViewProduct}
+      />
+
+      <Pagination
+        basePath="/shop"
+        pagination={initialData}
+        searchParams={searchParams}
       />
 
       <QuickViewDialog

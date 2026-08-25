@@ -143,7 +143,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
               </div>
 
               <Link
-                href="/cart"
+                href="/checkout"
                 onClick={() => onOpenChange(false)}
                 className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 text-sm font-medium transition-colors"
               >

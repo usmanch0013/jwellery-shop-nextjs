@@ -14,6 +14,8 @@ export type Category =
 
 export interface Product {
   id: string;
+  slug?: string;
+  legacyId?: string;
   name: string;
   description: string;
   price: number;
@@ -28,6 +30,7 @@ export interface Product {
   isNew?: boolean;
   isBestseller?: boolean;
   soldOut?: boolean;
+  stock?: number;
 }
 
 export interface CartItem {

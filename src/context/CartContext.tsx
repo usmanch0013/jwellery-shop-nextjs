@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Product, CartItem } from "@/types";
+import { syncCartItem, clearServerCart } from "@/actions/cart";
 
 interface CartContextType {
   items: CartItem[];
@@ -18,10 +19,10 @@ interface CartContextType {
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
+  isHydrated: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
-
 const CART_STORAGE_KEY = "jewelry-cart";
 
 export function CartProvider({ children }: { children: ReactNode }) {
@@ -33,7 +34,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const stored = localStorage.getItem(CART_STORAGE_KEY);
       if (stored) setItems(JSON.parse(stored));
     } catch {
-      // ignore parse errors
+      // ignore
     }
     setIsHydrated(true);
   }, []);
@@ -44,37 +45,62 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, isHydrated]);
 
-  const addToCart = useCallback((product: Product, quantity = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((item) => item.product.id === product.id);
-      if (existing) {
-        return prev.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      }
-      return [...prev, { product, quantity }];
-    });
-  }, []);
-
-  const removeFromCart = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((item) => item.product.id !== productId));
-  }, []);
-
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setItems((prev) => prev.filter((item) => item.product.id !== productId));
-      return;
+  const syncServer = useCallback(async (productId: string, quantity: number) => {
+    try {
+      await syncCartItem(productId, quantity);
+    } catch {
+      // offline / no supabase
     }
-    setItems((prev) =>
-      prev.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
-      )
-    );
   }, []);
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const addToCart = useCallback(
+    (product: Product, quantity = 1) => {
+      if (product.soldOut) return;
+      setItems((prev) => {
+        const existing = prev.find((item) => item.product.id === product.id);
+        const newQty = existing ? existing.quantity + quantity : quantity;
+        void syncServer(product.id, newQty);
+        if (existing) {
+          return prev.map((item) =>
+            item.product.id === product.id
+              ? { ...item, quantity: newQty }
+              : item
+          );
+        }
+        return [...prev, { product, quantity }];
+      });
+    },
+    [syncServer]
+  );
+
+  const removeFromCart = useCallback(
+    (productId: string) => {
+      void syncServer(productId, 0);
+      setItems((prev) => prev.filter((item) => item.product.id !== productId));
+    },
+    [syncServer]
+  );
+
+  const updateQuantity = useCallback(
+    (productId: string, quantity: number) => {
+      if (quantity <= 0) {
+        removeFromCart(productId);
+        return;
+      }
+      void syncServer(productId, quantity);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.product.id === productId ? { ...item, quantity } : item
+        )
+      );
+    },
+    [removeFromCart, syncServer]
+  );
+
+  const clearCart = useCallback(() => {
+    void clearServerCart();
+    setItems([]);
+  }, []);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce(
@@ -92,6 +118,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         totalItems,
         totalPrice,
+        isHydrated,
       }}
     >
       {children}
@@ -101,8 +128,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
 export function useCart() {
   const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
+  if (!context) throw new Error("useCart must be used within CartProvider");
   return context;
 }

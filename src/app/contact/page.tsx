@@ -2,19 +2,26 @@
 
 import { useState } from "react";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { toast } from "sonner";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { submitContactAction } from "@/actions/contact";
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast.success("Message sent! We'll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+    setLoading(true);
+    const result = await submitContactAction(new FormData(e.currentTarget));
+    setLoading(false);
+    if (result.error) toast.error(result.error);
+    else {
+      toast.success("Message sent! We'll get back to you soon.");
+      e.currentTarget.reset();
+    }
   };
 
   return (
@@ -73,41 +80,33 @@ export default function ContactPage() {
           >
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input
-                id="name"
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                required
-              />
+              <Input id="name" name="name" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                required
-              />
+              <Input id="email" name="email" type="email" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="subject">Subject (optional)</Label>
+              <Input id="subject" name="subject" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Message</Label>
               <textarea
                 id="message"
+                name="message"
                 rows={5}
-                value={form.message}
-                onChange={(e) =>
-                  setForm({ ...form, message: e.target.value })
-                }
                 required
+                minLength={10}
                 className="flex w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
               />
             </div>
             <Button
               type="submit"
+              disabled={loading}
               className="w-full bg-primary hover:bg-emerald-dark text-white h-11 uppercase tracking-wider"
             >
-              Send Message
+              {loading ? "Sending..." : "Send Message"}
             </Button>
           </form>
         </div>

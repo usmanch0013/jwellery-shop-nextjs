@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search } from "lucide-react";
@@ -11,7 +11,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { products, formatPrice } from "@/data/products";
+import { products } from "@/data/products";
+import { formatPrice } from "@/lib/products/format";
 
 interface SearchDialogProps {
   open: boolean;
@@ -21,18 +22,16 @@ interface SearchDialogProps {
 export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   const [query, setQuery] = useState("");
 
-  const results = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    return products
-      .filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.material.toLowerCase().includes(q)
-      )
-      .slice(0, 6);
-  }, [query]);
+  const results = query.trim()
+    ? products
+        .filter(
+          (p) =>
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            p.category.toLowerCase().includes(query.toLowerCase()) ||
+            p.material.toLowerCase().includes(query.toLowerCase())
+        )
+        .slice(0, 6)
+    : [];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,19 +46,32 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10 border-0 shadow-none focus-visible:ring-0 text-base"
               autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && query.trim()) {
+                  onOpenChange(false);
+                  window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                }
+              }}
             />
           </div>
         </DialogHeader>
         <div className="max-h-80 overflow-y-auto">
           {query && results.length === 0 && (
             <p className="p-6 text-center text-muted-foreground text-sm">
-              No products found for &quot;{query}&quot;
+              No quick results.{" "}
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}`}
+                className="text-primary underline"
+                onClick={() => onOpenChange(false)}
+              >
+                View all search results
+              </Link>
             </p>
           )}
           {results.map((product) => (
             <Link
               key={product.id}
-              href={`/products/${product.id}`}
+              href={`/products/${product.slug ?? product.id}`}
               onClick={() => onOpenChange(false)}
               className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors border-b last:border-0"
             >
@@ -82,6 +94,15 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
               </span>
             </Link>
           ))}
+          {query && results.length > 0 && (
+            <Link
+              href={`/search?q=${encodeURIComponent(query)}`}
+              onClick={() => onOpenChange(false)}
+              className="block p-4 text-center text-sm text-primary underline"
+            >
+              View all results for &ldquo;{query}&rdquo;
+            </Link>
+          )}
           {!query && (
             <p className="p-6 text-center text-muted-foreground text-sm">
               Start typing to search our collection

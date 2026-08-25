@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ShoppingBag, Menu, Search, User } from "lucide-react";
+import { ShoppingBag, Menu, Search, User, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { categories } from "@/data/products";
 import TopBar from "@/components/TopBar";
 import Logo from "@/components/Logo";
@@ -24,7 +25,7 @@ const navLinks = [
   { label: "Best selling products", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
   { label: "Collections", href: "/shop" },
-  { label: "Track Order", href: "/account" },
+  { label: "Track Order", href: "/track-order" },
   { label: "Client Reviews", href: "/#reviews" },
 ];
 
@@ -32,6 +33,7 @@ export default function Header() {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { totalItems } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
@@ -118,6 +120,20 @@ export default function Header() {
                 >
                   <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />
                 </Button>
+                <Link
+                  href="/wishlist"
+                  className={`relative inline-flex items-center justify-center size-9 rounded-full transition-colors ${
+                    transparent ? "hover:bg-white/10 text-white" : "hover:bg-muted"
+                  }`}
+                  aria-label="Wishlist"
+                >
+                  <Heart className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  {wishlistItems.length > 0 && (
+                    <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] rounded-full flex items-center justify-center">
+                      {wishlistItems.length}
+                    </span>
+                  )}
+                </Link>
                 <Link
                   href="/account"
                   className={`inline-flex items-center justify-center size-9 rounded-full transition-colors ${

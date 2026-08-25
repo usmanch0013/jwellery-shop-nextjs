@@ -362,9 +362,7 @@ export const products: Product[] = [
   },
 ];
 
-export function formatPrice(price: number): string {
-  return `Rs. ${price.toLocaleString("en-PK")}`;
-}
+export { formatPrice } from "@/lib/products/format";
 
 export function getProductById(id: string): Product | undefined {
   return products.find((p) => p.id === id);

@@ -9,13 +9,14 @@ import {
   type ReactNode,
 } from "react";
 import { Product } from "@/types";
+import { toggleWishlistAction } from "@/actions/wishlist";
 
 interface WishlistContextType {
   items: Product[];
   addToWishlist: (product: Product) => void;
   removeFromWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
-  totalItems: number;
+  toggleWishlist: (product: Product) => Promise<void>;
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(
@@ -60,6 +61,24 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     [items]
   );
 
+  const toggleWishlist = useCallback(
+    async (product: Product) => {
+      const result = await toggleWishlistAction(product.id);
+      if (result.error && result.error !== "Please login") {
+        return;
+      }
+      if (result.success) {
+        if (result.inWishlist) addToWishlist(product);
+        else removeFromWishlist(product.id);
+      } else {
+        // guest fallback — local only
+        if (isInWishlist(product.id)) removeFromWishlist(product.id);
+        else addToWishlist(product);
+      }
+    },
+    [addToWishlist, isInWishlist, removeFromWishlist]
+  );
+
   return (
     <WishlistContext.Provider
       value={{
@@ -67,7 +86,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         addToWishlist,
         removeFromWishlist,
         isInWishlist,
-        totalItems: items.length,
+        toggleWishlist,
       }}
     >
       {children}
@@ -77,8 +96,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
 export function useWishlist() {
   const context = useContext(WishlistContext);
-  if (!context) {
-    throw new Error("useWishlist must be used within a WishlistProvider");
-  }
+  if (!context)
+    throw new Error("useWishlist must be used within WishlistProvider");
   return context;
 }

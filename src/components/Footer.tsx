@@ -1,6 +1,15 @@
 import Link from "next/link";
 import { categories } from "@/data/products";
 
+const footerLinks = [
+  { label: "Track Your Order", href: "/track-order" },
+  { label: "How To Order?", href: "/shipping-policy" },
+  { label: "Shipping Rates", href: "/shipping-policy" },
+  { label: "About Us", href: "/about" },
+  { label: "Contact Us", href: "/contact" },
+  { label: "FAQs", href: "/#faq" },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-background border-t border-border mt-auto">
@@ -19,20 +28,13 @@ export default function Footer() {
               Useful Links
             </h4>
             <ul className="space-y-2.5">
-              {[
-                "Track Your Order",
-                "How To Order?",
-                "Shipping Rates",
-                "About Us",
-                "Contact Us",
-                "FAQs",
-              ].map((item) => (
-                <li key={item}>
+              {footerLinks.map((item) => (
+                <li key={item.label}>
                   <Link
-                    href="#"
+                    href={item.href}
                     className="text-sm text-muted-foreground hover:text-primary transition-colors"
                   >
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -59,25 +61,29 @@ export default function Footer() {
 
           <div>
             <h4 className="text-sm font-medium uppercase tracking-wider mb-4">
-              Social Media
+              Policies
             </h4>
             <ul className="space-y-2.5">
-              {[
-                "Instagram",
-                "Facebook",
-                "YouTube",
-                "TikTok",
-                "Pinterest",
-              ].map((item) => (
-                <li key={item}>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    {item}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link href="/terms" className="text-sm text-muted-foreground hover:text-primary">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/refund-policy" className="text-sm text-muted-foreground hover:text-primary">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="text-sm text-muted-foreground hover:text-primary">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/shipping-policy" className="text-sm text-muted-foreground hover:text-primary">
+                  Shipping Policy
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -87,14 +93,14 @@ export default function Footer() {
             © {new Date().getFullYear()} Lumière.pk. All rights reserved.
           </p>
           <div className="flex gap-4 text-xs text-muted-foreground">
-            <Link href="#" className="hover:text-primary">
-              Terms of Service
+            <Link href="/terms" className="hover:text-primary">
+              Terms
             </Link>
-            <Link href="#" className="hover:text-primary">
-              Refund Policy
+            <Link href="/refund-policy" className="hover:text-primary">
+              Refunds
             </Link>
-            <Link href="#" className="hover:text-primary">
-              Privacy Policy
+            <Link href="/privacy" className="hover:text-primary">
+              Privacy
             </Link>
           </div>
         </div>

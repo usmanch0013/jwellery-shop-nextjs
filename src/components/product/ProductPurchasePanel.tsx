@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/types";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/products/format";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 import { toast } from "sonner";
 import PaymentBadges from "./PaymentBadges";
 import ProductMiniRecommendations from "./ProductMiniRecommendations";
@@ -24,9 +25,11 @@ export default function ProductPurchasePanel({
   const [quantity, setQuantity] = useState(1);
   const [descOpen, setDescOpen] = useState(false);
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const router = useRouter();
+  const wished = isInWishlist(product.id);
 
-  const stockCount = product.soldOut ? 0 : 1;
+  const stockCount = product.soldOut ? 0 : (product.stock ?? 50);
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
@@ -35,7 +38,7 @@ export default function ProductPurchasePanel({
 
   const handleBuyNow = () => {
     addToCart(product, quantity);
-    router.push("/cart");
+    router.push("/checkout");
   };
 
   const whatsappMessage = encodeURIComponent(
@@ -44,8 +47,20 @@ export default function ProductPurchasePanel({
 
   return (
     <div className="lg:pl-4 xl:pl-8">
-      <h1 className="text-[22px] lg:text-[26px] font-medium text-foreground leading-snug mb-4">
+      <h1 className="text-[22px] lg:text-[26px] font-medium text-foreground leading-snug mb-4 pr-10 relative">
         {product.name}
+        <button
+          type="button"
+          onClick={() => toggleWishlist(product)}
+          className="absolute right-0 top-0 p-1"
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className={`w-5 h-5 ${
+              wished ? "fill-primary text-primary" : "text-muted-foreground"
+            }`}
+          />
+        </button>
       </h1>
 
       <p className="text-[20px] lg:text-[22px] font-medium text-foreground mb-5">

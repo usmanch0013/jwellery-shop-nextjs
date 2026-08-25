@@ -1,24 +1,34 @@
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CategoryPageClient from "./CategoryPageClient";
-import { getCategoryInfo, getProductsByCategory } from "@/data/products";
+import Pagination from "@/components/Pagination";
+import {
+  getCategoryBySlug,
+  getProducts,
+} from "@/lib/products/queries";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ page?: string; sort?: string }>;
 }
 
-export async function generateStaticParams() {
-  const { categories } = await import("@/data/products");
-  return categories.map((cat) => ({ slug: cat.slug }));
-}
+export const dynamicParams = true;
 
-export default async function CategoryPage({ params }: CategoryPageProps) {
+export default async function CategoryPage({
+  params,
+  searchParams,
+}: CategoryPageProps) {
   const { slug } = await params;
-  const category = getCategoryInfo(slug);
+  const sp = await searchParams;
+  const category = await getCategoryBySlug(slug);
 
   if (!category) notFound();
 
-  const categoryProducts = getProductsByCategory(slug);
+  const result = await getProducts({
+    category: slug,
+    page: Number(sp.page) || 1,
+    sort: (sp.sort as "newest") || "newest",
+  });
 
   return (
     <div className="py-10 bg-background">
@@ -30,11 +40,16 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           {category.name}
         </h1>
         <p className="text-sm text-muted-foreground text-center mb-2">
-          {category.productCount} products
+          {result.total} products
         </p>
       </div>
 
-      <CategoryPageClient products={categoryProducts} />
+      <CategoryPageClient products={result.products} />
+      <Pagination
+        basePath={`/categories/${slug}`}
+        pagination={result}
+        searchParams={sp}
+      />
     </div>
   );
 }

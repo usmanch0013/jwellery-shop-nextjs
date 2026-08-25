@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Heart } from "lucide-react";
 import { Product } from "@/types";
-import { formatPrice } from "@/data/products";
+import { formatPrice } from "@/lib/products/format";
+import { useWishlist } from "@/context/WishlistContext";
 import StarRating from "./StarRating";
 
 interface ProductCardProps {
@@ -15,6 +17,9 @@ interface ProductCardProps {
 export default function ProductCard({ product, onQuickView }: ProductCardProps) {
   const [activeImage, setActiveImage] = useState(product.image);
   const [isHovered, setIsHovered] = useState(false);
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const productHref = `/products/${product.slug ?? product.id}`;
+  const wished = isInWishlist(product.id);
 
   const hoverImg = product.hoverImage ?? product.image;
   const thumbnails = [product.image, hoverImg].filter(
@@ -34,7 +39,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       }}
     >
       <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-muted mb-2">
-        <Link href={`/products/${product.id}`} className="block absolute inset-0">
+        <Link href={productHref} className="block absolute inset-0">
           <Image
             src={product.image}
             alt={product.name}
@@ -67,6 +72,26 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             Sold out
           </span>
         )}
+
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            void toggleWishlist(product);
+          }}
+          className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-colors ${
+            wished
+              ? "bg-rose-500 text-white"
+              : "bg-white/80 text-foreground hover:bg-white"
+          }`}
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className="w-4 h-4"
+            fill={wished ? "currentColor" : "none"}
+            strokeWidth={1.5}
+          />
+        </button>
 
         {/* Quick view button */}
         {onQuickView && !product.soldOut && (
@@ -114,7 +139,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         )}
       </div>
 
-      <Link href={`/products/${product.id}`} className="block px-1">
+      <Link href={productHref} className="block px-1">
         <h3 className="text-[15px] text-foreground leading-snug mb-2 font-normal hover:underline">
           {product.name}
         </h3>
