@@ -21,13 +21,28 @@ export default function ProductGrid({
           </h2>
         )}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 lg:gap-2">
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onQuickView={onQuickView}
-            />
-          ))}
+          {products.length === 0 ? (
+            <div className="col-span-full py-16 text-center">
+              <p className="font-serif text-xl mb-2">No products yet</p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Add products from the admin dashboard to populate this page.
+              </p>
+              <a
+                href="/shop"
+                className="text-sm text-primary underline"
+              >
+                View all shop
+              </a>
+            </div>
+          ) : (
+            products.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onQuickView={onQuickView}
+              />
+            ))
+          )}
         </div>
       </div>
     </section>

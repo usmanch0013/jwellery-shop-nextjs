@@ -81,7 +81,9 @@ export default function ShopContent({
             >
               All
             </button>
-            {categories.map((cat) => (
+            {categories
+              .filter((cat) => cat.productCount > 0)
+              .map((cat) => (
               <button
                 key={cat.slug}
                 onClick={() => setCategory(cat.slug)}

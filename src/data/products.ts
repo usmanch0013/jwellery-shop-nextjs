@@ -5,7 +5,7 @@ export const categories: CategoryInfo[] = [
     slug: "necklace-sets",
     name: "Necklace Sets",
     description: "Stunning necklace sets for every occasion",
-    productCount: 445,
+    productCount: 3,
     image:
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=800&fit=crop",
   },
@@ -13,7 +13,7 @@ export const categories: CategoryInfo[] = [
     slug: "earrings",
     name: "Earrings",
     description: "Studs, hoops, jhumkas & drops",
-    productCount: 345,
+    productCount: 3,
     image:
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=800&fit=crop",
   },
@@ -21,7 +21,7 @@ export const categories: CategoryInfo[] = [
     slug: "bangles",
     name: "Bangles",
     description: "Statement bangles & kadas",
-    productCount: 216,
+    productCount: 1,
     image:
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=800&fit=crop",
   },
@@ -29,7 +29,7 @@ export const categories: CategoryInfo[] = [
     slug: "finger-ring",
     name: "Finger Ring",
     description: "Rings for every style",
-    productCount: 287,
+    productCount: 1,
     image:
       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=800&fit=crop",
   },
@@ -37,7 +37,7 @@ export const categories: CategoryInfo[] = [
     slug: "bracelet",
     name: "Bracelet",
     description: "Charm, cuff & chain bracelets",
-    productCount: 292,
+    productCount: 4,
     image:
       "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600&h=800&fit=crop",
   },
@@ -45,7 +45,7 @@ export const categories: CategoryInfo[] = [
     slug: "bridal-sets",
     name: "Bridal Sets",
     description: "Complete bridal jewellery sets",
-    productCount: 167,
+    productCount: 3,
     image:
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=800&fit=crop",
   },
@@ -53,7 +53,7 @@ export const categories: CategoryInfo[] = [
     slug: "chains",
     name: "Chains",
     description: "Elegant chains & long malas",
-    productCount: 81,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=800&fit=crop",
   },
@@ -61,7 +61,7 @@ export const categories: CategoryInfo[] = [
     slug: "anklets",
     name: "Anklets",
     description: "Delicate payal designs",
-    productCount: 30,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1602751584552-8ba73aad10cd?w=600&h=800&fit=crop",
   },
@@ -69,7 +69,7 @@ export const categories: CategoryInfo[] = [
     slug: "bindiya-jhumar",
     name: "Bindiya & Jhumar",
     description: "Traditional bridal headpieces",
-    productCount: 77,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1583937443569-f14a5bcdfbb6?w=600&h=800&fit=crop",
   },
@@ -77,7 +77,7 @@ export const categories: CategoryInfo[] = [
     slug: "matha-pati",
     name: "Matha Pati",
     description: "Forehead jewellery",
-    productCount: 31,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1596944924616-7b384dd8ed56?w=600&h=800&fit=crop",
   },
@@ -85,7 +85,7 @@ export const categories: CategoryInfo[] = [
     slug: "nose-ring",
     name: "Nose Ring",
     description: "Nath & nose pin collection",
-    productCount: 15,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&h=800&fit=crop",
   },
@@ -93,7 +93,7 @@ export const categories: CategoryInfo[] = [
     slug: "accessories",
     name: "Accessories",
     description: "Jewellery accessories",
-    productCount: 180,
+    productCount: 0,
     image:
       "https://images.unsplash.com/photo-1630019853432-7b4aa2a6b0a0?w=600&h=800&fit=crop",
   },
@@ -106,6 +106,7 @@ export const products: Product[] = [
     description:
       "Elegant American Diamond necklace set with matching earrings. Perfect for weddings and festive occasions.",
     price: 12800,
+    originalPrice: 16000,
     category: "necklace-sets",
     image:
       "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop",
@@ -121,6 +122,7 @@ export const products: Product[] = [
     description:
       "Stunning baguette cut necklace set with scalloped fan design. A statement piece for special events.",
     price: 18800,
+    originalPrice: 24000,
     category: "necklace-sets",
     image:
       "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop",
@@ -151,6 +153,7 @@ export const products: Product[] = [
     description:
       "Delicate teardrop earrings with bell motif. Lightweight and perfect for daily wear.",
     price: 1000,
+    originalPrice: 1400,
     category: "earrings",
     image:
       "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=600&fit=crop",
@@ -195,6 +198,7 @@ export const products: Product[] = [
     description:
       "Statement bangles with pearl filigree work. Perfect for weddings and mehndi.",
     price: 4500,
+    originalPrice: 5500,
     category: "bangles",
     image:
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=600&fit=crop",
@@ -239,6 +243,7 @@ export const products: Product[] = [
     description:
       "Trendy watch-style bracelet with roman numeral dial design.",
     price: 1500,
+    originalPrice: 1900,
     category: "bracelet",
     image:
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=600&fit=crop",
@@ -254,6 +259,7 @@ export const products: Product[] = [
     description:
       "Traditional hasli necklace set with crimson gemstones. Bridal favourite.",
     price: 5600,
+    originalPrice: 7000,
     category: "bridal-sets",
     image:
       "https://images.unsplash.com/photo-1583937443569-f14a5bcdfbb6?w=600&h=600&fit=crop",
@@ -283,6 +289,7 @@ export const products: Product[] = [
     description:
       "Luxurious complete bridal set with teardrop gemstones.",
     price: 33600,
+    originalPrice: 42000,
     category: "bridal-sets",
     image:
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=600&h=600&fit=crop",
@@ -312,6 +319,7 @@ export const products: Product[] = [
     name: "Crown Ring-8290",
     description: "Elegant crown design finger ring with crystal stones.",
     price: 850,
+    originalPrice: 1100,
     category: "finger-ring",
     image:
       "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop",
@@ -319,46 +327,6 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&h=600&fit=crop",
     material: "Gold Plated",
     reviews: 18,
-  },
-  {
-    id: "16",
-    name: "Floral Ring-8243",
-    description: "Delicate floral motif ring for everyday elegance.",
-    price: 750,
-    category: "finger-ring",
-    image:
-      "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?w=600&h=600&fit=crop",
-    hoverImage:
-      "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=600&fit=crop",
-    material: "Gold Plated",
-    reviews: 22,
-    isNew: true,
-  },
-  {
-    id: "17",
-    name: "Layered Gold Chain",
-    description: "Multi-layer gold chain for versatile styling.",
-    price: 2200,
-    category: "chains",
-    image:
-      "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=600&fit=crop",
-    hoverImage:
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=600&fit=crop",
-    material: "Gold Plated",
-    reviews: 15,
-  },
-  {
-    id: "18",
-    name: "Pearl Anklet Payal",
-    description: "Traditional pearl anklet with delicate bells.",
-    price: 950,
-    category: "anklets",
-    image:
-      "https://images.unsplash.com/photo-1602751584552-8ba73aad10cd?w=600&h=600&fit=crop",
-    hoverImage:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&h=600&fit=crop",
-    material: "Pearl",
-    reviews: 11,
   },
 ];
 

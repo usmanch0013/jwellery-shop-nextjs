@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Search } from "lucide-react";
@@ -11,8 +11,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { products } from "@/data/products";
+import { searchProductsQuickAction } from "@/actions/catalog";
 import { formatPrice } from "@/lib/products/format";
+import type { Product } from "@/types";
 
 interface SearchDialogProps {
   open: boolean;
@@ -21,17 +22,29 @@ interface SearchDialogProps {
 
 export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) {
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const results = query.trim()
-    ? products
-        .filter(
-          (p) =>
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            p.category.toLowerCase().includes(query.toLowerCase()) ||
-            p.material.toLowerCase().includes(query.toLowerCase())
-        )
-        .slice(0, 6)
-    : [];
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const items = await searchProductsQuickAction(query);
+        setResults(items);
+      } catch {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,7 +69,12 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
           </div>
         </DialogHeader>
         <div className="max-h-80 overflow-y-auto">
-          {query && results.length === 0 && (
+          {query && loading && (
+            <p className="p-6 text-center text-muted-foreground text-sm">
+              Searching...
+            </p>
+          )}
+          {query && !loading && results.length === 0 && (
             <p className="p-6 text-center text-muted-foreground text-sm">
               No quick results.{" "}
               <Link
@@ -94,7 +112,7 @@ export default function SearchDialog({ open, onOpenChange }: SearchDialogProps) 
               </span>
             </Link>
           ))}
-          {query && results.length > 0 && (
+          {query && !loading && results.length > 0 && (
             <Link
               href={`/search?q=${encodeURIComponent(query)}`}
               onClick={() => onOpenChange(false)}

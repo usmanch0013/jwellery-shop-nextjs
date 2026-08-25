@@ -1,6 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { getSupabaseAnonKey, getSupabaseUrl, isSupabaseConfigured } from "./config";
+import {
+  getSupabaseAnonKey,
+  getSupabaseAuthClientOptions,
+  getSupabaseUrl,
+  isSupabaseConfigured,
+} from "./config";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -24,13 +29,14 @@ export async function updateSession(request: NextRequest) {
         );
       },
     },
+    ...getSupabaseAuthClientOptions(),
   });
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const protectedPaths = ["/account", "/orders"];
+  const protectedPaths = ["/account", "/orders", "/admin"];
   const isProtected = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );

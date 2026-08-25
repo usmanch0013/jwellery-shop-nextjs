@@ -5,7 +5,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { Heart } from "lucide-react";
 import { Product } from "@/types";
-import { formatPrice } from "@/lib/products/format";
+import { formatPrice, productPath } from "@/lib/products/format";
+import { discountPercent, isOnSale } from "@/lib/products/sale";
 import { useWishlist } from "@/context/WishlistContext";
 import StarRating from "./StarRating";
 
@@ -18,8 +19,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
   const [activeImage, setActiveImage] = useState(product.image);
   const [isHovered, setIsHovered] = useState(false);
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const productHref = `/products/${product.slug ?? product.id}`;
+  const productHref = productPath(product);
   const wished = isInWishlist(product.id);
+  const onSale = isOnSale(product);
+  const salePercent = discountPercent(product);
 
   const hoverImg = product.hoverImage ?? product.image;
   const thumbnails = [product.image, hoverImg].filter(
@@ -67,11 +70,23 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           </span>
         </div>
 
-        {product.soldOut && (
-          <span className="absolute top-3 left-3 bg-black/70 text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded">
-            Sold out
-          </span>
-        )}
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+          {onSale && (
+            <span className="bg-rose-600 text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-sm shadow-sm">
+              Sale {salePercent > 0 ? `-${salePercent}%` : ""}
+            </span>
+          )}
+          {product.isNew && !product.soldOut && (
+            <span className="bg-primary text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-sm">
+              New
+            </span>
+          )}
+          {product.soldOut && (
+            <span className="bg-black/75 text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-sm">
+              Sold out
+            </span>
+          )}
+        </div>
 
         <button
           type="button"
@@ -144,10 +159,15 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           {product.name}
         </h3>
         <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
-        <div className="flex items-center gap-2 mt-2">
+        <div className="flex flex-wrap items-center gap-2 mt-2">
           <p className="text-[15px] font-medium text-foreground">
             {formatPrice(product.price)}
           </p>
+          {onSale && product.originalPrice && (
+            <p className="text-[13px] text-muted-foreground line-through">
+              {formatPrice(product.originalPrice)}
+            </p>
+          )}
           <span className="inline-flex items-center gap-1 text-[10px] text-[#888] border border-[#ddd] rounded px-1.5 py-0.5">
             🇵🇰 PKR
           </span>

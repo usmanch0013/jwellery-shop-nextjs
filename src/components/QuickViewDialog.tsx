@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Product } from "@/types";
-import { formatPrice } from "@/data/products";
+import { formatPrice, productPath } from "@/lib/products/format";
+import { discountPercent, isOnSale } from "@/lib/products/sale";
 import { useCart } from "@/context/CartContext";
 import StarRating from "./StarRating";
 import {
@@ -29,6 +30,9 @@ export default function QuickViewDialog({
   const { addToCart } = useCart();
 
   if (!product) return null;
+
+  const onSale = isOnSale(product);
+  const salePercent = discountPercent(product);
 
   const handleAdd = () => {
     addToCart(product);
@@ -59,9 +63,19 @@ export default function QuickViewDialog({
               {product.name}
             </h2>
             <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
-            <p className="text-xl font-medium mt-4 mb-4">
-              {formatPrice(product.price)}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 mt-4 mb-4">
+              <p className="text-xl font-medium">{formatPrice(product.price)}</p>
+              {onSale && product.originalPrice && (
+                <p className="text-base text-muted-foreground line-through">
+                  {formatPrice(product.originalPrice)}
+                </p>
+              )}
+              {onSale && (
+                <span className="bg-rose-600 text-white text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                  Sale {salePercent > 0 ? `-${salePercent}%` : ""}
+                </span>
+              )}
+            </div>
             <p className="text-sm text-muted-foreground mb-6 line-clamp-4 leading-relaxed">
               {product.description}
             </p>
@@ -79,7 +93,7 @@ export default function QuickViewDialog({
               </button>
             )}
             <Link
-              href={`/products/${product.id}`}
+              href={productPath(product)}
               onClick={() => onOpenChange(false)}
               className="text-center text-sm text-muted-foreground mt-4 hover:text-primary underline"
             >

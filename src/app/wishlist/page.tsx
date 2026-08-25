@@ -7,7 +7,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/data/products";
+import { formatPrice, productPath } from "@/lib/products/format";
 import { toast } from "sonner";
 
 export default function WishlistPage() {
@@ -45,7 +45,7 @@ export default function WishlistPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5 lg:gap-2">
           {items.map((product) => (
             <div key={product.id} className="group relative">
-              <Link href={`/products/${product.id}`}>
+              <Link href={productPath(product)}>
                 <div className="relative aspect-square overflow-hidden bg-muted rounded-lg mb-4">
                   <Image
                     src={product.image}

@@ -1,4 +1,4 @@
-import type { Category, Product } from "@/types";
+import type { Product } from "@/types";
 import {
   categories as staticCategories,
   products as staticProducts,
@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { mapDbCategory, mapDbProductToProduct } from "@/lib/products/mappers";
 import type { DbProduct } from "@/lib/database.types";
+import { isOnSale } from "@/lib/products/sale";
 import { PRODUCTS_PER_PAGE } from "@/lib/constants/commerce";
 import type {
   PaginatedProducts,
@@ -15,6 +16,30 @@ import type {
 } from "@/lib/products/types";
 
 export type { PaginatedProducts, ProductQueryParams, ProductSort };
+
+const emptyPage = (page: number, limit: number): PaginatedProducts => ({
+  products: [],
+  total: 0,
+  page,
+  totalPages: 1,
+});
+
+function isUuid(value: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value
+  );
+}
+
+function productLookupFilter(identifier: string): string {
+  const filters = [
+    `slug.eq.${identifier}`,
+    `legacy_id.eq.${identifier}`,
+  ];
+  if (isUuid(identifier)) {
+    filters.push(`id.eq.${identifier}`);
+  }
+  return filters.join(",");
+}
 
 function filterStaticProducts(params: ProductQueryParams): PaginatedProducts {
   const page = params.page ?? 1;
@@ -34,7 +59,7 @@ function filterStaticProducts(params: ProductQueryParams): PaginatedProducts {
   if (params.filter === "bestseller")
     filtered = filtered.filter((p) => p.isBestseller);
   if (params.filter === "sale")
-    filtered = filtered.filter((p) => p.originalPrice);
+    filtered = filtered.filter((p) => isOnSale(p));
   if (params.search) {
     const q = params.search.toLowerCase();
     filtered = filtered.filter(
@@ -123,7 +148,7 @@ export async function getProducts(
   const { data, count, error } = await query.range(from, to);
   if (error) {
     console.error("getProducts error:", error.message);
-    return filterStaticProducts(params);
+    return emptyPage(page, limit);
   }
 
   const products = (data as DbProduct[]).map(mapDbProductToProduct);
@@ -137,6 +162,27 @@ export async function getProducts(
   };
 }
 
+export async function resolveCanonicalProductId(
+  idOrSlug: string
+): Promise<string | null> {
+  if (!isSupabaseConfigured()) {
+    const p = staticProducts.find(
+      (x) => x.id === idOrSlug || x.slug === idOrSlug
+    );
+    return p?.id ?? null;
+  }
+
+  const { createAdminClient } = await import("@/lib/supabase/admin");
+  const admin = createAdminClient();
+  const { data } = await admin
+    .from("products")
+    .select("id")
+    .or(productLookupFilter(idOrSlug))
+    .maybeSingle();
+
+  return data?.id ?? null;
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | null> {
   if (!isSupabaseConfigured()) {
     const p =
@@ -148,15 +194,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
   const { data, error } = await supabase
     .from("products")
     .select("*, categories(slug, name)")
-    .or(`slug.eq.${slug},legacy_id.eq.${slug},id.eq.${slug}`)
+    .or(productLookupFilter(slug))
     .maybeSingle();
 
-  if (error || !data) {
-    const fallback =
-      staticProducts.find((x) => x.slug === slug || x.id === slug) ?? null;
-    return fallback
-      ? { ...fallback, stock: fallback.stock ?? 50, slug: fallback.slug ?? fallback.id }
-      : null;
+  if (error) {
+    console.error("getProductBySlug error:", error.message, slug);
+    return null;
+  }
+
+  if (!data) {
+    return null;
   }
 
   return mapDbProductToProduct(data as DbProduct);
@@ -174,11 +221,19 @@ export async function getCategories() {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("categories")
-    .select("*")
+    .select("*, products(count)")
     .order("name");
 
-  if (error || !data?.length) return staticCategories;
-  return data.map(mapDbCategory);
+  if (error || !data?.length) return [];
+
+  return data.map((row) => {
+    const countRow = row.products as { count: number }[] | null;
+    const productCount = countRow?.[0]?.count ?? 0;
+    return {
+      ...mapDbCategory(row),
+      productCount,
+    };
+  });
 }
 
 export async function getCategoryBySlug(slug: string) {
@@ -215,6 +270,44 @@ export async function getFeaturedProducts(options: {
   return products;
 }
 
-export function getCategoryInfo(slug: string) {
-  return staticCategories.find((c) => c.slug === slug as Category);
+export type HomepageCategorySection = {
+  category: Awaited<ReturnType<typeof getCategories>>[number];
+  products: Product[];
+};
+
+export async function getHomepageData() {
+  const categories = await getCategories();
+  const activeCategories = categories.filter((c) => c.productCount > 0);
+
+  const categorySections: HomepageCategorySection[] = (
+    await Promise.all(
+      activeCategories.slice(0, 4).map(async (category) => {
+        const { products } = await getProducts({
+          category: category.slug,
+          limit: 4,
+        });
+        return { category, products };
+      })
+    )
+  ).filter((section) => section.products.length > 0);
+
+  const [bestSelling, newArrivals, latest, sale] = await Promise.all([
+    getFeaturedProducts({ bestseller: true, limit: 8 }),
+    getFeaturedProducts({ isNew: true, limit: 8 }),
+    getProducts({ limit: 8, sort: "newest" }),
+    getProducts({ filter: "sale", limit: 12, sort: "popular" }),
+  ]);
+
+  const saleProducts = sale.products.filter((p) => isOnSale(p)).slice(0, 8);
+
+  return {
+    categories,
+    activeCategories,
+    categorySections,
+    bestSelling,
+    newArrivals,
+    latestProducts: latest.products,
+    saleProducts,
+    totalProducts: latest.total,
+  };
 }

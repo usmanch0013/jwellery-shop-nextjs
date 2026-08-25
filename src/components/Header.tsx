@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { ShoppingBag, Menu, Search, User, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { categories } from "@/data/products";
+import type { CategoryInfo } from "@/types";
 import TopBar from "@/components/TopBar";
 import Logo from "@/components/Logo";
 import SearchDialog from "@/components/SearchDialog";
@@ -24,12 +24,12 @@ const navLinks = [
   { label: "Shop", href: "/shop" },
   { label: "Best selling products", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
-  { label: "Collections", href: "/shop" },
+  { label: "Collections", href: "/#collections" },
   { label: "Track Order", href: "/track-order" },
   { label: "Client Reviews", href: "/#reviews" },
 ];
 
-export default function Header() {
+export default function Header({ categories }: { categories: CategoryInfo[] }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const { totalItems } = useCart();
@@ -185,7 +185,9 @@ export default function Header() {
             <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 mb-2">
               Categories
             </p>
-            {categories.map((cat) => (
+            {categories
+              .filter((cat) => cat.productCount > 0)
+              .map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/categories/${cat.slug}`}

@@ -9,7 +9,6 @@ import QuickViewDialog from "@/components/QuickViewDialog";
 import TrustBar from "@/components/TrustBar";
 import VideoSection from "@/components/VideoSection";
 import Testimonials from "@/components/Testimonials";
-import StoreLocator from "@/components/StoreLocator";
 import BlogSection from "@/components/BlogSection";
 import FAQ from "@/components/FAQ";
 import CategoryCard from "@/components/CategoryCard";
@@ -159,7 +158,6 @@ export default function HomePageContent({
       <div id="reviews">
         <Testimonials />
       </div>
-      <StoreLocator />
       <BlogSection />
       <TrustBar />
       <FAQ />

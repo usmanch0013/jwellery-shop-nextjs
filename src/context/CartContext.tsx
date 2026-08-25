@@ -47,7 +47,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const syncServer = useCallback(async (productId: string, quantity: number) => {
     try {
-      await syncCartItem(productId, quantity);
+      const result = await syncCartItem(productId, quantity);
+      if (!result.success && result.error) {
+        console.warn("Cart sync:", result.error);
+      }
     } catch {
       // offline / no supabase
     }

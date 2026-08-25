@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Product } from "@/types";
-import { formatPrice } from "@/data/products";
+import { formatPrice, productPath } from "@/lib/products/format";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 
@@ -28,7 +28,7 @@ export default function ProductMiniRecommendations({
         {products.map((item) => (
           <div key={item.id} className="flex gap-3 items-center">
             <Link
-              href={`/products/${item.id}`}
+              href={productPath(item)}
               className="relative w-[72px] h-[72px] shrink-0 rounded-lg overflow-hidden bg-muted"
             >
               <Image
@@ -41,7 +41,7 @@ export default function ProductMiniRecommendations({
             </Link>
             <div className="flex-1 min-w-0">
               <Link
-                href={`/products/${item.id}`}
+                href={productPath(item)}
                 className="text-[13px] text-[#333] leading-snug hover:underline line-clamp-2"
               >
                 {item.name}

@@ -1,8 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
-import { getSupabaseUrl } from "./config";
+import { getSupabaseServiceRoleKey, getSupabaseUrl } from "./config";
 
 export function createAdminClient() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = getSupabaseServiceRoleKey();
   if (!serviceKey) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY is not configured");
   }

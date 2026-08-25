@@ -22,6 +22,8 @@ export default function ProductShowcase({
 }: ProductShowcaseProps) {
   const category = categorySlug ? getCategoryInfo(categorySlug) : null;
 
+  if (products.length === 0) return null;
+
   return (
     <section className="py-8 lg:py-12 bg-background">
       <div className="max-w-[1400px] mx-auto px-4">

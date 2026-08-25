@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { getGuestSessionId, readGuestSessionId } from "@/lib/cart/session";
-import { getProductById } from "@/lib/products/queries";
+import { getProductById, resolveCanonicalProductId } from "@/lib/products/queries";
 import type { CartItem, Product } from "@/types";
 import { revalidatePath } from "next/cache";
 
@@ -74,7 +74,9 @@ export async function fetchCartItems(): Promise<CartItem[]> {
 
   const items: CartItem[] = [];
   for (const row of rows) {
-    const product = await getProductById(row.product_id);
+    const canonicalId =
+      (await resolveCanonicalProductId(row.product_id)) ?? row.product_id;
+    const product = await getProductById(canonicalId);
     if (product && !product.soldOut) {
       items.push({ product, quantity: row.quantity });
     }
@@ -82,11 +84,22 @@ export async function fetchCartItems(): Promise<CartItem[]> {
   return items;
 }
 
+export async function syncFullCartAction(
+  clientItems: { productId: string; quantity: number }[]
+): Promise<void> {
+  for (const item of clientItems) {
+    const canonicalId = await resolveCanonicalProductId(item.productId);
+    if (!canonicalId) continue;
+    await syncCartItem(canonicalId, item.quantity);
+  }
+}
+
 export async function syncCartItem(
   productId: string,
   quantity: number
 ): Promise<{ success: boolean; error?: string }> {
-  const product = await getProductById(productId);
+  const canonicalId = (await resolveCanonicalProductId(productId)) ?? productId;
+  const product = await getProductById(canonicalId);
   if (!product) return { success: false, error: "Product not found" };
   if (product.soldOut) return { success: false, error: "Product is sold out" };
   if (quantity > (product.stock ?? 0))
@@ -111,10 +124,10 @@ export async function syncCartItem(
       .from("cart_items")
       .delete()
       .eq("cart_id", cartId)
-      .eq("product_id", productId);
+      .eq("product_id", canonicalId);
   } else {
     await admin.from("cart_items").upsert(
-      { cart_id: cartId, product_id: productId, quantity },
+      { cart_id: cartId, product_id: canonicalId, quantity },
       { onConflict: "cart_id,product_id" }
     );
   }

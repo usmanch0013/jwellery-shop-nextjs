@@ -1,10 +1,11 @@
 #!/usr/bin/env npx tsx
 /**
- * Seed Supabase with categories, products (18 real + bulk generated), and sample coupons.
- * Usage: npm run db:seed
- * Requires: SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SUPABASE_URL in .env.local
+ * Seed categories and coupons only (no demo products).
+ * Optional: SEED_DEMO_PRODUCTS=1 to load static samples from src/data/products.ts
  */
 import { createClient } from "@supabase/supabase-js";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const ws = require("ws") as typeof import("ws");
 import { categories, products } from "../src/data/products";
 import { slugify } from "../src/lib/products/mappers";
 
@@ -16,44 +17,30 @@ if (!url || !serviceKey) {
   process.exit(1);
 }
 
-const supabase = createClient(url, serviceKey);
+const supabase = createClient(url, serviceKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+  realtime: { transport: ws as unknown as typeof WebSocket },
+});
 
-const MATERIALS = [
-  "American Diamond",
-  "Gold Plated",
-  "Pearl",
-  "Zirconia",
-  "Crystal",
-  "Gemstone",
-];
+async function removeBulkProducts() {
+  const { error, count } = await supabase
+    .from("products")
+    .delete({ count: "exact" })
+    .like("legacy_id", "bulk-%");
 
-const NAME_PREFIXES = [
-  "Royal",
-  "Elegant",
-  "Classic",
-  "Vintage",
-  "Modern",
-  "Heritage",
-  "Luxe",
-  "Dainty",
-  "Statement",
-  "Bridal",
-];
+  if (error) {
+    console.warn("Could not remove bulk products:", error.message);
+    return;
+  }
 
-const NAME_SUFFIXES = [
-  "Necklace Set",
-  "Earrings",
-  "Bangle",
-  "Bracelet",
-  "Ring",
-  "Chain",
-  "Anklet",
-  "Jhumka",
-  "Hasli Set",
-  "Choker",
-];
+  if (count) {
+    console.log(`Removed ${count} bulk-generated products.`);
+  }
+}
 
 async function seed() {
+  await removeBulkProducts();
+
   console.log("Seeding categories...");
   const categoryMap = new Map<string, string>();
 
@@ -66,7 +53,7 @@ async function seed() {
           name: cat.name,
           description: cat.description,
           image: cat.image,
-          product_count: cat.productCount,
+          product_count: 0,
         },
         { onConflict: "slug" }
       )
@@ -80,7 +67,21 @@ async function seed() {
     categoryMap.set(cat.slug, data.id);
   }
 
-  console.log("Seeding base products...");
+  console.log(
+    process.env.SEED_DEMO_PRODUCTS === "1"
+      ? `Seeding ${products.length} demo products...`
+      : "Skipping demo products (client catalog only)."
+  );
+  const counts = new Map<string, number>();
+
+  if (process.env.SEED_DEMO_PRODUCTS !== "1") {
+    const demoIds = products.map((p) => p.id);
+    if (demoIds.length) {
+      await supabase.from("products").delete().in("legacy_id", demoIds);
+    }
+  }
+
+  if (process.env.SEED_DEMO_PRODUCTS === "1") {
   for (const p of products) {
     const categoryId = categoryMap.get(p.category);
     if (!categoryId) continue;
@@ -109,53 +110,15 @@ async function seed() {
     );
 
     if (error) console.error("Product error:", p.name, error.message);
+    else counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
   }
 
-  console.log("Generating bulk products (1000+)...");
-  const categorySlugs = [...categoryMap.keys()];
-  const batch: Record<string, unknown>[] = [];
-  const TARGET = 1000;
-
-  for (let i = 0; i < TARGET; i++) {
-    const catSlug = categorySlugs[i % categorySlugs.length];
-    const categoryId = categoryMap.get(catSlug)!;
-    const prefix = NAME_PREFIXES[i % NAME_PREFIXES.length];
-    const suffix = NAME_SUFFIXES[i % NAME_SUFFIXES.length];
-    const name = `${prefix} ${suffix} #${i + 100}`;
-    const price = 500 + (i % 50) * 200;
-    const material = MATERIALS[i % MATERIALS.length];
-
-    batch.push({
-      legacy_id: `bulk-${i}`,
-      slug: slugify(name),
-      name,
-      description: `Beautiful ${material.toLowerCase()} ${suffix.toLowerCase()} from Lumière collection.`,
-      price,
-      original_price: i % 5 === 0 ? price + 500 : null,
-      category_id: categoryId,
-      material,
-      stock: 20 + (i % 30),
-      is_new: i % 7 === 0,
-      is_bestseller: i % 11 === 0,
-      sold_out: false,
-      review_count: i % 40,
-      rating_avg: 3.5 + (i % 15) / 10,
-      image: products[i % products.length].image,
-      hover_image: products[(i + 1) % products.length].image,
-    });
-
-    if (batch.length >= 100) {
-      const { error } = await supabase.from("products").upsert(batch, {
-        onConflict: "slug",
-      });
-      if (error) console.error("Batch error:", error.message);
-      batch.length = 0;
-      console.log(`  ...${i + 1} products`);
-    }
+  for (const [slug, count] of counts) {
+    await supabase
+      .from("categories")
+      .update({ product_count: count })
+      .eq("slug", slug);
   }
-
-  if (batch.length) {
-    await supabase.from("products").upsert(batch, { onConflict: "slug" });
   }
 
   console.log("Seeding coupons...");
@@ -181,7 +144,11 @@ async function seed() {
     { onConflict: "code" }
   );
 
-  console.log("Done! Run SELECT count(*) FROM products; to verify.");
+  const { count } = await supabase
+    .from("products")
+    .select("*", { count: "exact", head: true });
+
+  console.log(`Done! ${count ?? products.length} products in catalog.`);
 }
 
 seed().catch(console.error);

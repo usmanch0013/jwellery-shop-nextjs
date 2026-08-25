@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:seed": "tsx scripts/seed-products.ts"
+    "db:migrate": "node --env-file=.env.local ./node_modules/.bin/tsx scripts/run-migration.ts",
+    "db:seed": "node --env-file=.env.local ./node_modules/.bin/tsx scripts/seed-products.ts",
+    "db:seed-demo": "SEED_DEMO_PRODUCTS=1 node --env-file=.env.local ./node_modules/.bin/tsx scripts/seed-products.ts",
+    "db:trim-products": "node --env-file=.env.local ./node_modules/.bin/tsx scripts/trim-products.ts",
+    "db:setup": "npm run db:migrate && npm run db:seed"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -45,12 +49,16 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.3.2",
+    "pg": "^8.23.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ws": "^8.21.3"
   }
 }

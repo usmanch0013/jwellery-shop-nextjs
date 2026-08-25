@@ -10,7 +10,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/data/products";
+import { formatPrice, productPath } from "@/lib/products/format";
 
 interface CartSheetProps {
   open: boolean;
@@ -54,7 +54,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                   className="flex gap-4 pb-5 border-b border-border last:border-0 last:pb-0"
                 >
                   <Link
-                    href={`/products/${item.product.id}`}
+                    href={productPath(item.product)}
                     onClick={() => onOpenChange(false)}
                     className="relative w-[88px] h-[88px] rounded-lg overflow-hidden shrink-0 bg-muted border border-border"
                   >
@@ -69,7 +69,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
                   <div className="flex-1 min-w-0 flex flex-col">
                     <Link
-                      href={`/products/${item.product.id}`}
+                      href={productPath(item.product)}
                       onClick={() => onOpenChange(false)}
                       className="font-medium text-sm text-foreground hover:text-primary transition-colors line-clamp-2 leading-snug"
                     >

@@ -5,10 +5,13 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { checkoutSchema } from "@/lib/validations/commerce";
 import { clearServerCart } from "@/actions/cart";
-import { fetchCartItems } from "@/actions/cart";
 import { revalidatePath } from "next/cache";
 import type { DbOrder, DbOrderItem } from "@/lib/database.types";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
+import {
+  getProductById,
+  resolveCanonicalProductId,
+} from "@/lib/products/queries";
 
 async function sendOrderConfirmationEmail(
   email: string,
@@ -64,6 +67,47 @@ export async function validateCoupon(code: string, subtotal: number) {
   return { valid: true, discount, code: data.code };
 }
 
+async function resolveOrderItems(
+  clientItems: { productId: string; quantity: number }[]
+): Promise<
+  | { ok: true; items: { product_id: string; quantity: number }[] }
+  | { ok: false; error: string }
+> {
+  if (!clientItems.length) {
+    return { ok: false, error: "Your cart is empty" };
+  }
+
+  const resolved: { product_id: string; quantity: number }[] = [];
+
+  for (const item of clientItems) {
+    const canonicalId = await resolveCanonicalProductId(item.productId);
+    if (!canonicalId) {
+      return {
+        ok: false,
+        error: "A product in your cart is no longer available",
+      };
+    }
+
+    const product = await getProductById(canonicalId);
+    if (!product) {
+      return {
+        ok: false,
+        error: "A product in your cart is no longer available",
+      };
+    }
+    if (product.soldOut || (product.stock ?? 0) < item.quantity) {
+      return {
+        ok: false,
+        error: `Insufficient stock for ${product.name}`,
+      };
+    }
+
+    resolved.push({ product_id: canonicalId, quantity: item.quantity });
+  }
+
+  return { ok: true, items: resolved };
+}
+
 export async function placeOrderAction(input: unknown) {
   const rl = rateLimit(await rateLimitKey("place-order"), 5, 60_000);
   if (!rl.ok) {
@@ -72,21 +116,20 @@ export async function placeOrderAction(input: unknown) {
 
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) {
-    return { success: false, error: "Invalid checkout data" };
+    const message =
+      parsed.error.issues[0]?.message ?? "Invalid checkout data";
+    return { success: false, error: message };
   }
 
-  const { shipping, paymentMethod, couponCode, paymentReference, notes } =
+  const { shipping, paymentMethod, couponCode, paymentReference, notes, items: clientItems } =
     parsed.data;
 
-  const cartItems = await fetchCartItems();
-  if (!cartItems.length) {
-    return { success: false, error: "Your cart is empty" };
+  const resolved = await resolveOrderItems(clientItems);
+  if (!resolved.ok) {
+    return { success: false, error: resolved.error };
   }
 
-  const items = cartItems.map((i) => ({
-    product_id: i.product.id,
-    quantity: i.quantity,
-  }));
+  const items = resolved.items;
 
   if (!isSupabaseConfigured()) {
     return {

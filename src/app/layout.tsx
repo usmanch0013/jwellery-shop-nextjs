@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter, Cormorant_Garamond, Great_Vibes } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import StorefrontShell from "@/components/StorefrontShell";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { getCategories } from "@/lib/products/queries";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,7 +30,9 @@ export const metadata: Metadata = {
     "Pakistan's award winning artificial jewellery brand. Shop necklace sets, earrings, bangles, bridal sets and more.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const categories = await getCategories();
+
   return (
     <html
       lang="en"
@@ -39,9 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full w-full flex flex-col bg-background text-foreground font-sans">
         <CartProvider>
           <WishlistProvider>
-            <Header />
-            <main className="flex-1 w-full">{children}</main>
-            <Footer />
+            <StorefrontShell categories={categories}>{children}</StorefrontShell>
             <Toaster position="bottom-right" />
           </WishlistProvider>
         </CartProvider>

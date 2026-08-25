@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { categories } from "@/data/products";
+import type { CategoryInfo } from "@/types";
 
 const footerLinks = [
   { label: "Track Your Order", href: "/track-order" },
@@ -10,7 +10,7 @@ const footerLinks = [
   { label: "FAQs", href: "/#faq" },
 ];
 
-export default function Footer() {
+export default function Footer({ categories }: { categories: CategoryInfo[] }) {
   return (
     <footer className="bg-background border-t border-border mt-auto">
       <div className="max-w-[1400px] mx-auto px-4 py-14">
@@ -46,7 +46,10 @@ export default function Footer() {
               Quick Links
             </h4>
             <ul className="space-y-2.5">
-              {categories.slice(0, 7).map((cat) => (
+            {categories
+              .filter((cat) => cat.productCount > 0)
+              .slice(0, 7)
+              .map((cat) => (
                 <li key={cat.slug}>
                   <Link
                     href={`/categories/${cat.slug}`}

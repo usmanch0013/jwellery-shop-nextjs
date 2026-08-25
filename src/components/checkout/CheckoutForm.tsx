@@ -14,6 +14,8 @@ import {
 } from "@/lib/constants/commerce";
 import { formatPrice } from "@/lib/products/format";
 import { placeOrderAction, validateCoupon } from "@/actions/orders";
+import { syncFullCartAction } from "@/actions/cart";
+import { shippingAddressSchema } from "@/lib/validations/commerce";
 
 const STEPS = ["Shipping", "Payment", "Review"] as const;
 
@@ -58,6 +60,57 @@ export default function CheckoutForm() {
     totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_FEE;
   const total = Math.max(0, totalPrice - discount + shipping);
 
+  function validateShipping(): string | null {
+    const result = shippingAddressSchema.safeParse({
+      fullName: form.fullName.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim(),
+      line1: form.line1.trim(),
+      line2: form.line2.trim() || undefined,
+      city: form.city.trim(),
+      province: form.province,
+      postalCode: form.postalCode.trim() || undefined,
+    });
+
+    if (!result.success) {
+      return result.error.issues[0]?.message ?? "Please complete shipping details";
+    }
+
+    return null;
+  }
+
+  function validatePayment(): string | null {
+    if (
+      (form.paymentMethod === "bank_transfer" ||
+        form.paymentMethod === "jazzcash" ||
+        form.paymentMethod === "easypaisa") &&
+      !form.paymentReference.trim()
+    ) {
+      return "Payment reference / transaction ID is required";
+    }
+    return null;
+  }
+
+  function goToPayment() {
+    const shippingError = validateShipping();
+    if (shippingError) {
+      setError(shippingError);
+      return;
+    }
+    setError("");
+    setStep(1);
+  }
+
+  function goToReview() {
+    const paymentError = validatePayment();
+    if (paymentError) {
+      setError(paymentError);
+      return;
+    }
+    setError("");
+    setStep(2);
+  }
+
   async function applyCoupon() {
     const result = await validateCoupon(couponCode, totalPrice);
     if (result.valid) setDiscount(result.discount);
@@ -65,23 +118,49 @@ export default function CheckoutForm() {
   }
 
   async function placeOrder() {
+    const shippingError = validateShipping();
+    if (shippingError) {
+      setError(shippingError);
+      setStep(0);
+      return;
+    }
+
+    const paymentError = validatePayment();
+    if (paymentError) {
+      setError(paymentError);
+      setStep(1);
+      return;
+    }
+
     setLoading(true);
     setError("");
+    const cartPayload = items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+    }));
+
+    try {
+      await syncFullCartAction(cartPayload);
+    } catch {
+      // non-blocking; order uses validated client items
+    }
+
     const result = await placeOrderAction({
       shipping: {
-        fullName: form.fullName,
-        phone: form.phone,
-        email: form.email,
-        line1: form.line1,
-        line2: form.line2,
-        city: form.city,
+        fullName: form.fullName.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        line1: form.line1.trim(),
+        line2: form.line2.trim() || undefined,
+        city: form.city.trim(),
         province: form.province as (typeof PK_PROVINCES)[number],
-        postalCode: form.postalCode,
+        postalCode: form.postalCode.trim() || undefined,
       },
       paymentMethod: form.paymentMethod as "cod",
       couponCode: couponCode || undefined,
       paymentReference: form.paymentReference || undefined,
       notes: form.notes || undefined,
+      items: cartPayload,
     });
     setLoading(false);
 
@@ -137,7 +216,13 @@ export default function CheckoutForm() {
         )}
 
         {step === 0 && (
-          <div className="space-y-4">
+          <form
+            className="space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              goToPayment();
+            }}
+          >
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <Label>Full Name</Label>
@@ -211,10 +296,10 @@ export default function CheckoutForm() {
                 </select>
               </div>
             </div>
-            <Button onClick={() => setStep(1)} className="w-full sm:w-auto">
+            <Button type="submit" className="w-full sm:w-auto">
               Continue to Payment
             </Button>
-          </div>
+          </form>
         )}
 
         {step === 1 && (
@@ -285,7 +370,7 @@ export default function CheckoutForm() {
               <Button variant="outline" onClick={() => setStep(0)}>
                 Back
               </Button>
-              <Button onClick={() => setStep(2)}>Review Order</Button>
+              <Button onClick={goToReview}>Review Order</Button>
             </div>
           </div>
         )}

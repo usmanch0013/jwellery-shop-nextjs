@@ -100,4 +100,47 @@ export interface DbReview {
   approved: boolean;
   created_at: string;
   profiles?: { full_name: string | null } | null;
+  products?: { name: string } | null;
+}
+
+export interface DbCoupon {
+  id: string;
+  code: string;
+  type: "percent" | "fixed";
+  value: number;
+  min_order: number;
+  usage_limit: number | null;
+  usage_count: number;
+  expires_at: string | null;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface DbPayment {
+  id: string;
+  order_id: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  provider_ref: string | null;
+  amount: number;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+  orders?: { order_number: string; guest_email: string | null } | null;
+}
+
+export interface DbContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string | null;
+  message: string;
+  created_at: string;
+}
+
+export interface DbProfile {
+  id: string;
+  full_name: string | null;
+  phone: string | null;
+  role: "customer" | "admin";
+  created_at: string;
 }

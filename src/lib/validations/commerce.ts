@@ -3,7 +3,13 @@ import { PK_PROVINCES } from "@/lib/constants/commerce";
 
 export const shippingAddressSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
-  phone: z.string().min(10, "Valid phone number required"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .refine(
+      (value) => value.replace(/\D/g, "").length >= 10,
+      "Enter a valid phone number (at least 10 digits)"
+    ),
   email: z.string().email("Valid email required"),
   line1: z.string().min(5, "Address is required"),
   line2: z.string().optional(),
@@ -26,6 +32,14 @@ export const checkoutSchema = z.object({
   couponCode: z.string().optional(),
   paymentReference: z.string().optional(),
   notes: z.string().max(500).optional(),
+  items: z
+    .array(
+      z.object({
+        productId: z.string().min(1),
+        quantity: z.number().int().positive(),
+      })
+    )
+    .min(1),
 });
 
 export const loginSchema = z.object({

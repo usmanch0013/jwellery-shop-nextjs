@@ -21,7 +21,11 @@ export default function LoginForm() {
     const result = await loginAction(formData);
     setLoading(false);
     if (result.error) {
-      setError(result.error);
+      setError(
+        typeof result.error === "string"
+          ? result.error
+          : "Sign in failed. Please try again."
+      );
       return;
     }
     router.push("/account");
