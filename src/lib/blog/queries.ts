@@ -3,6 +3,20 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import type { DbBlogCategory, DbBlogPost, DbBlogTag } from "@/lib/database.types";
 import type { BlogPostCard } from "@/lib/blog/types";
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function pickCategory(value: unknown): DbBlogCategory | null {
+  if (!isRecord(value) || typeof value.id !== "string") return null;
+  return value as unknown as DbBlogCategory;
+}
+
+function pickTag(value: unknown): DbBlogTag | null {
+  if (!isRecord(value) || typeof value.id !== "string") return null;
+  return value as unknown as DbBlogTag;
+}
+
 function mapPostCard(
   post: DbBlogPost & {
     blog_post_categories?: {
@@ -83,13 +97,11 @@ export async function getBlogPostBySlug(slug: string) {
 
   return {
     ...(post as DbBlogPost),
-    categories:
-      categoriesRes.data
-        ?.map((row) => row.blog_categories as DbBlogCategory)
-        .filter(Boolean) ?? [],
-    tags:
-      tagsRes.data
-        ?.map((row) => row.blog_tags as DbBlogTag)
-        .filter(Boolean) ?? [],
+    categories: (categoriesRes.data ?? [])
+      .map((row) => pickCategory(row.blog_categories))
+      .filter((c): c is DbBlogCategory => c !== null),
+    tags: (tagsRes.data ?? [])
+      .map((row) => pickTag(row.blog_tags))
+      .filter((t): t is DbBlogTag => t !== null),
   };
 }

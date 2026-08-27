@@ -116,6 +116,7 @@ export interface DbOrder {
   payment_status: PaymentStatus;
   shipping_address: Record<string, string>;
   coupon_code: string | null;
+  notes?: string | null;
   created_at: string;
 }
 

@@ -110,7 +110,7 @@ export function AdminThead({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function AdminTh({ children }: { children: React.ReactNode }) {
+export function AdminTh({ children }: { children?: React.ReactNode }) {
   return (
     <th className="px-5 py-3 text-[11px] font-medium uppercase tracking-wider">
       {children}
