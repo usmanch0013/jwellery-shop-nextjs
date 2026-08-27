@@ -30,8 +30,6 @@ export function getSupabaseAuthClientOptions(apiKey = getSupabaseAnonKey()) {
   return {
     global: {
       fetch: wrapSupabaseFetch(apiKey),
-      // Override SDK default `Bearer sb_*...` on the auth client.
-      headers: { Authorization: "" },
     },
   };
 }
