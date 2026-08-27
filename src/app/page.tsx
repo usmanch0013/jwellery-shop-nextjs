@@ -1,4 +1,5 @@
 import HomePageContent from "@/components/HomePageContent";
+import { getLatestBlogPosts } from "@/lib/blog/queries";
 import {
   getCategories,
   getFeaturedProducts,
@@ -15,6 +16,7 @@ export default async function HomePage() {
     bestSelling,
     newArrivals,
     mostLoved,
+    blogPosts,
   ] = await Promise.all([
     getCategories(),
     getProducts({ category: "necklace-sets", limit: 8 }),
@@ -24,6 +26,7 @@ export default async function HomePage() {
     getFeaturedProducts({ bestseller: true, limit: 8 }),
     getFeaturedProducts({ isNew: true, limit: 8 }),
     getProducts({ sort: "popular", limit: 4 }),
+    getLatestBlogPosts(3),
   ]);
 
   return (
@@ -36,6 +39,7 @@ export default async function HomePage() {
       bestSelling={bestSelling}
       newArrivals={newArrivals}
       mostLoved={mostLoved.products}
+      blogPosts={blogPosts}
     />
   );
 }

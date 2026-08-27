@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getSupabaseConfigIssue, isSupabaseConfigured } from "@/lib/supabase/config";
 import { loginSchema, registerSchema } from "@/lib/validations/commerce";
 import { mergeGuestCartOnLogin } from "@/actions/cart";
 import { redirect } from "next/navigation";
@@ -198,7 +198,12 @@ export async function loginAction(formData: FormData) {
   }
 
   if (!isSupabaseConfigured()) {
-    return { error: "Authentication not configured" };
+    const issue = getSupabaseConfigIssue();
+    return {
+      error:
+        issue ??
+        "Authentication not configured on this server. Add Supabase environment variables in Netlify and redeploy.",
+    };
   }
 
   const supabase = await createClient();
@@ -225,7 +230,12 @@ export async function registerAction(formData: FormData) {
     }
 
     if (!isSupabaseConfigured()) {
-      return { error: "Authentication not configured" };
+      const issue = getSupabaseConfigIssue();
+      return {
+        error:
+          issue ??
+          "Authentication not configured on this server. Add Supabase environment variables in Netlify and redeploy.",
+      };
     }
 
     const email = parsed.data.email.trim().toLowerCase();

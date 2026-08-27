@@ -9,6 +9,8 @@ import {
 } from "@/actions/admin/orders";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AdminCard } from "@/components/admin/AdminShell";
+import { Save } from "lucide-react";
 
 const ORDER_STATUSES: OrderStatus[] = [
   "pending",
@@ -27,6 +29,9 @@ const PAYMENT_STATUSES: PaymentStatus[] = [
   "refunded",
   "cod_pending",
 ];
+
+const selectClass =
+  "w-full h-10 rounded-xl border border-border/70 bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20";
 
 export default function OrderAdminActions({
   orderId,
@@ -51,41 +56,42 @@ export default function OrderAdminActions({
   }
 
   return (
-    <form action={save} className="space-y-4 border border-border rounded-lg p-4 bg-background">
-      <h3 className="font-medium">Update order</h3>
-      <div className="grid sm:grid-cols-2 gap-4">
-        <div>
-          <Label>Order status</Label>
-          <select
-            name="status"
-            defaultValue={status}
-            className="w-full h-9 border border-input px-3 text-sm rounded-md"
-          >
-            {ORDER_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+    <AdminCard
+      title="Update order"
+      description="Change fulfillment and payment status"
+    >
+      <form action={save} className="space-y-5">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label>Order status</Label>
+            <select name="status" defaultValue={status} className={selectClass}>
+              {ORDER_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-2">
+            <Label>Payment status</Label>
+            <select
+              name="paymentStatus"
+              defaultValue={paymentStatus}
+              className={selectClass}
+            >
+              {PAYMENT_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {s.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div>
-          <Label>Payment status</Label>
-          <select
-            name="paymentStatus"
-            defaultValue={paymentStatus}
-            className="w-full h-9 border border-input px-3 text-sm rounded-md"
-          >
-            {PAYMENT_STATUSES.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <Button type="submit" disabled={loading}>
-        {loading ? "Saving..." : "Save changes"}
-      </Button>
-    </form>
+        <Button type="submit" disabled={loading} className="gap-2">
+          <Save className="h-4 w-4" />
+          {loading ? "Saving..." : "Save changes"}
+        </Button>
+      </form>
+    </AdminCard>
   );
 }

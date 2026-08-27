@@ -8,7 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "@/actions/auth";
 
-export default function LoginForm() {
+export default function LoginForm({
+  configIssue = null,
+}: {
+  configIssue?: string | null;
+}) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,6 +38,13 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
+      {configIssue && (
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 p-3 rounded">
+          Sign-in is not configured on this server yet. {configIssue} Add the
+          variables in Netlify → Site settings → Environment variables, then
+          redeploy.
+        </p>
+      )}
       {error && (
         <p className="text-sm text-red-600 bg-red-50 p-3 rounded">{error}</p>
       )}

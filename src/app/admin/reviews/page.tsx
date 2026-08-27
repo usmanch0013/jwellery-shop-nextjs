@@ -4,45 +4,56 @@ import {
   deleteReviewFormAction,
 } from "@/actions/admin/reviews";
 import { Button } from "@/components/ui/button";
+import { AdminCard, AdminEmpty, AdminPageHeader } from "@/components/admin/AdminShell";
+import { Star } from "lucide-react";
 
 export default async function AdminReviewsPage() {
   const reviews = await getAdminReviews();
 
   return (
     <div className="space-y-6">
-      <h1 className="font-serif text-2xl">Reviews</h1>
+      <AdminPageHeader
+        title="Reviews"
+        description={`${reviews.length} customer reviews`}
+      />
 
-      <div className="space-y-3">
-        {reviews.length === 0 ? (
-          <p className="text-muted-foreground">No reviews yet</p>
-        ) : (
-          reviews.map((r) => (
-            <div
-              key={r.id}
-              className="border border-border rounded-lg p-4 bg-background"
-            >
+      {reviews.length === 0 ? (
+        <AdminEmpty
+          title="No reviews yet"
+          description="Product reviews will appear here for moderation."
+        />
+      ) : (
+        <div className="grid gap-4">
+          {reviews.map((r) => (
+            <AdminCard key={r.id} padding>
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="font-medium">
-                    {r.products?.name ?? "Product"} · {r.rating}/5
-                  </p>
-                  <p className="text-xs text-muted-foreground">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium">
+                      {r.products?.name ?? "Product"}
+                    </p>
+                    <div className="flex items-center gap-0.5 text-amber-600">
+                      <Star className="h-3.5 w-3.5 fill-current" />
+                      <span className="text-sm font-medium">{r.rating}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
                     {r.profiles?.full_name ?? "Customer"} ·{" "}
                     {new Date(r.created_at).toLocaleDateString("en-PK")}
                   </p>
-                  <p className="text-sm mt-2">{r.comment}</p>
+                  <p className="text-sm mt-3 leading-relaxed">{r.comment}</p>
                 </div>
                 <span
-                  className={`text-xs px-2 py-0.5 rounded ${
+                  className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                     r.approved
-                      ? "bg-green-100 text-green-800"
+                      ? "bg-emerald-100 text-emerald-800"
                       : "bg-amber-100 text-amber-800"
                   }`}
                 >
                   {r.approved ? "Approved" : "Pending"}
                 </span>
               </div>
-              <div className="flex gap-2 mt-3">
+              <div className="flex gap-2 mt-4 pt-4 border-t border-border/50">
                 {!r.approved && (
                   <form action={setReviewApprovalFormAction}>
                     <input type="hidden" name="id" value={r.id} />
@@ -68,10 +79,10 @@ export default async function AdminReviewsPage() {
                   </Button>
                 </form>
               </div>
-            </div>
-          ))
-        )}
-      </div>
+            </AdminCard>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

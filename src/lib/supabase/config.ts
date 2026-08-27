@@ -40,6 +40,19 @@ export function isSupabaseConfigured(): boolean {
   return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }
 
+export function getSupabaseConfigIssue(): string | null {
+  if (!getSupabaseUrl() && !getSupabaseAnonKey()) {
+    return "Missing NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (or ANON_KEY).";
+  }
+  if (!getSupabaseUrl()) {
+    return "Missing NEXT_PUBLIC_SUPABASE_URL.";
+  }
+  if (!getSupabaseAnonKey()) {
+    return "Missing NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY).";
+  }
+  return null;
+}
+
 export function getSupabaseUrl(): string {
   return process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 }

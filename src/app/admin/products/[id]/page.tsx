@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
-import { getAdminCategories, getAdminProduct } from "@/lib/admin/queries";
-import ProductForm from "@/components/admin/ProductForm";
+import {
+  getAdminCategories,
+  getAdminProductDetails,
+} from "@/lib/admin/queries";
+import { getProductTagsAction } from "@/actions/admin/tags";
+import ProductEditor from "@/components/admin/ProductEditor";
+import { AdminPageHeader } from "@/components/admin/AdminShell";
 
 export default async function EditProductPage({
   params,
@@ -8,17 +13,26 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [product, categories] = await Promise.all([
-    getAdminProduct(id),
+  const [product, categories, tags] = await Promise.all([
+    getAdminProductDetails(id),
     getAdminCategories(),
+    getProductTagsAction(),
   ]);
 
   if (!product) notFound();
 
   return (
-    <div className="space-y-6">
-      <h1 className="font-serif text-2xl">Edit product</h1>
-      <ProductForm categories={categories} product={product} />
+    <div className="mx-auto max-w-[1400px] space-y-8">
+      <AdminPageHeader
+        title="Edit product"
+        description={product.name}
+        backHref="/admin/products"
+      />
+      <ProductEditor
+        categories={categories}
+        tags={tags}
+        product={product}
+      />
     </div>
   );
 }

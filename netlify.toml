@@ -1,0 +1,19 @@
+# Netlify — Supabase auth requires these at build + runtime
+[build]
+  command = "npm run build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NEXT_PUBLIC_SUPABASE_URL = "https://ktvzsfydpnnkqydkfuhq.supabase.co"
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_5F4VATxUSFjLXQwAH14r6Q_Zkfn64oM"
+  NEXT_PUBLIC_APP_URL = "https://jwelleryshophsp.netlify.app"
+  ADMIN_EMAILS = "asantechpvt@gmail.com"
+
+# Add in Netlify UI (Site settings → Environment variables):
+# SUPABASE_SERVICE_ROLE_KEY = your sb_secret_... key (for admin/orders — not in git)
+#
+# Supabase Dashboard → Authentication → URL Configuration:
+#   Site URL: https://jwelleryshophsp.netlify.app
+#   Redirect URLs: https://jwelleryshophsp.netlify.app/**

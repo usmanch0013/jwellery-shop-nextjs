@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CategoryInfo, Product } from "@/types";
+import type { BlogPostCard } from "@/lib/blog/types";
 import ProductShowcase from "@/components/ProductShowcase";
 import ProductCard from "@/components/ProductCard";
 import QuickViewDialog from "@/components/QuickViewDialog";
@@ -23,6 +24,7 @@ interface HomePageContentProps {
   bestSelling: Product[];
   newArrivals: Product[];
   mostLoved: Product[];
+  blogPosts: BlogPostCard[];
 }
 
 function categoryCount(categories: CategoryInfo[], slug: string) {
@@ -38,6 +40,7 @@ export default function HomePageContent({
   bestSelling,
   newArrivals,
   mostLoved,
+  blogPosts,
 }: HomePageContentProps) {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
     null
@@ -158,7 +161,7 @@ export default function HomePageContent({
       <div id="reviews">
         <Testimonials />
       </div>
-      <BlogSection />
+      <BlogSection posts={blogPosts} />
       <TrustBar />
       <FAQ />
 

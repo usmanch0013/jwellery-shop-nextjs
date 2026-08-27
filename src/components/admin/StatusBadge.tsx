@@ -1,39 +1,51 @@
 import type { OrderStatus, PaymentStatus } from "@/lib/database.types";
 
 const ORDER_COLORS: Record<OrderStatus, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  confirmed: "bg-blue-100 text-blue-800",
-  processing: "bg-indigo-100 text-indigo-800",
-  shipped: "bg-purple-100 text-purple-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+  pending: "bg-amber-100 text-amber-800 ring-amber-200",
+  confirmed: "bg-blue-100 text-blue-800 ring-blue-200",
+  processing: "bg-indigo-100 text-indigo-800 ring-indigo-200",
+  shipped: "bg-purple-100 text-purple-800 ring-purple-200",
+  delivered: "bg-emerald-100 text-emerald-800 ring-emerald-200",
+  cancelled: "bg-rose-100 text-rose-800 ring-rose-200",
 };
 
 const PAYMENT_COLORS: Record<PaymentStatus, string> = {
-  pending: "bg-gray-100 text-gray-800",
-  awaiting_payment: "bg-amber-100 text-amber-800",
-  paid: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
-  refunded: "bg-orange-100 text-orange-800",
-  cod_pending: "bg-blue-100 text-blue-800",
+  pending: "bg-slate-100 text-slate-800 ring-slate-200",
+  awaiting_payment: "bg-amber-100 text-amber-800 ring-amber-200",
+  paid: "bg-emerald-100 text-emerald-800 ring-emerald-200",
+  failed: "bg-rose-100 text-rose-800 ring-rose-200",
+  refunded: "bg-orange-100 text-orange-800 ring-orange-200",
+  cod_pending: "bg-sky-100 text-sky-800 ring-sky-200",
 };
+
+function Badge({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className: string;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 ring-inset ${className}`}
+    >
+      {children}
+    </span>
+  );
+}
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
   return (
-    <span
-      className={`inline-flex px-2 py-0.5 text-xs font-medium rounded ${ORDER_COLORS[status]}`}
-    >
-      {status}
-    </span>
+    <Badge className={ORDER_COLORS[status]}>
+      {status.replace("_", " ")}
+    </Badge>
   );
 }
 
 export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {
   return (
-    <span
-      className={`inline-flex px-2 py-0.5 text-xs font-medium rounded ${PAYMENT_COLORS[status]}`}
-    >
-      {status.replace("_", " ")}
-    </span>
+    <Badge className={PAYMENT_COLORS[status]}>
+      {status.replace(/_/g, " ")}
+    </Badge>
   );
 }

@@ -12,6 +12,10 @@ import {
 } from "@/actions/admin/products";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { AdminCard } from "@/components/admin/AdminShell";
+
+const inputClass =
+  "w-full h-10 rounded-xl border border-border/70 bg-background px-3 text-sm";
 
 type ProductRow = DbProduct & {
   categories?: { slug: string; name: string } | null;
@@ -38,9 +42,13 @@ export default function ProductForm({
   }
 
   return (
-    <form action={handleSubmit} className="max-w-2xl space-y-4">
+    <AdminCard
+      title={isEdit ? "Product details" : "New product"}
+      description="Fill in catalog information below"
+    >
+      <form action={handleSubmit} className="space-y-5">
       {error && (
-        <p className="text-sm text-red-600 bg-red-50 p-3 rounded">{error}</p>
+        <p className="text-sm text-red-600 bg-red-50 p-3 rounded-xl">{error}</p>
       )}
 
       <div className="grid sm:grid-cols-2 gap-4">
@@ -61,7 +69,7 @@ export default function ProductForm({
           defaultValue={product?.description}
           required
           rows={4}
-          className="w-full border border-input px-3 py-2 text-sm rounded-md"
+          className={`${inputClass} min-h-[100px] py-2`}
         />
       </div>
 
@@ -101,7 +109,7 @@ export default function ProductForm({
             name="categoryId"
             defaultValue={product?.category_id}
             required
-            className="w-full h-9 border border-input px-3 text-sm rounded-md"
+            className={inputClass}
           >
             {categories.map((c) => (
               <option key={c.id} value={c.id}>
@@ -178,5 +186,6 @@ export default function ProductForm({
         )}
       </div>
     </form>
+    </AdminCard>
   );
 }

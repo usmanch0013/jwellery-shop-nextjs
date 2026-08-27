@@ -1,36 +1,50 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { blogPosts } from "@/data/site";
+import type { BlogPostCard } from "@/lib/blog/types";
+import { formatBlogDate } from "@/lib/blog/format";
 
-export default function BlogSection() {
+export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
+  if (posts.length === 0) return null;
+
   return (
     <section className="py-14 lg:py-20">
-      <div className="max-w-[1400px] mx-auto px-4">
-        <h2 className="text-2xl font-medium text-center mb-10">Blog posts</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {blogPosts.map((post) => (
-            <Link
-              key={post.id}
-              href="#"
-              className="group"
-            >
-              <div className="relative aspect-[3/2] bg-muted overflow-hidden mb-4">
-                <Image
-                  src={post.image}
-                  alt={post.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+      <div className="mx-auto max-w-[1400px] px-4">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <h2 className="text-2xl font-medium">Blog posts</h2>
+          <Link
+            href="/blog"
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
+            View all
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {posts.map((post) => (
+            <Link key={post.id} href={`/blog/${post.slug}`} className="group">
+              <div className="relative mb-4 aspect-[3/2] overflow-hidden bg-muted">
+                {post.featured_image ? (
+                  <Image
+                    src={post.featured_image}
+                    alt={post.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    unoptimized
+                  />
+                ) : null}
               </div>
-              <h3 className="text-sm font-medium mb-2 group-hover:underline leading-snug">
+              <p className="text-xs text-muted-foreground">
+                {formatBlogDate(post.published_at)}
+              </p>
+              <h3 className="mb-2 text-sm font-medium leading-snug group-hover:underline">
                 {post.title}
               </h3>
-              <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
+              <p className="mb-3 line-clamp-2 text-xs text-muted-foreground">
                 {post.excerpt}
               </p>
-              <span className="text-xs text-muted-foreground flex items-center gap-1 group-hover:text-primary transition-colors">
-                Read more <ArrowRight className="w-3 h-3" />
+              <span className="flex items-center gap-1 text-xs text-muted-foreground transition-colors group-hover:text-primary">
+                Read more <ArrowRight className="h-3 w-3" />
               </span>
             </Link>
           ))}

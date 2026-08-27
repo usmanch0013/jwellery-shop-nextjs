@@ -36,6 +36,9 @@ export interface DbProduct {
   slug: string;
   name: string;
   description: string;
+  short_description?: string;
+  sku?: string | null;
+  status?: "draft" | "published";
   price: number;
   original_price: number | null;
   category_id: string;
@@ -50,6 +53,52 @@ export interface DbProduct {
   hover_image: string | null;
   created_at: string;
   categories?: DbCategory | null;
+}
+
+export interface DbMediaAsset {
+  id: string;
+  url: string;
+  alt_text: string | null;
+  title: string | null;
+  file_name: string | null;
+  mime_type: string | null;
+  source?: string | null;
+  created_at: string;
+}
+
+export interface DbProductTag {
+  id: string;
+  slug: string;
+  name: string;
+  created_at: string;
+}
+
+export interface DbProductImage {
+  id: string;
+  product_id: string;
+  url: string;
+  sort_order: number;
+}
+
+export interface DbProductVariation {
+  id: string;
+  product_id: string;
+  sku: string | null;
+  name: string;
+  price: number | null;
+  original_price: number | null;
+  stock: number;
+  image_url: string | null;
+  attributes: Record<string, string>;
+  sort_order: number;
+  is_default: boolean;
+  created_at: string;
+}
+
+export interface AdminProductDetails extends DbProduct {
+  gallery: DbProductImage[];
+  tags: DbProductTag[];
+  variations: DbProductVariation[];
 }
 
 export interface DbOrder {
@@ -135,6 +184,43 @@ export interface DbContactMessage {
   subject: string | null;
   message: string;
   created_at: string;
+}
+
+export interface DbBlogCategory {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+}
+
+export interface DbBlogTag {
+  id: string;
+  slug: string;
+  name: string;
+  created_at: string;
+}
+
+export interface DbBlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featured_image: string | null;
+  status: "draft" | "published";
+  author_email: string | null;
+  author_name: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdminBlogPostDetails extends DbBlogPost {
+  categories: DbBlogCategory[];
+  tags: DbBlogTag[];
 }
 
 export interface DbProfile {

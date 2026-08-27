@@ -1,9 +1,19 @@
 import Link from "next/link";
 import { getAdminProducts } from "@/lib/admin/queries";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { formatPrice } from "@/lib/products/format";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  AdminEmpty,
+  AdminPageHeader,
+  AdminTable,
+  AdminTableElement,
+  AdminTd,
+  AdminTh,
+  AdminThead,
+  AdminTr,
+} from "@/components/admin/AdminShell";
 
 export default async function AdminProductsPage({
   searchParams,
@@ -17,58 +27,102 @@ export default async function AdminProductsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-serif text-2xl">Products</h1>
-          <p className="text-sm text-muted-foreground">{total} total</p>
-        </div>
-        <Link
-          href="/admin/products/new"
-          className={cn(buttonVariants(), "inline-flex gap-1")}
-        >
-          <Plus className="w-4 h-4" />
-          Add product
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Products"
+        description={`${total} products in your catalog`}
+        actions={
+          <Link
+            href="/admin/products/new"
+            className={cn(buttonVariants(), "inline-flex gap-1.5")}
+          >
+            <Plus className="w-4 h-4" />
+            Add product
+          </Link>
+        }
+      />
 
-      <div className="rounded-lg border border-border bg-background overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left">
-            <tr>
-              <th className="px-4 py-3">Product</th>
-              <th className="px-4 py-3">Category</th>
-              <th className="px-4 py-3">Price</th>
-              <th className="px-4 py-3">Stock</th>
-              <th className="px-4 py-3">Flags</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((p) => (
-              <tr key={p.id} className="border-t border-border">
-                <td className="px-4 py-3">
-                  <Link
-                    href={`/admin/products/${p.id}`}
-                    className="font-medium hover:text-primary"
-                  >
-                    {p.name}
-                  </Link>
-                  <p className="text-xs text-muted-foreground">{p.slug}</p>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {(p.categories as { name: string } | null)?.name ?? "—"}
-                </td>
-                <td className="px-4 py-3">{formatPrice(p.price)}</td>
-                <td className="px-4 py-3">{p.stock}</td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">
-                  {p.is_new && "New "}
-                  {p.is_bestseller && "Bestseller "}
-                  {p.sold_out && "Sold out"}
-                </td>
+      {products.length === 0 ? (
+        <AdminEmpty
+          title="No products yet"
+          description="Add your first product to start selling."
+        />
+      ) : (
+        <AdminTable>
+          <AdminTableElement>
+            <AdminThead>
+              <tr>
+                <AdminTh>Product</AdminTh>
+                <AdminTh>Category</AdminTh>
+                <AdminTh>Price</AdminTh>
+                <AdminTh>Stock</AdminTh>
+                <AdminTh>Status</AdminTh>
+                <AdminTh>Flags</AdminTh>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </AdminThead>
+            <tbody>
+              {products.map((p) => (
+                <AdminTr key={p.id}>
+                  <AdminTd>
+                    <Link
+                      href={`/admin/products/${p.id}`}
+                      className="font-medium hover:text-primary"
+                    >
+                      {p.name}
+                    </Link>
+                    <p className="text-xs text-muted-foreground">{p.slug}</p>
+                  </AdminTd>
+                  <AdminTd className="text-muted-foreground">
+                    {(p.categories as { name: string } | null)?.name ?? "—"}
+                  </AdminTd>
+                  <AdminTd className="font-medium">{formatPrice(p.price)}</AdminTd>
+                  <AdminTd>
+                    <span
+                      className={
+                        p.stock <= 5
+                          ? "text-amber-700 font-medium"
+                          : "text-foreground"
+                      }
+                    >
+                      {p.stock}
+                    </span>
+                  </AdminTd>
+                  <AdminTd>
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-medium capitalize",
+                        (p as { status?: string }).status === "draft"
+                          ? "bg-slate-100 text-slate-700"
+                          : "bg-emerald-100 text-emerald-800"
+                      )}
+                    >
+                      {(p as { status?: string }).status ?? "published"}
+                    </span>
+                  </AdminTd>
+                  <AdminTd>
+                    <div className="flex flex-wrap gap-1">
+                      {p.is_new && (
+                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
+                          New
+                        </span>
+                      )}
+                      {p.is_bestseller && (
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                          Bestseller
+                        </span>
+                      )}
+                      {p.sold_out && (
+                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-800">
+                          Sold out
+                        </span>
+                      )}
+                    </div>
+                  </AdminTd>
+                </AdminTr>
+              ))}
+            </tbody>
+          </AdminTableElement>
+        </AdminTable>
+      )}
 
       {totalPages > 1 && (
         <div className="flex gap-2 justify-center">
