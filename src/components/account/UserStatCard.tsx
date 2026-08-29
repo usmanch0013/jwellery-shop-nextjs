@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
 export default function UserStatCard({
@@ -5,27 +6,35 @@ export default function UserStatCard({
   value,
   hint,
   icon: Icon,
+  className,
 }: {
   label: string;
   value: string | number;
   hint?: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  className?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border/50 bg-white p-4 shadow-sm">
+    <div className={cn("user-card p-4 lg:p-5", className)}>
       <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-[12px] font-medium uppercase tracking-wide text-muted-foreground">
+        <div className="min-w-0">
+          <p className="text-[12px] font-medium text-[var(--user-text-subdued)]">
             {label}
           </p>
-          <p className="mt-1 font-serif text-2xl text-foreground">{value}</p>
+          <p className="mt-1.5 text-2xl font-semibold leading-none text-[var(--user-text)]">
+            {value}
+          </p>
           {hint && (
-            <p className="mt-1 text-[12px] text-muted-foreground">{hint}</p>
+            <p className="mt-1.5 text-[12px] text-[var(--user-text-subdued)]">
+              {hint}
+            </p>
           )}
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0B3D35]/8">
-          <Icon className="h-5 w-5 text-[#0B3D35]" />
-        </div>
+        {Icon && (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[var(--user-bg)] text-[var(--user-text-subdued)]">
+            <Icon className="h-4 w-4" />
+          </div>
+        )}
       </div>
     </div>
   );

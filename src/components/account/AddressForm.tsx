@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PK_PROVINCES } from "@/lib/constants/commerce";
@@ -55,9 +54,13 @@ export default function AddressForm() {
         </div>
       </div>
       <input type="hidden" name="isDefault" value="false" />
-      <Button type="submit" size="sm" disabled={loading}>
-        Add Address
-      </Button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--user-accent)] px-4 text-[12px] font-semibold text-white hover:bg-[#006e52] disabled:opacity-60"
+      >
+        {loading ? "Saving..." : "Add address"}
+      </button>
     </form>
   );
 }

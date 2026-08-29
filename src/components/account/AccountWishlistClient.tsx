@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Heart, ShoppingBag } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { formatPrice, productPath } from "@/lib/products/format";
@@ -15,15 +14,17 @@ export default function AccountWishlistClient() {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border/60 bg-white p-12 text-center">
-        <Heart className="mx-auto mb-4 h-12 w-12 text-muted-foreground/30" />
-        <p className="font-serif text-xl">Your wishlist is empty</p>
-        <p className="mt-2 text-sm text-muted-foreground">
+      <div className="user-card py-16 text-center">
+        <Heart className="mx-auto mb-4 h-12 w-12 text-[var(--user-text-subdued)]/30" />
+        <p className="text-base font-semibold text-[var(--user-text)]">
+          Your wishlist is empty
+        </p>
+        <p className="mt-2 text-[13px] text-[var(--user-text-subdued)]">
           Save your favourite pieces while browsing the shop.
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground"
+          className="mt-6 inline-flex h-9 items-center justify-center rounded-lg bg-[var(--user-accent)] px-5 text-[13px] font-semibold text-white hover:bg-[#006e52]"
         >
           Explore collection
         </Link>
@@ -34,9 +35,12 @@ export default function AccountWishlistClient() {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4">
       {items.map((product) => (
-        <div key={product.id} className="group relative rounded-2xl border border-border/50 bg-white p-2 shadow-sm">
+        <div
+          key={product.id}
+          className="user-card group relative p-2 transition-shadow hover:shadow-md"
+        >
           <Link href={productPath(product)}>
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
+            <div className="relative aspect-square overflow-hidden rounded-lg bg-[var(--user-bg)]">
               <Image
                 src={product.image}
                 alt={product.name}
@@ -57,19 +61,21 @@ export default function AccountWishlistClient() {
           >
             <Heart className="h-4 w-4 fill-rose-gold text-rose-gold" />
           </button>
-          <h3 className="mt-3 truncate font-serif text-sm">{product.name}</h3>
-          <p className="text-sm font-medium">{formatPrice(product.price)}</p>
-          <Button
-            size="sm"
-            className="mt-2 w-full bg-primary hover:bg-emerald-dark"
+          <h3 className="mt-3 truncate text-[13px] font-medium text-[var(--user-text)]">
+            {product.name}
+          </h3>
+          <p className="text-[13px] font-semibold">{formatPrice(product.price)}</p>
+          <button
+            type="button"
+            className="mt-2 flex h-8 w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--user-accent)] text-[12px] font-semibold text-white hover:bg-[#006e52]"
             onClick={() => {
               addToCart(product);
               toast.success("Added to cart");
             }}
           >
-            <ShoppingBag className="mr-1.5 h-3.5 w-3.5" />
+            <ShoppingBag className="h-3.5 w-3.5" />
             Add to cart
-          </Button>
+          </button>
         </div>
       ))}
     </div>

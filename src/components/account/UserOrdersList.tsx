@@ -1,74 +1,106 @@
 import Link from "next/link";
 import { formatPrice } from "@/lib/products/format";
-import {
-  ORDER_STATUS_LABELS,
-  PAYMENT_METHOD_LABELS,
-} from "@/lib/constants/commerce";
+import { ORDER_STATUS_LABELS } from "@/lib/constants/commerce";
 import type { DbOrder } from "@/lib/database.types";
-import { ChevronRight } from "lucide-react";
+import { OrderStatusBadge } from "@/components/admin/StatusBadge";
+import { ArrowRight } from "lucide-react";
 
 type OrderRow = Pick<
   DbOrder,
   "id" | "order_number" | "status" | "total" | "created_at"
-> & {
-  payment_method?: DbOrder["payment_method"];
-};
+>;
 
 export default function UserOrdersList({
   orders,
-  compact = false,
+  showHeader = true,
 }: {
   orders: OrderRow[];
-  compact?: boolean;
+  showHeader?: boolean;
 }) {
   if (orders.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border/60 bg-white p-8 text-center">
-        <p className="text-muted-foreground">No orders yet.</p>
-        <Link
-          href="/shop"
-          className="mt-3 inline-flex text-sm font-medium text-primary hover:underline"
-        >
-          Start shopping →
-        </Link>
+      <div className="user-card">
+        <div className="py-16 text-center">
+          <p className="font-medium text-[var(--user-text)]">No orders yet</p>
+          <p className="mt-2 text-[13px] text-[var(--user-text-subdued)]">
+            When you place an order, it will appear here.
+          </p>
+          <Link
+            href="/shop"
+            className="mt-4 inline-flex text-[13px] font-medium text-[var(--user-accent)] hover:underline"
+          >
+            Start shopping →
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border/50 bg-white shadow-sm">
-      {orders.map((order, i) => (
-        <Link
-          key={order.id}
-          href={`/account/orders/${order.id}`}
-          className={`flex items-center justify-between gap-4 px-4 py-4 transition-colors hover:bg-muted/30 ${
-            i > 0 ? "border-t border-border/40" : ""
-          }`}
-        >
-          <div className="min-w-0">
-            <p className="font-medium">{order.order_number}</p>
-            <p className="mt-0.5 text-[12px] text-muted-foreground">
-              {new Date(order.created_at).toLocaleDateString("en-PK", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })}
-              {!compact && order.payment_method && (
-                <> · {PAYMENT_METHOD_LABELS[order.payment_method]}</>
-              )}
-            </p>
-          </div>
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="text-right">
-              <p className="font-medium">{formatPrice(order.total)}</p>
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-                {ORDER_STATUS_LABELS[order.status]}
-              </p>
-            </div>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-          </div>
-        </Link>
-      ))}
+    <div className="user-card overflow-hidden">
+      {showHeader && (
+        <div className="flex items-center justify-between border-b border-[var(--user-border)] px-4 py-3 lg:px-5">
+          <h2 className="text-sm font-semibold">Recent orders</h2>
+          <Link
+            href="/account/orders"
+            className="inline-flex items-center gap-1 text-[13px] font-medium text-[var(--user-accent)] hover:underline"
+          >
+            View all
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-[13px]">
+          <thead className="border-b border-[var(--user-border)] bg-[#fafbfb] text-left">
+            <tr>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] lg:px-5">
+                Order
+              </th>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] lg:px-5">
+                Total
+              </th>
+              <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] lg:px-5">
+                Status
+              </th>
+              <th className="hidden px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] sm:table-cell lg:px-5">
+                Date
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr
+                key={order.id}
+                className="border-b border-[var(--user-border)] last:border-0 hover:bg-[#fafbfb]"
+              >
+                <td className="px-4 py-3 lg:px-5">
+                  <Link
+                    href={`/account/orders/${order.id}`}
+                    className="font-medium text-[var(--user-accent)] hover:underline"
+                  >
+                    {order.order_number}
+                  </Link>
+                </td>
+                <td className="px-4 py-3 font-medium lg:px-5">
+                  {formatPrice(order.total)}
+                </td>
+                <td className="px-4 py-3 lg:px-5">
+                  <OrderStatusBadge status={order.status} />
+                </td>
+                <td className="hidden px-4 py-3 text-[var(--user-text-subdued)] sm:table-cell lg:px-5">
+                  {new Date(order.created_at).toLocaleDateString("en-PK", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

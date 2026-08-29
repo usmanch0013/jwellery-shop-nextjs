@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { getOrderById } from "@/actions/orders";
 import OrderDetailView from "@/components/account/OrderDetailView";
 import type { DbOrderEvent } from "@/lib/orders/events";
@@ -28,18 +27,10 @@ export default async function AccountOrderDetailPage({
   if (!data) notFound();
 
   return (
-    <div className="space-y-4">
-      <Link
-        href="/account/orders"
-        className="inline-flex text-sm text-primary hover:underline"
-      >
-        ← Back to orders
-      </Link>
-      <OrderDetailView
-        order={data.order}
-        items={data.items}
-        events={(data.events ?? []) as DbOrderEvent[]}
-      />
-    </div>
+    <OrderDetailView
+      order={data.order}
+      items={data.items}
+      events={(data.events ?? []) as DbOrderEvent[]}
+    />
   );
 }

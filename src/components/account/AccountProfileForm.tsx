@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateProfileAction } from "@/actions/auth";
@@ -53,9 +52,13 @@ export default function AccountProfileForm({
           className="mt-1"
         />
       </div>
-      <Button type="submit" disabled={loading}>
-        {loading ? "Saving..." : "Save Profile"}
-      </Button>
+      <button
+        type="submit"
+        disabled={loading}
+        className="inline-flex h-9 items-center justify-center rounded-lg bg-[var(--user-accent)] px-4 text-[13px] font-semibold text-white hover:bg-[#006e52] disabled:opacity-60"
+      >
+        {loading ? "Saving..." : "Save profile"}
+      </button>
     </form>
   );
 }
