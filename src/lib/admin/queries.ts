@@ -4,6 +4,7 @@ import type {
   DbCoupon,
   DbOrder,
   DbPayment,
+  DbProfile,
   DbReview,
   DbContactMessage,
 } from "@/lib/database.types";
@@ -237,11 +238,25 @@ export async function getDashboardChartData(): Promise<DashboardChartData> {
   };
 }
 
-export async function getAdminOrders(limit = 50) {
+export async function getAdminOrders(
+  limit = 50,
+  filters?: { status?: string; search?: string }
+) {
   const admin = await getAdminClient();
-  const { data } = await admin
-    .from("orders")
-    .select("*")
+  let query = admin.from("orders").select("*");
+
+  if (filters?.status && filters.status !== "all") {
+    query = query.eq("status", filters.status);
+  }
+
+  if (filters?.search?.trim()) {
+    const term = filters.search.trim();
+    query = query.or(
+      `order_number.ilike.%${term}%,guest_email.ilike.%${term}%,guest_phone.ilike.%${term}%`
+    );
+  }
+
+  const { data } = await query
     .order("created_at", { ascending: false })
     .limit(limit);
   return (data ?? []) as DbOrder[];
@@ -256,15 +271,20 @@ export async function getAdminOrder(id: string) {
     .maybeSingle();
   if (!order) return null;
 
-  const [{ data: items }, { data: payments }] = await Promise.all([
-    admin.from("order_items").select("*").eq("order_id", id),
-    admin.from("payments").select("*").eq("order_id", id),
-  ]);
+  const [{ data: items }, { data: payments }, { data: events }, { data: invoice }] =
+    await Promise.all([
+      admin.from("order_items").select("*").eq("order_id", id),
+      admin.from("payments").select("*").eq("order_id", id),
+      admin.from("order_events").select("*").eq("order_id", id).order("created_at", { ascending: true }),
+      admin.from("invoices").select("*").eq("order_id", id).maybeSingle(),
+    ]);
 
   return {
     order: order as DbOrder,
     items: items ?? [],
     payments: (payments ?? []) as DbPayment[],
+    events: events ?? [],
+    invoice: invoice ?? null,
   };
 }
 
@@ -440,4 +460,108 @@ export async function getAdminBlogPostDetails(id: string) {
   }
 
   return { ...post, categories, tags };
+}
+
+export interface AdminCustomer {
+  id: string;
+  type: "registered" | "guest";
+  name: string;
+  email: string | null;
+  phone: string | null;
+  ordersCount: number;
+  totalSpent: number;
+  lastOrderAt: string | null;
+}
+
+export async function getAdminCustomers(): Promise<AdminCustomer[]> {
+  const admin = await getAdminClient();
+  const [{ data: profiles }, { data: orders }] = await Promise.all([
+    admin.from("profiles").select("*").order("created_at", { ascending: false }),
+    admin.from("orders").select("*").order("created_at", { ascending: false }),
+  ]);
+
+  const customerMap = new Map<string, AdminCustomer>();
+
+  for (const order of (orders ?? []) as DbOrder[]) {
+    const addr = order.shipping_address ?? {};
+    const key = order.user_id
+      ? `user:${order.user_id}`
+      : `guest:${order.guest_email ?? order.guest_phone ?? order.id}`;
+
+    const existing = customerMap.get(key);
+    const spent = (existing?.totalSpent ?? 0) + order.total;
+    const count = (existing?.ordersCount ?? 0) + 1;
+
+    customerMap.set(key, {
+      id: order.user_id ?? key,
+      type: order.user_id ? "registered" : "guest",
+      name: addr.fullName ?? existing?.name ?? "Guest",
+      email: order.guest_email ?? addr.email ?? existing?.email ?? null,
+      phone: order.guest_phone ?? addr.phone ?? existing?.phone ?? null,
+      ordersCount: count,
+      totalSpent: spent,
+      lastOrderAt:
+        !existing?.lastOrderAt || order.created_at > existing.lastOrderAt
+          ? order.created_at
+          : existing.lastOrderAt,
+    });
+  }
+
+  for (const profile of (profiles ?? []) as DbProfile[]) {
+    const key = `user:${profile.id}`;
+    if (!customerMap.has(key)) {
+      customerMap.set(key, {
+        id: profile.id,
+        type: "registered",
+        name: profile.full_name ?? "Customer",
+        email: null,
+        phone: profile.phone,
+        ordersCount: 0,
+        totalSpent: 0,
+        lastOrderAt: null,
+      });
+    } else {
+      const c = customerMap.get(key)!;
+      if (profile.full_name) c.name = profile.full_name;
+      if (profile.phone) c.phone = profile.phone;
+    }
+  }
+
+  return Array.from(customerMap.values()).sort((a, b) => {
+    const aTime = a.lastOrderAt ? new Date(a.lastOrderAt).getTime() : 0;
+    const bTime = b.lastOrderAt ? new Date(b.lastOrderAt).getTime() : 0;
+    return bTime - aTime;
+  });
+}
+
+export async function getAdminCustomer(id: string) {
+  const admin = await getAdminClient();
+  const customers = await getAdminCustomers();
+  const customer = customers.find((c) => c.id === id);
+  if (!customer) return null;
+
+  let ordersQuery = admin.from("orders").select("*").order("created_at", {
+    ascending: false,
+  });
+
+  if (customer.type === "registered" && !id.startsWith("guest:")) {
+    ordersQuery = ordersQuery.eq("user_id", id);
+  } else if (customer.email) {
+    ordersQuery = ordersQuery.eq("guest_email", customer.email);
+  } else if (customer.phone) {
+    ordersQuery = ordersQuery.eq("guest_phone", customer.phone);
+  }
+
+  const { data: orders } = await ordersQuery;
+  return { customer, orders: (orders ?? []) as DbOrder[] };
+}
+
+export async function getLowStockProducts(threshold = 5) {
+  const admin = await getAdminClient();
+  const { data } = await admin
+    .from("products")
+    .select("id, name, slug, stock, sold_out, price, image, sku")
+    .lte("stock", threshold)
+    .order("stock", { ascending: true });
+  return data ?? [];
 }

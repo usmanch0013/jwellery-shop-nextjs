@@ -2,7 +2,7 @@
 
 import { Suspense, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment, OrbitControls, Sparkles } from "@react-three/drei";
+import { OrbitControls, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 
 const GOLD = "#C9A96E";
@@ -138,15 +138,17 @@ function FixedBracelet({ scrollProgress }: { scrollProgress: number }) {
 function SceneLights() {
   return (
     <>
-      <ambientLight intensity={0.4} color="#F7F3EA" />
-      <directionalLight position={[5, 8, 5]} intensity={1.5} color="#C9A96E" />
-      <directionalLight position={[-5, 3, 4]} intensity={0.55} color="#A8B9A6" />
-      <pointLight position={[2, 2, 3]} intensity={0.9} color="#ffffff" />
+      <hemisphereLight intensity={0.55} color="#F7F3EA" groundColor="#1a3d35" />
+      <ambientLight intensity={0.45} color="#F7F3EA" />
+      <directionalLight position={[5, 8, 5]} intensity={1.65} color="#C9A96E" />
+      <directionalLight position={[-5, 3, 4]} intensity={0.7} color="#A8B9A6" />
+      <pointLight position={[2, 2, 3]} intensity={1.1} color="#ffffff" />
+      <pointLight position={[-2, -1, 2]} intensity={0.45} color="#E8D5A8" />
       <spotLight
         position={[0, 6, 2]}
         angle={0.45}
         penumbra={0.8}
-        intensity={1.3}
+        intensity={1.5}
         color="#E8D5A8"
       />
     </>
@@ -169,7 +171,6 @@ export default function HeroScene3D({ scrollProgress }: HeroScene3DProps) {
       >
         <Suspense fallback={null}>
           <SceneLights />
-          <Environment preset="studio" />
           <FixedBracelet scrollProgress={scrollProgress} />
           <Sparkles
             count={50}

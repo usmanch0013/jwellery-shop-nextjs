@@ -3,12 +3,8 @@
 import { useState } from "react";
 import { Play, RefreshCw, Scale, Gem, HeartHandshake } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { videoFeatures } from "@/data/site";
-
-const VIDEO_SRC = "/intro-video.mp4";
-const POSTER_SRC = "/intro-video-poster.png";
-const YOUTUBE_EMBED =
-  "https://www.youtube.com/embed/Y-x0efG1seA?autoplay=1&rel=0";
+import { DEFAULT_VIDEO } from "@/lib/cms/defaults";
+import type { CmsVideoSettings } from "@/lib/cms/types";
 
 const iconMap = {
   exchange: RefreshCw,
@@ -17,8 +13,13 @@ const iconMap = {
   maintenance: HeartHandshake,
 } as const;
 
-export default function VideoSection() {
+export default function VideoSection({
+  video = DEFAULT_VIDEO,
+}: {
+  video?: CmsVideoSettings;
+}) {
   const [videoOpen, setVideoOpen] = useState(false);
+  const features = video.features;
 
   return (
     <>
@@ -34,10 +35,10 @@ export default function VideoSection() {
             muted
             loop
             playsInline
-            poster={POSTER_SRC}
+            poster={video.posterImage}
             aria-hidden
           >
-            <source src={VIDEO_SRC} type="video/mp4" />
+            <source src={video.backgroundVideo} type="video/mp4" />
           </video>
 
           {/* Layered overlays for readability */}
@@ -69,9 +70,9 @@ export default function VideoSection() {
           <div className="relative z-10 border-t border-white/15 bg-black/20 backdrop-blur-[2px]">
             <div className="mx-auto w-full max-w-[var(--site-max)] px-[var(--site-px)] py-10 lg:py-12">
               <div className="grid grid-cols-2 gap-x-4 gap-y-10 lg:grid-cols-4 lg:gap-y-0">
-                {videoFeatures.map((feature, index) => {
-                  const Icon = iconMap[feature.icon];
-                  const isLast = index === videoFeatures.length - 1;
+                {features.map((feature, index) => {
+                  const Icon = iconMap[feature.icon as keyof typeof iconMap];
+                  const isLast = index === features.length - 1;
                   const isSecondCol = index === 1;
 
                   return (
@@ -112,7 +113,7 @@ export default function VideoSection() {
           <div className="aspect-video w-full">
             {videoOpen && (
               <iframe
-                src={YOUTUBE_EMBED}
+                src={video.youtubeUrl}
                 title="Lumière Jewellery"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen

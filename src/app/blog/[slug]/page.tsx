@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBlogPostBySlug } from "@/lib/blog/queries";
 import { formatBlogDate } from "@/lib/blog/format";
+import { sanitizeHtml } from "@/lib/security/sanitize-html";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -76,7 +77,7 @@ export default async function BlogPostPage({
 
       <div
         className="blog-content space-y-4 text-[15px] leading-7 text-foreground [&_a]:text-primary [&_a]:underline [&_h2]:mt-8 [&_h2]:font-serif [&_h2]:text-2xl [&_h3]:mt-6 [&_h3]:font-serif [&_h3]:text-xl [&_li]:ml-5 [&_ol]:list-decimal [&_p]:text-muted-foreground [&_ul]:list-disc"
-        dangerouslySetInnerHTML={{ __html: post.content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
       />
 
       {post.tags.length > 0 && (

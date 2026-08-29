@@ -9,10 +9,11 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { testimonials } from "@/data/site";
+import { testimonials as defaultTestimonials } from "@/data/site";
+import type { CmsTestimonial } from "@/lib/cms/types";
 import "jarallax/dist/jarallax.css";
 
-const BG_IMAGE = "/testimonial-bg-cignet.jpg";
+const BG_IMAGE_DEFAULT = "/testimonial-bg-cignet.jpg";
 const PARALLAX_SPEED = 0.5; // Cignet ElementsKit: ekit_section_parallax_bg_speed
 
 function Stars({ count = 5 }: { count?: number }) {
@@ -30,7 +31,26 @@ function Stars({ count = 5 }: { count?: number }) {
   );
 }
 
-export default function Testimonials() {
+export default function Testimonials({
+  testimonials = defaultTestimonials.map((t, i) => ({
+    id: t.id,
+    name: t.name,
+    role: t.role,
+    content: t.content,
+    image: t.image,
+    rating: t.rating,
+    sort_order: i,
+    is_published: true,
+  })),
+  badge = "• TESTIMONIALS",
+  title = "Trusted Reviews From Jewellery Style Enthusiasts",
+  backgroundImage = BG_IMAGE_DEFAULT,
+}: {
+  testimonials?: CmsTestimonial[];
+  badge?: string;
+  title?: string;
+  backgroundImage?: string;
+}) {
   const sectionRef = useRef<HTMLElement>(null);
   const [api, setApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
@@ -64,7 +84,7 @@ export default function Testimonials() {
 
       jarallax(section, {
         speed: PARALLAX_SPEED,
-        imgSrc: BG_IMAGE,
+        imgSrc: backgroundImage,
         imgSize: "cover",
         imgPosition: "center center",
       });
@@ -76,7 +96,7 @@ export default function Testimonials() {
         jarallax(section, "destroy");
       });
     };
-  }, []);
+  }, [backgroundImage]);
 
   return (
     <section
@@ -86,7 +106,7 @@ export default function Testimonials() {
       {/* Jarallax injects background; hidden img satisfies SSR + no-JS fallback */}
       <img
         className="jarallax-img pointer-events-none"
-        src={BG_IMAGE}
+        src={backgroundImage}
         alt=""
         aria-hidden
       />
@@ -102,13 +122,13 @@ export default function Testimonials() {
           {/* Badge */}
           <div className="rounded-full border border-white/20 px-4 py-[7px] lg:px-4">
             <h3 className="text-[14px] font-normal leading-[1.286] text-white">
-              • TESTIMONIALS
+              {badge}
             </h3>
           </div>
 
           {/* Heading */}
           <h2 className="text-left font-serif text-[44px] font-normal leading-[1.2] text-white lg:text-[60px]">
-            Trusted Reviews From Jewellery Style Enthusiasts
+            {title}
           </h2>
 
           {/* Slider block */}
@@ -137,7 +157,7 @@ export default function Testimonials() {
               <div className="flex items-center gap-3.5">
                 <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-full">
                   <Image
-                    src={current.image}
+                    src={current.image ?? "/testimonial-author-1.jpg"}
                     alt={current.name}
                     fill
                     className="object-cover"

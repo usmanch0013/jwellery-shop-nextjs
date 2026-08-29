@@ -1,5 +1,6 @@
 interface MarqueeBarProps {
   variant?: "light" | "dark";
+  text?: string;
 }
 
 function BoxIcon({ className }: { className?: string }) {
@@ -20,8 +21,10 @@ function BoxIcon({ className }: { className?: string }) {
   );
 }
 
-export default function MarqueeBar({ variant = "light" }: MarqueeBarProps) {
-  const text = "Pakistan's 1st award winning Artificial Jewellery brand";
+export default function MarqueeBar({
+  variant = "light",
+  text = "Pakistan's 1st award winning Artificial Jewellery brand",
+}: MarqueeBarProps) {
   const items = Array(6).fill(text);
   const isDark = variant === "dark";
 

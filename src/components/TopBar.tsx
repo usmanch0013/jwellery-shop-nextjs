@@ -77,7 +77,13 @@ const socials = [
   { icon: IconLinkedin, label: "LinkedIn" },
 ];
 
-export default function TopBar({ transparent = false }: { transparent?: boolean }) {
+export default function TopBar({
+  transparent = false,
+  text = "Worldwide Shipping",
+}: {
+  transparent?: boolean;
+  text?: string;
+}) {
   return (
     <div
       className={`w-full text-white relative transition-all duration-300 ${
@@ -101,7 +107,7 @@ export default function TopBar({ transparent = false }: { transparent?: boolean 
         <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
           <ChevronLeft className="w-3 h-3 text-white/50" strokeWidth={2} />
           <p className="text-[10px] font-medium tracking-[0.22em] uppercase">
-            Worldwide Shipping
+            {text}
           </p>
           <ChevronRight className="w-3 h-3 text-white/50" strokeWidth={2} />
         </div>

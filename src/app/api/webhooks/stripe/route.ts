@@ -26,14 +26,22 @@ export async function POST(request: NextRequest) {
 
     if (orderId) {
       const admin = createAdminClient();
-      await admin
+      const { data: existing } = await admin
         .from("orders")
-        .update({ payment_status: "paid", status: "confirmed" })
-        .eq("id", orderId);
-      await admin
-        .from("payments")
-        .update({ status: "paid", provider_ref: session.payment_intent as string })
-        .eq("order_id", orderId);
+        .select("payment_status")
+        .eq("id", orderId)
+        .maybeSingle();
+
+      if (existing?.payment_status !== "paid") {
+        await admin
+          .from("orders")
+          .update({ payment_status: "paid", status: "confirmed" })
+          .eq("id", orderId);
+        await admin
+          .from("payments")
+          .update({ status: "paid", provider_ref: session.payment_intent as string })
+          .eq("order_id", orderId);
+      }
     }
   }
 

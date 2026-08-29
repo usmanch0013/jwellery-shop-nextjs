@@ -63,6 +63,7 @@
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
   --font-script: var(--font-script), cursive;
+  --font-admin: var(--font-admin-sans), var(--font-sans), system-ui, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -167,4 +168,64 @@ body {
   * {
     @apply border-border;
   }
+}
+
+@media print {
+  aside,
+  header {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+  }
+}
+
+/* Admin dashboard — Shopify-inspired */
+.admin-shell {
+  --admin-bg: #f1f2f4;
+  --admin-sidebar: #ebebeb;
+  --admin-surface: #ffffff;
+  --admin-border: #e1e3e5;
+  --admin-text: #303030;
+  --admin-text-subdued: #616161;
+  --admin-primary: #008060;
+  --admin-primary-hover: #006e52;
+  --admin-nav-active: #ffffff;
+
+  font-family: var(--font-admin);
+  font-feature-settings: "liga" 1, "kern" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--admin-text);
+  background: var(--admin-bg);
+}
+
+.admin-shell .font-serif,
+.admin-shell h1,
+.admin-shell h2,
+.admin-shell h3 {
+  font-family: var(--font-admin);
+  letter-spacing: -0.02em;
+}
+
+.admin-card {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.admin-btn-primary {
+  background: var(--admin-primary);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 0.5rem 1rem;
+  transition: background 0.15s;
+}
+
+.admin-btn-primary:hover {
+  background: var(--admin-primary-hover);
 }

@@ -1,21 +1,21 @@
 import type { OrderStatus, PaymentStatus } from "@/lib/database.types";
 
 const ORDER_COLORS: Record<OrderStatus, string> = {
-  pending: "bg-amber-100 text-amber-800 ring-amber-200",
-  confirmed: "bg-blue-100 text-blue-800 ring-blue-200",
-  processing: "bg-indigo-100 text-indigo-800 ring-indigo-200",
-  shipped: "bg-purple-100 text-purple-800 ring-purple-200",
-  delivered: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  cancelled: "bg-rose-100 text-rose-800 ring-rose-200",
+  pending: "bg-[#fff4e5] text-[#b98900]",
+  confirmed: "bg-[#e3f1ff] text-[#0066cc]",
+  processing: "bg-[#ede9fe] text-[#5b21b6]",
+  shipped: "bg-[#e0f5f0] text-[#008060]",
+  delivered: "bg-[#e3f5ef] text-[#007a5c]",
+  cancelled: "bg-[#fde8e8] text-[#c5280c]",
 };
 
 const PAYMENT_COLORS: Record<PaymentStatus, string> = {
-  pending: "bg-slate-100 text-slate-800 ring-slate-200",
-  awaiting_payment: "bg-amber-100 text-amber-800 ring-amber-200",
-  paid: "bg-emerald-100 text-emerald-800 ring-emerald-200",
-  failed: "bg-rose-100 text-rose-800 ring-rose-200",
-  refunded: "bg-orange-100 text-orange-800 ring-orange-200",
-  cod_pending: "bg-sky-100 text-sky-800 ring-sky-200",
+  pending: "bg-[#f1f2f4] text-[#616161]",
+  awaiting_payment: "bg-[#fff4e5] text-[#b98900]",
+  paid: "bg-[#e3f5ef] text-[#007a5c]",
+  failed: "bg-[#fde8e8] text-[#c5280c]",
+  refunded: "bg-[#fde8e8] text-[#c5280c]",
+  cod_pending: "bg-[#fff4e5] text-[#b98900]",
 };
 
 function Badge({
@@ -27,7 +27,7 @@ function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ring-1 ring-inset ${className}`}
+      className={`inline-flex items-center rounded-md px-2 py-0.5 text-[11px] font-medium capitalize ${className}`}
     >
       {children}
     </span>

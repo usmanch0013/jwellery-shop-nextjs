@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { getOrderByNumber } from "@/actions/orders";
-import { formatPrice } from "@/lib/products/format";
 
 interface SuccessPageProps {
   searchParams: Promise<{ order?: string }>;
@@ -10,7 +8,6 @@ export default async function CheckoutSuccessPage({
   searchParams,
 }: SuccessPageProps) {
   const { order: orderNumber } = await searchParams;
-  const data = orderNumber ? await getOrderByNumber(orderNumber) : null;
 
   return (
     <div className="py-20 px-4 max-w-lg mx-auto text-center">
@@ -22,15 +19,13 @@ export default async function CheckoutSuccessPage({
         Your order has been placed successfully.
       </p>
       {orderNumber && (
-        <p className="text-lg font-medium mb-2">
+        <p className="text-lg font-medium mb-8">
           Order #{orderNumber}
         </p>
       )}
-      {data && (
-        <p className="text-muted-foreground mb-8">
-          Total: {formatPrice(data.order.total)}
-        </p>
-      )}
+      <p className="text-sm text-muted-foreground mb-8">
+        Use your order number and phone on the track order page to view status.
+      </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link
           href={`/track-order?order=${orderNumber ?? ""}`}

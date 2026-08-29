@@ -11,6 +11,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AdminCard } from "@/components/admin/AdminShell";
 import { Save } from "lucide-react";
+import {
+  ORDER_STATUS_LABELS,
+} from "@/lib/constants/commerce";
 
 const ORDER_STATUSES: OrderStatus[] = [
   "pending",
@@ -49,8 +52,14 @@ export default function OrderAdminActions({
     setLoading(true);
     const newStatus = formData.get("status") as OrderStatus;
     const newPayment = formData.get("paymentStatus") as PaymentStatus;
-    await updateOrderStatusAction(orderId, newStatus);
-    await updatePaymentStatusAction(orderId, newPayment);
+
+    if (newStatus !== status) {
+      await updateOrderStatusAction(orderId, newStatus, status);
+    }
+    if (newPayment !== paymentStatus) {
+      await updatePaymentStatusAction(orderId, newPayment, paymentStatus);
+    }
+
     setLoading(false);
     router.refresh();
   }
@@ -67,7 +76,7 @@ export default function OrderAdminActions({
             <select name="status" defaultValue={status} className={selectClass}>
               {ORDER_STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
+                  {ORDER_STATUS_LABELS[s] ?? s}
                 </option>
               ))}
             </select>

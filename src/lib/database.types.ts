@@ -117,7 +117,23 @@ export interface DbOrder {
   shipping_address: Record<string, string>;
   coupon_code: string | null;
   notes?: string | null;
+  tracking_number?: string | null;
+  carrier?: string | null;
+  tracking_url?: string | null;
+  internal_notes?: string | null;
+  shipped_at?: string | null;
+  delivered_at?: string | null;
   created_at: string;
+  updated_at?: string;
+}
+
+export interface DbInvoice {
+  id: string;
+  order_id: string;
+  invoice_number: string;
+  status: "draft" | "issued" | "paid" | "void";
+  issued_at: string;
+  snapshot: Record<string, unknown>;
 }
 
 export interface DbOrderItem {

@@ -6,6 +6,7 @@ import StorefrontShell from "@/components/StorefrontShell";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { getCategories } from "@/lib/products/queries";
+import { getCmsBundle } from "@/lib/cms/queries";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,14 +25,16 @@ const greatVibes = Great_Vibes({
   variable: "--font-script",
 });
 
-export const metadata: Metadata = {
-  title: "Artificial Jewellery in Pakistan | Lumière Jewellery",
-  description:
-    "Pakistan's award winning artificial jewellery brand. Shop necklace sets, earrings, bangles, bridal sets and more.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const cms = await getCmsBundle();
+  return {
+    title: cms.site.seoTitle,
+    description: cms.site.seoDescription,
+  };
+}
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const categories = await getCategories();
+  const [categories, cms] = await Promise.all([getCategories(), getCmsBundle()]);
 
   return (
     <html
@@ -41,7 +44,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full w-full flex flex-col bg-background text-foreground font-sans">
         <CartProvider>
           <WishlistProvider>
-            <StorefrontShell categories={categories}>{children}</StorefrontShell>
+            <StorefrontShell categories={categories} cms={cms}>{children}</StorefrontShell>
             <Toaster position="bottom-right" />
           </WishlistProvider>
         </CartProvider>

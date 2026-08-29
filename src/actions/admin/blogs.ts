@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/admin/auth";
 import { slugify } from "@/lib/products/mappers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sanitizeHtml } from "@/lib/security/sanitize-html";
 import { z } from "zod";
 
 const postSchema = z.object({
@@ -97,7 +98,7 @@ export async function createBlogPostAction(formData: FormData) {
       title: data.title,
       slug,
       excerpt: data.excerpt ?? "",
-      content: data.content,
+      content: sanitizeHtml(data.content),
       featured_image: data.featuredImage || null,
       status: data.status,
       author_email: user.email ?? null,
@@ -152,7 +153,7 @@ export async function updateBlogPostAction(id: string, formData: FormData) {
       title: data.title,
       slug,
       excerpt: data.excerpt ?? "",
-      content: data.content,
+      content: sanitizeHtml(data.content),
       featured_image: data.featuredImage || null,
       status: data.status,
       seo_title: data.seoTitle || null,

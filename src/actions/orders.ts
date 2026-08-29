@@ -2,16 +2,19 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logOrderEvent } from "@/lib/orders/events";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { checkoutSchema } from "@/lib/validations/commerce";
 import { clearServerCart } from "@/actions/cart";
 import { revalidatePath } from "next/cache";
 import type { DbOrder, DbOrderItem } from "@/lib/database.types";
+import { getOrderEvents } from "@/lib/orders/events";
 import { rateLimit, rateLimitKey } from "@/lib/rate-limit";
 import {
   getProductById,
   resolveCanonicalProductId,
 } from "@/lib/products/queries";
+import { sanitizeOrderForCustomer } from "@/lib/orders/customer-order";
 
 async function sendOrderConfirmationEmail(
   email: string,
@@ -175,6 +178,13 @@ export async function placeOrderAction(input: unknown) {
     total: number;
   };
 
+  await logOrderEvent(
+    admin,
+    result.order_id,
+    "order_placed",
+    "Order placed successfully"
+  );
+
   if (paymentMethod === "stripe" && process.env.STRIPE_SECRET_KEY) {
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
@@ -240,7 +250,7 @@ export async function getUserOrders() {
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
-  return (data ?? []) as DbOrder[];
+  return ((data ?? []) as DbOrder[]).map(sanitizeOrderForCustomer);
 }
 
 export async function getOrderById(orderId: string) {
@@ -262,16 +272,27 @@ export async function getOrderById(orderId: string) {
     .select("*")
     .eq("order_id", orderId);
 
-  return { order: order as DbOrder, items: (items ?? []) as DbOrderItem[] };
+  const events = await getOrderEvents(supabase, orderId);
+
+  return {
+    order: sanitizeOrderForCustomer(order as DbOrder),
+    items: (items ?? []) as DbOrderItem[],
+    events,
+  };
 }
 
 export async function trackOrderAction(orderNumber: string, phone: string) {
+  const rl = rateLimit(await rateLimitKey("track-order"), 10, 60_000);
+  if (!rl.ok) return null;
+
   if (!isSupabaseConfigured()) return null;
 
   const admin = createAdminClient();
   const { data: order } = await admin
     .from("orders")
-    .select("*")
+    .select(
+      "id, order_number, status, payment_status, total, subtotal, shipping_address, tracking_number, carrier, tracking_url, created_at, updated_at, shipped_at, delivered_at"
+    )
     .eq("order_number", orderNumber.toUpperCase())
     .maybeSingle();
 
@@ -284,23 +305,11 @@ export async function trackOrderAction(orderNumber: string, phone: string) {
     .select("*")
     .eq("order_id", order.id);
 
-  return { order: order as DbOrder, items: (items ?? []) as DbOrderItem[] };
-}
+  const events = await getOrderEvents(admin, order.id);
 
-export async function getOrderByNumber(orderNumber: string) {
-  if (!isSupabaseConfigured()) return null;
-  const admin = createAdminClient();
-  const { data: order } = await admin
-    .from("orders")
-    .select("*")
-    .eq("order_number", orderNumber)
-    .maybeSingle();
-  if (!order) return null;
-
-  const { data: items } = await admin
-    .from("order_items")
-    .select("*")
-    .eq("order_id", order.id);
-
-  return { order: order as DbOrder, items: (items ?? []) as DbOrderItem[] };
+  return {
+    order: order as DbOrder,
+    items: (items ?? []) as DbOrderItem[],
+    events,
+  };
 }

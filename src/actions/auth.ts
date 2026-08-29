@@ -50,27 +50,46 @@ function getAuthErrorCode(error: unknown): string {
 function shouldFallbackToAdminSignup(error: unknown): boolean {
   const code = getAuthErrorCode(error);
   const message = authErrorMessage(error, "").toLowerCase();
+  // Only fall back for rate limits — never when email already exists (prevents takeover).
+  return code === "over_email_send_rate_limit" || message.includes("rate limit");
+}
+
+function isEmailAlreadyRegistered(error: unknown): boolean {
+  const code = getAuthErrorCode(error);
+  const message = authErrorMessage(error, "").toLowerCase();
   return (
-    code === "over_email_send_rate_limit" ||
     code === "email_exists" ||
     code === "user_already_exists" ||
-    message.includes("rate limit") ||
     message.includes("already registered") ||
-    message.includes("already been registered")
+    message.includes("already been registered") ||
+    message.includes("already exists")
   );
 }
 
-async function registerWithAdmin(
-  parsed: {
-    email: string;
-    password: string;
-    fullName: string;
-    phone: string;
-  },
-  isAdmin: boolean
-): Promise<{ error?: string }> {
+async function registerWithAdmin(parsed: {
+  email: string;
+  password: string;
+  fullName: string;
+  phone: string;
+}): Promise<{ error?: string }> {
   const admin = createAdminClient();
   const email = parsed.email.trim().toLowerCase();
+
+  const { data: listed, error: listError } =
+    await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  if (listError) {
+    return { error: authErrorMessage(listError, "Could not create account") };
+  }
+
+  const existing = listed.users.find(
+    (user) => user.email?.toLowerCase() === email
+  );
+  if (existing) {
+    return {
+      error:
+        "This email is already registered. Please sign in with your password.",
+    };
+  }
 
   const { data: created, error: createError } =
     await admin.auth.admin.createUser({
@@ -83,68 +102,19 @@ async function registerWithAdmin(
       },
     });
 
-  let userId = created.user?.id;
-
   if (createError) {
-    const code = getAuthErrorCode(createError);
-    const exists =
-      code === "email_exists" ||
-      code === "user_already_exists" ||
-      authErrorMessage(createError, "")
-        .toLowerCase()
-        .includes("already");
-
-    if (!exists) {
-      return {
-        error: authErrorMessage(createError, "Could not create account"),
-      };
-    }
-
-    const { data: listed, error: listError } =
-      await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-    if (listError) {
-      return {
-        error:
-          "This email is already registered. Please sign in with your password.",
-      };
-    }
-
-    const existing = listed.users.find(
-      (user) => user.email?.toLowerCase() === email
-    );
-    if (!existing) {
-      return {
-        error:
-          "This email is already registered. Please sign in with your password.",
-      };
-    }
-
-    userId = existing.id;
-    const { error: updateError } = await admin.auth.admin.updateUserById(
-      userId,
-      {
-        password: parsed.password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: parsed.fullName,
-          phone: parsed.phone,
-        },
-      }
-    );
-    if (updateError) {
-      return {
-        error:
-          "This email is already registered. Please sign in with your password.",
-      };
-    }
+    return {
+      error: authErrorMessage(createError, "Could not create account"),
+    };
   }
 
+  const userId = created.user?.id;
   if (userId) {
     await admin.from("profiles").upsert({
       id: userId,
       full_name: parsed.fullName,
       phone: parsed.phone,
-      ...(isAdmin ? { role: "admin" } : {}),
+      role: "customer",
     });
   }
 
@@ -153,8 +123,7 @@ async function registerWithAdmin(
 
 async function completeRegistration(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  parsed: { email: string; password: string },
-  isAdmin: boolean
+  parsed: { email: string; password: string }
 ) {
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email: parsed.email,
@@ -172,7 +141,7 @@ async function completeRegistration(
   revalidatePath("/");
   return {
     ok: true as const,
-    redirectTo: isAdmin ? "/admin" : "/account",
+    redirectTo: "/account",
   };
 }
 
@@ -217,6 +186,9 @@ export async function loginAction(formData: FormData) {
 }
 
 export async function registerAction(formData: FormData) {
+  const rl = rateLimit(await rateLimitKey("register"), 5, 60_000);
+  if (!rl.ok) return { error: "Too many attempts. Please try again later." };
+
   try {
     const parsed = registerSchema.safeParse({
       fullName: formData.get("fullName"),
@@ -238,8 +210,6 @@ export async function registerAction(formData: FormData) {
       };
     }
 
-    const email = parsed.data.email.trim().toLowerCase();
-    const isAdmin = isAdminEmail(email);
     const supabase = await createClient();
 
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -254,31 +224,28 @@ export async function registerAction(formData: FormData) {
     });
 
     if (signUpError) {
+      if (isEmailAlreadyRegistered(signUpError)) {
+        return {
+          error:
+            "This email is already registered. Please sign in with your password.",
+        };
+      }
+
       if (!shouldFallbackToAdminSignup(signUpError)) {
         return {
           error: authErrorMessage(signUpError, "Could not create account"),
         };
       }
 
-      const adminResult = await registerWithAdmin(parsed.data, isAdmin);
+      const adminResult = await registerWithAdmin(parsed.data);
       if (adminResult.error) {
         return { error: adminResult.error };
       }
 
-      return completeRegistration(supabase, parsed.data, isAdmin);
+      return completeRegistration(supabase, parsed.data);
     }
 
-    if (data.user && isAdmin) {
-      try {
-        const admin = createAdminClient();
-        await admin
-          .from("profiles")
-          .update({ role: "admin", phone: parsed.data.phone })
-          .eq("id", data.user.id);
-      } catch {
-        // ADMIN_EMAILS still grants /admin access if profile update fails.
-      }
-    } else if (data.user) {
+    if (data.user) {
       await supabase
         .from("profiles")
         .update({ phone: parsed.data.phone })
@@ -288,10 +255,10 @@ export async function registerAction(formData: FormData) {
     if (data.session) {
       await mergeGuestCartOnLogin().catch(() => {});
       revalidatePath("/");
-      return { ok: true, redirectTo: isAdmin ? "/admin" : "/account" };
+      return { ok: true, redirectTo: "/account" };
     }
 
-    return completeRegistration(supabase, parsed.data, isAdmin);
+    return completeRegistration(supabase, parsed.data);
   } catch (err) {
     return {
       error: authErrorMessage(err, "Registration failed. Please try again."),
@@ -308,6 +275,9 @@ export async function logoutAction() {
 }
 
 export async function forgotPasswordAction(formData: FormData) {
+  const rl = rateLimit(await rateLimitKey("forgot-password"), 5, 60_000);
+  if (!rl.ok) return { error: "Too many attempts. Please try again later." };
+
   const email = formData.get("email") as string;
   if (!email || !isSupabaseConfigured()) {
     return { error: "Invalid email" };

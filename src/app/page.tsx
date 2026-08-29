@@ -1,5 +1,6 @@
 import HomePageContent from "@/components/HomePageContent";
 import { getLatestBlogPosts } from "@/lib/blog/queries";
+import { getCmsBundle } from "@/lib/cms/queries";
 import {
   getCategories,
   getFeaturedProducts,
@@ -17,6 +18,7 @@ export default async function HomePage() {
     newArrivals,
     mostLoved,
     blogPosts,
+    cms,
   ] = await Promise.all([
     getCategories(),
     getProducts({ category: "necklace-sets", limit: 8 }),
@@ -27,6 +29,7 @@ export default async function HomePage() {
     getFeaturedProducts({ isNew: true, limit: 8 }),
     getProducts({ sort: "popular", limit: 4 }),
     getLatestBlogPosts(3),
+    getCmsBundle(),
   ]);
 
   return (
@@ -40,6 +43,13 @@ export default async function HomePage() {
       newArrivals={newArrivals}
       mostLoved={mostLoved.products}
       blogPosts={blogPosts}
+      hero={cms.hero}
+      homepage={cms.homepage}
+      site={cms.site}
+      testimonials={cms.testimonials}
+      faqs={cms.faqs}
+      trustFeatures={cms.trustFeatures}
+      video={cms.video}
     />
   );
 }

@@ -48,6 +48,17 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user && request.nextUrl.pathname.startsWith("/admin")) {
+    const { isAdminUserMiddleware } = await import("@/lib/admin/middleware-auth");
+    const allowed = await isAdminUserMiddleware(user, supabase);
+    if (!allowed) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      url.searchParams.set("error", "admin");
+      return NextResponse.redirect(url);
+    }
+  }
+
   const authPaths = ["/login", "/register"];
   if (user && authPaths.includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone();

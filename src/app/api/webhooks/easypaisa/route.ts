@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { verifyWebhookSecret } from "@/lib/security/webhook-auth";
 
 export async function POST(request: NextRequest) {
+  const auth = verifyWebhookSecret(request, "EASYPAISA_WEBHOOK_SECRET");
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.message }, { status: auth.status });
+  }
+
   try {
     const body = await request.json();
     const orderNumber = body.orderId ?? body.orderRefNum;
@@ -14,12 +20,16 @@ export async function POST(request: NextRequest) {
     const admin = createAdminClient();
     const { data: order } = await admin
       .from("orders")
-      .select("id")
+      .select("id, payment_status")
       .eq("order_number", orderNumber)
       .maybeSingle();
 
     if (!order) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    if (order.payment_status === "paid") {
+      return NextResponse.json({ received: true, skipped: "already_paid" });
     }
 
     if (status === "PAID" || status === "success") {

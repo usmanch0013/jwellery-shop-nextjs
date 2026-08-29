@@ -1,12 +1,14 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  FileText,
   MessageSquare,
   Package,
   Plus,
   ShoppingBag,
   Star,
   Ticket,
+  Truck,
 } from "lucide-react";
 
 const actions = [
@@ -18,10 +20,24 @@ const actions = [
     accent: "bg-emerald-600 text-white",
   },
   {
-    href: "/admin/orders",
-    label: "Manage orders",
-    description: "Track and fulfill customer orders",
+    href: "/admin/orders?status=pending",
+    label: "Pending orders",
+    description: "Review and confirm new orders",
     icon: ShoppingBag,
+    accent: "bg-amber-500 text-white",
+  },
+  {
+    href: "/admin/orders?status=processing",
+    label: "Fulfill orders",
+    description: "Add tracking & mark as shipped",
+    icon: Truck,
+    accent: "bg-white text-foreground ring-1 ring-border",
+  },
+  {
+    href: "/admin/orders",
+    label: "Generate invoices",
+    description: "Print PDF invoices for any order",
+    icon: FileText,
     accent: "bg-white text-foreground ring-1 ring-border",
   },
   {

@@ -29,3 +29,15 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
+
+export const ORDER_EVENT_LABELS: Record<string, string> = {
+  order_placed: "Order placed",
+  status_changed: "Status updated",
+  payment_updated: "Payment updated",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  tracking_added: "Tracking added",
+  note_added: "Note added",
+  invoice_generated: "Invoice generated",
+  cancelled: "Cancelled",
+};

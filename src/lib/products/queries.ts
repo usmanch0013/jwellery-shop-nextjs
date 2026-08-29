@@ -115,7 +115,8 @@ export async function getProducts(
 
   let query = supabase
     .from("products")
-    .select("*, categories!inner(slug, name)", { count: "exact" });
+    .select("*, categories!inner(slug, name)", { count: "exact" })
+    .eq("status", "published");
 
   if (params.category) {
     query = query.eq("categories.slug", params.category);
@@ -172,9 +173,8 @@ export async function resolveCanonicalProductId(
     return p?.id ?? null;
   }
 
-  const { createAdminClient } = await import("@/lib/supabase/admin");
-  const admin = createAdminClient();
-  const { data } = await admin
+  const supabase = await createClient();
+  const { data } = await supabase
     .from("products")
     .select("id")
     .or(productLookupFilter(idOrSlug))

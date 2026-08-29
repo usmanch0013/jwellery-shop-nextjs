@@ -29,9 +29,20 @@ const navLinks = [
   { label: "Client Reviews", href: "/#reviews" },
 ];
 
-export default function Header({ categories }: { categories: CategoryInfo[] }) {
+export default function Header({
+  categories,
+  headerNav,
+  topBarText,
+}: {
+  categories: CategoryInfo[];
+  headerNav?: Array<{ label: string; href: string }>;
+  topBarText?: string;
+}) {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const links = headerNav?.length
+    ? headerNav.map((l) => ({ label: l.label, href: l.href }))
+    : navLinks;
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -62,7 +73,7 @@ export default function Header({ categories }: { categories: CategoryInfo[] }) {
           isHome ? "fixed top-0 left-0 right-0" : "sticky top-0"
         }`}
       >
-        <TopBar transparent={transparent} />
+        <TopBar transparent={transparent} text={topBarText} />
         <header
           className={`w-full transition-all duration-300 ${
             transparent
@@ -86,7 +97,7 @@ export default function Header({ categories }: { categories: CategoryInfo[] }) {
               </div>
 
               <nav className="hidden xl:flex items-center justify-center gap-7 2xl:gap-9 flex-1">
-                {navLinks.map((link) => (
+                {links.map((link) => (
                   <Link
                     key={link.href + link.label}
                     href={link.href}
@@ -99,7 +110,7 @@ export default function Header({ categories }: { categories: CategoryInfo[] }) {
 
               {/* Compact nav for lg screens */}
               <nav className="hidden lg:flex xl:hidden items-center justify-center gap-5 flex-1">
-                {navLinks.slice(0, 5).map((link) => (
+                {links.slice(0, 5).map((link) => (
                   <Link
                     key={link.href + link.label}
                     href={link.href}
@@ -172,7 +183,7 @@ export default function Header({ categories }: { categories: CategoryInfo[] }) {
             <SheetTitle className="font-serif text-2xl">Lumière</SheetTitle>
           </SheetHeader>
           <nav className="flex flex-col gap-0 mt-6">
-            {navLinks.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.href + link.label}
                 href={link.href}

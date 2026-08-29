@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { DbMediaAsset } from "@/lib/database.types";
-import { addMediaAction, getMediaLibraryAction } from "@/actions/admin/media";
+import { addMediaAction, getMediaLibraryAction, uploadMediaFileAction } from "@/actions/admin/media";
 import { cn } from "@/lib/utils";
 
 type MediaPickerModalProps = {
@@ -37,6 +37,7 @@ export function MediaPickerModal({
   const [selected, setSelected] = useState<string[]>([]);
   const [newUrl, setNewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -76,6 +77,32 @@ export function MediaPickerModal({
     setUploading(false);
   }
 
+  async function uploadFiles(files: FileList | File[]) {
+    const list = [...files];
+    if (list.length === 0) return;
+    setUploadingFile(true);
+    setError("");
+    let uploaded = 0;
+    for (const file of list) {
+      const formData = new FormData();
+      formData.set("file", file);
+      const result = await uploadMediaFileAction(formData);
+      if (result.error) {
+        setError(result.error);
+        break;
+      }
+      uploaded += 1;
+    }
+    if (uploaded > 0) {
+      const res = await getMediaLibraryAction();
+      setItems(res.items as DbMediaAsset[]);
+      if (!multiple && res.items[0]) {
+        setSelected([res.items[0].url]);
+      }
+    }
+    setUploadingFile(false);
+  }
+
   function handleConfirm() {
     if (selected.length === 0) return;
     onSelect(selected);
@@ -102,6 +129,35 @@ export function MediaPickerModal({
         </DialogHeader>
 
         <div className="space-y-4 px-6 py-4">
+          <div
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (e.dataTransfer.files?.length) uploadFiles(e.dataTransfer.files);
+            }}
+            className="rounded-xl border-2 border-dashed border-border/70 bg-muted/20 p-5 text-center"
+          >
+            <Upload className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+            <p className="text-sm font-medium">Drop images here or upload</p>
+            <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, WebP, GIF — up to 10MB</p>
+            <label className="mt-3 inline-block">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+                multiple={multiple}
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files?.length) uploadFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+              <span className={cn(buttonVariants({ variant: "outline", size: "sm" }), "cursor-pointer mt-2 inline-flex")}>
+                {uploadingFile ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                Browse files
+              </span>
+            </label>
+          </div>
+
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1 space-y-2">
               <Label className="text-sm">Add image by URL</Label>
