@@ -24,7 +24,7 @@ export default function AddressForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 border p-4">
+    <form onSubmit={handleSubmit} className="space-y-3">
       <div>
         <Label htmlFor="label">Label</Label>
         <Input id="label" name="label" defaultValue="Home" />

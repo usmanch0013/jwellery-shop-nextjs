@@ -1,105 +1,94 @@
 import Link from "next/link";
-import { logoutAction, getProfile, getAddresses } from "@/actions/auth";
 import { getUserOrders } from "@/actions/orders";
+import { getUserDashboardStats } from "@/lib/account/queries";
+import UserStatCard from "@/components/account/UserStatCard";
+import UserOrdersList from "@/components/account/UserOrdersList";
 import { formatPrice } from "@/lib/products/format";
-import { ORDER_STATUS_LABELS, PAYMENT_METHOD_LABELS } from "@/lib/constants/commerce";
-import { Button } from "@/components/ui/button";
-import AccountProfileForm from "@/components/account/AccountProfileForm";
-import AddressForm from "@/components/account/AddressForm";
+import { Heart, Package, ShoppingBag, Wallet } from "lucide-react";
 
-export const metadata = { title: "My Account | Lumière Jewellery" };
+export default async function AccountDashboardPage() {
+  const [stats, orders] = await Promise.all([
+    getUserDashboardStats(),
+    getUserOrders(),
+  ]);
 
-export default async function AccountPage() {
-  const profile = await getProfile();
-  const orders = await getUserOrders();
-  const addresses = await getAddresses();
-
-  if (!profile) {
-    return (
-      <div className="py-20 text-center px-4">
-        <h1 className="font-serif text-3xl mb-4">My Account</h1>
-        <p className="text-muted-foreground mb-6">
-          Please sign in to view your account.
-        </p>
-        <Link
-          href="/login"
-          className="inline-flex h-9 items-center justify-center bg-primary px-4 text-sm text-primary-foreground"
-        >
-          Sign In
-        </Link>
-      </div>
-    );
-  }
+  const s = stats ?? {
+    orderCount: orders.length,
+    activeOrders: 0,
+    wishlistCount: 0,
+    totalSpent: 0,
+    recentOrders: orders.slice(0, 5),
+  };
 
   return (
-    <div className="py-10 px-4 max-w-[1000px] mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="font-serif text-3xl">My Account</h1>
-        <form action={logoutAction}>
-          <Button type="submit" variant="outline" size="sm">
-            Sign Out
-          </Button>
-        </form>
+    <div className="space-y-8">
+      <div>
+        <h1 className="font-serif text-2xl sm:text-3xl">Dashboard</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Welcome back — manage orders, wishlist and account details.
+        </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-10">
-        <section>
-          <h2 className="font-serif text-xl mb-4">Profile</h2>
-          <AccountProfileForm
-            fullName={profile.profile?.full_name ?? ""}
-            phone={profile.profile?.phone ?? ""}
-            email={profile.user.email ?? ""}
-          />
-        </section>
-
-        <section>
-          <h2 className="font-serif text-xl mb-4">Saved Addresses</h2>
-          <AddressForm />
-          {addresses.length > 0 && (
-            <ul className="mt-4 space-y-3">
-              {addresses.map((addr) => (
-                <li key={addr.id} className="border p-3 text-sm">
-                  <p className="font-medium">{addr.label}</p>
-                  <p>
-                    {addr.line1}, {addr.city}, {addr.province}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <UserStatCard
+          label="Total orders"
+          value={s.orderCount}
+          icon={Package}
+          hint={`${s.activeOrders} active`}
+        />
+        <UserStatCard
+          label="Total spent"
+          value={formatPrice(s.totalSpent)}
+          icon={Wallet}
+        />
+        <UserStatCard
+          label="Wishlist"
+          value={s.wishlistCount}
+          icon={Heart}
+        />
+        <UserStatCard
+          label="Active orders"
+          value={s.activeOrders}
+          icon={ShoppingBag}
+        />
       </div>
 
-      <section className="mt-12">
-        <h2 className="font-serif text-xl mb-4">Order History</h2>
-        {orders.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No orders yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {orders.map((order) => (
+      <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-serif text-xl">Recent orders</h2>
+            {orders.length > 0 && (
               <Link
-                key={order.id}
-                href={`/orders/${order.id}`}
-                className="flex flex-wrap items-center justify-between gap-2 border p-4 hover:bg-muted/50"
+                href="/account/orders"
+                className="text-[13px] font-medium text-primary hover:underline"
               >
-                <div>
-                  <p className="font-medium">{order.order_number}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {new Date(order.created_at).toLocaleDateString()} ·{" "}
-                    {PAYMENT_METHOD_LABELS[order.payment_method]}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">{formatPrice(order.total)}</p>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                    {ORDER_STATUS_LABELS[order.status]}
-                  </p>
-                </div>
+                View all →
+              </Link>
+            )}
+          </div>
+          <UserOrdersList orders={s.recentOrders} compact />
+        </section>
+
+        <aside className="space-y-3">
+          <h2 className="font-serif text-xl">Quick links</h2>
+          <div className="rounded-2xl border border-border/50 bg-white p-4 shadow-sm space-y-2">
+            {[
+              { href: "/shop", label: "Shop collection" },
+              { href: "/account/wishlist", label: "View wishlist" },
+              { href: "/account/addresses", label: "Manage addresses" },
+              { href: "/track-order", label: "Track an order" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="block rounded-lg px-3 py-2 text-[13px] text-foreground/80 transition-colors hover:bg-muted/50 hover:text-primary"
+              >
+                {link.label}
               </Link>
             ))}
           </div>
-        )}
-      </section>
+        </aside>
+      </div>
     </div>
   );
 }
