@@ -6,14 +6,14 @@ interface LogoProps {
 
 export default function Logo({ light = false }: LogoProps) {
   return (
-    <Link href="/" className="group flex items-center gap-2.5">
+    <Link href="/" className="group flex items-center gap-3">
       <svg
-        width="30"
-        height="24"
+        width="34"
+        height="28"
         viewBox="0 0 40 32"
         fill="none"
         aria-hidden
-        className="shrink-0"
+        className={`shrink-0 ${light ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""}`}
       >
         <path
           d="M20 4C16 10 10 12 6 16c3 2 6 5 10 10 1-1 2-2 4-3 2-3 4-6 4-10 0-4-2-8-4-9z"
@@ -30,15 +30,19 @@ export default function Logo({ light = false }: LogoProps) {
       </svg>
       <span className="flex flex-col leading-none">
         <span
-          className={`font-serif text-[20px] font-medium tracking-[0.02em] lowercase ${
-            light ? "text-white" : "text-[#1a1a1a]"
+          className={`font-serif text-[22px] font-medium tracking-[0.02em] lowercase ${
+            light
+              ? "text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]"
+              : "text-[#1a1a1a]"
           }`}
         >
           lumière
         </span>
         <span
-          className={`mt-1 text-[8px] font-medium uppercase tracking-[0.38em] ${
-            light ? "text-white/70" : "text-[#8a8680]"
+          className={`mt-1 text-[8px] font-medium uppercase tracking-[0.4em] ${
+            light
+              ? "text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
+              : "text-[#8a8680]"
           }`}
         >
           Jewellery

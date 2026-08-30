@@ -41,24 +41,13 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         setActiveImage(product.image);
       }}
     >
-      <div className="relative mb-2.5 aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f5f5f5]">
+      <div className="relative mb-2 aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f5f5f5]">
         <Link href={productHref} className="absolute inset-0 block">
           <Image
-            src={product.image}
+            src={activeImage}
             alt={product.name}
             fill
-            className={`object-cover transition-opacity duration-500 ${
-              isHovered ? "opacity-0" : "opacity-100"
-            }`}
-            sizes="(max-width: 640px) 50vw, 25vw"
-          />
-          <Image
-            src={hoverImg}
-            alt={`${product.name} alternate view`}
-            fill
-            className={`object-cover transition-opacity duration-500 ${
-              isHovered ? "opacity-100" : "opacity-0"
-            }`}
+            className="object-cover"
             sizes="(max-width: 640px) 50vw, 25vw"
           />
         </Link>
@@ -109,47 +98,57 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
         {onQuickView && !product.soldOut && (
           <button
+            type="button"
             onClick={(e) => {
               e.preventDefault();
               onQuickView(product);
             }}
-            className={`absolute bottom-0 left-0 right-0 bg-[#6F112B] py-3.5 text-sm text-white transition-all duration-300 ${
-              isHovered
-                ? "translate-y-0 opacity-100"
-                : "translate-y-full opacity-0"
-            }`}
+            className="pointer-events-none absolute inset-x-2.5 bottom-2 z-10 h-6 translate-y-2 rounded-md bg-[#6F112B] text-[11px] font-medium leading-6 text-white opacity-0 transition-all duration-300 group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100"
           >
             Quick view
           </button>
         )}
-
-        {isHovered && thumbnails.length > 1 && (
-          <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-2">
-            {thumbnails.map((thumb, i) => (
-              <button
-                key={i}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setActiveImage(thumb);
-                }}
-                className={`h-8 w-8 overflow-hidden rounded-full border-2 transition-all ${
-                  activeImage === thumb
-                    ? "scale-110 border-white"
-                    : "border-white/50 opacity-70"
-                }`}
-              >
-                <Image
-                  src={thumb}
-                  alt=""
-                  width={32}
-                  height={32}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
-        )}
       </div>
+
+      {thumbnails.length > 1 && (
+        <div
+          className={`grid transition-all duration-300 ${
+            isHovered
+              ? "mb-2 grid-rows-[1fr] opacity-100"
+              : "mb-0 grid-rows-[0fr] opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="flex gap-1.5 px-0.5">
+              {thumbnails.map((thumb, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onMouseEnter={() => setActiveImage(thumb)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveImage(thumb);
+                  }}
+                  className={`relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 transition-colors ${
+                    activeImage === thumb
+                      ? "border-[#3b3933]"
+                      : "border-white ring-1 ring-[#ddd]"
+                  }`}
+                  aria-label={`View image ${i + 1}`}
+                >
+                  <Image
+                    src={thumb}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="36px"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Link href={productHref} className="block px-0.5">
         <h3 className="mb-1.5 text-[14px] font-normal leading-snug text-[#3b3933] hover:underline">
