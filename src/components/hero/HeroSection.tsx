@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ChevronDown, ArrowRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import MarqueeBar from "@/components/MarqueeBar";
 import type { CmsHeroSettings } from "@/lib/cms/types";
@@ -29,8 +28,8 @@ export default function HeroSection({
     offset: ["start start", "end start"],
   });
 
-  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 28]);
+  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 20]);
 
   const videoSrc = content.backgroundVideo || HERO_VIDEO_FALLBACK;
   const posterSrc = content.backgroundImage || HERO_POSTER_FALLBACK;
@@ -52,14 +51,14 @@ export default function HeroSection({
   return (
     <section
       ref={sectionRef}
-      className="relative flex w-full min-h-[100dvh] flex-col overflow-hidden"
+      className="relative flex min-h-[100dvh] w-full flex-col overflow-hidden"
     >
       <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-screen max-w-none -translate-x-1/2">
         <motion.div className="absolute inset-0" style={{ scale: mediaScale }}>
           {!videoFailed && !reduceMotion ? (
             <video
               ref={videoRef}
-              className="absolute inset-0 h-full w-full object-cover object-[72%_center] [filter:brightness(1.04)_contrast(1.08)_saturate(1.08)]"
+              className="absolute inset-0 h-full w-full object-cover object-[82%_center]"
               autoPlay
               muted
               loop
@@ -79,9 +78,14 @@ export default function HeroSection({
           )}
         </motion.div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B3D35]/80 via-[#0B3D35]/22 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B3D35]/55 via-transparent to-transparent" />
-        <div className="absolute inset-x-0 top-0 h-[var(--header-height)] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(10,14,12,0.62) 0%, rgba(10,14,12,0.32) 26%, rgba(10,14,12,0.08) 48%, transparent 66%)",
+          }}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
 
       <div
@@ -96,56 +100,28 @@ export default function HeroSection({
           }}
         >
           <div
-            className="w-full max-w-[var(--site-max)] mx-auto px-[var(--hero-px)]"
+            className="mx-auto w-full max-w-[var(--site-max)] px-[var(--hero-px)]"
             style={{
               paddingTop: "var(--hero-v-pad)",
               paddingBottom: "var(--hero-v-pad)",
             }}
           >
-            <motion.div
-              style={{ y: contentY }}
-              className="w-full max-w-[640px]"
-            >
-              <div
-                className="flex flex-col"
-                style={{ gap: "var(--hero-stack)" }}
-              >
-                <div className="space-y-3 sm:space-y-4">
-                  <p className="text-champagne text-[10px] sm:text-[11px] md:text-xs font-medium uppercase tracking-[0.32em] sm:tracking-[0.38em]">
-                    {content.eyebrow}
-                  </p>
-                  <div className="h-px w-10 sm:w-12 bg-champagne/60" />
-                </div>
+            <motion.div style={{ y: contentY }} className="w-full max-w-[520px]">
+              <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.42em] text-champagne sm:mb-6 sm:text-[11px]">
+                {content.eyebrow}
+              </p>
+              <div className="mb-5 h-px w-8 bg-champagne/70 sm:mb-6" />
 
-                <div className="space-y-0.5 sm:space-y-1">
-                  <h1 className="font-serif text-[clamp(1.875rem,5vw,3.5rem)] leading-[1.08] text-white">
-                    {content.headlineLine1}
-                  </h1>
-                  <p className="font-script text-[clamp(2.5rem,6.5vw,4.75rem)] leading-[0.95] text-champagne">
-                    {content.headlineLine2}
-                  </p>
-                </div>
+              <h1 className="font-serif text-[clamp(2.25rem,5.2vw,3.75rem)] font-normal leading-[1.12] tracking-[-0.01em] text-white">
+                {content.headlineLine1}
+              </h1>
+              <p className="mt-1 font-script text-[clamp(2.75rem,6vw,4.5rem)] leading-[0.95] text-champagne">
+                {content.headlineLine2}
+              </p>
 
-                <p className="max-w-[480px] text-[14px] sm:text-[15px] md:text-base leading-[1.7] sm:leading-[1.75] text-white/75">
-                  {content.description}
-                </p>
-
-                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
-                  <Link
-                    href={content.primaryCtaHref}
-                    className="inline-flex items-center justify-center gap-2.5 bg-champagne px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-foreground transition-colors hover:bg-champagne-dark sm:min-w-[168px]"
-                  >
-                    {content.primaryCtaLabel}
-                    <ArrowRight className="h-4 w-4 shrink-0" />
-                  </Link>
-                  <Link
-                    href={content.secondaryCtaHref}
-                    className="inline-flex items-center justify-center border border-white/35 px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-white transition-colors hover:bg-white/10 sm:min-w-[148px]"
-                  >
-                    {content.secondaryCtaLabel}
-                  </Link>
-                </div>
-              </div>
+              <p className="mt-6 max-w-[420px] text-[13px] leading-[1.85] text-white/82 sm:mt-7 sm:text-[14px] sm:leading-[1.9]">
+                {content.description}
+              </p>
             </motion.div>
           </div>
         </div>
@@ -156,16 +132,16 @@ export default function HeroSection({
         style={{ minHeight: "var(--hero-bottom-bar)" }}
       >
         <motion.div
-          className="absolute inset-x-0 top-0 flex justify-center text-white/35"
+          className="absolute inset-x-0 top-0 flex justify-center text-white/45"
           style={{ paddingBlock: "var(--hero-scroll-gap)" }}
-          animate={{ y: [0, 4, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={reduceMotion ? undefined : { y: [0, 5, 0] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
         >
-          <div className="flex flex-col items-center gap-1">
-            <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.28em] sm:tracking-[0.3em]">
+          <div className="flex flex-col items-center gap-1.5">
+            <span className="text-[9px] uppercase tracking-[0.36em]">
               {content.scrollHint}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <ChevronDown className="h-3.5 w-3.5" strokeWidth={1.25} />
           </div>
         </motion.div>
 

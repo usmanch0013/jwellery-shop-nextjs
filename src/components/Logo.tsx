@@ -6,14 +6,14 @@ interface LogoProps {
 
 export default function Logo({ light = false }: LogoProps) {
   return (
-    <Link href="/" className="flex flex-col items-center leading-none group min-w-[84px]">
+    <Link href="/" className="group flex items-center gap-2.5">
       <svg
-        width="34"
-        height="28"
+        width="30"
+        height="24"
         viewBox="0 0 40 32"
         fill="none"
-        className="mb-0.5"
         aria-hidden
+        className="shrink-0"
       >
         <path
           d="M20 4C16 10 10 12 6 16c3 2 6 5 10 10 1-1 2-2 4-3 2-3 4-6 4-10 0-4-2-8-4-9z"
@@ -28,19 +28,21 @@ export default function Logo({ light = false }: LogoProps) {
           fill="#E8D5A8"
         />
       </svg>
-      <span
-        className={`text-[15px] font-bold tracking-tight lowercase ${
-          light ? "text-white" : "text-foreground"
-        }`}
-      >
-        lumière
-      </span>
-      <span
-        className={`text-[6px] tracking-[0.38em] uppercase mt-0.5 font-medium ${
-          light ? "text-white/70" : "text-muted-foreground"
-        }`}
-      >
-        Jewellery
+      <span className="flex flex-col leading-none">
+        <span
+          className={`font-serif text-[20px] font-medium tracking-[0.02em] lowercase ${
+            light ? "text-white" : "text-[#1a1a1a]"
+          }`}
+        >
+          lumière
+        </span>
+        <span
+          className={`mt-1 text-[8px] font-medium uppercase tracking-[0.38em] ${
+            light ? "text-white/70" : "text-[#8a8680]"
+          }`}
+        >
+          Jewellery
+        </span>
       </span>
     </Link>
   );

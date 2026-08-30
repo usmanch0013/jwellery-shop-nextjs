@@ -22,12 +22,22 @@ import {
 const navLinks = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "Best selling products", href: "/shop?filter=bestseller" },
+  { label: "Best Sellers", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
   { label: "Collections", href: "/#collections" },
-  { label: "Track Order", href: "/track-order" },
-  { label: "Client Reviews", href: "/#reviews" },
+  { label: "Track", href: "/track-order" },
+  { label: "Reviews", href: "/#reviews" },
 ];
+
+function shortLabel(label: string) {
+  const map: Record<string, string> = {
+    "Best selling products": "Best Sellers",
+    "Best Selling Products": "Best Sellers",
+    "Client Reviews": "Reviews",
+    "Track Order": "Track",
+  };
+  return map[label] ?? label;
+}
 
 export default function Header({
   categories,
@@ -41,7 +51,7 @@ export default function Header({
   const pathname = usePathname();
   const isHome = pathname === "/";
   const links = headerNav?.length
-    ? headerNav.map((l) => ({ label: l.label, href: l.href }))
+    ? headerNav.map((l) => ({ label: shortLabel(l.label), href: l.href }))
     : navLinks;
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
@@ -50,120 +60,118 @@ export default function Header({
   const [cartOpen, setCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const transparent = isHome && !scrolled;
+  const overHero = isHome && !scrolled;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
+    const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  const iconClass = transparent
-    ? "text-white hover:text-champagne drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
-    : "text-foreground hover:text-primary";
-  const navClass = transparent
-    ? "text-white hover:text-champagne font-medium [text-shadow:0_1px_10px_rgba(0,0,0,0.85)]"
-    : "text-foreground/80 hover:text-primary font-medium";
-
   return (
     <>
       <div
-        className={`z-50 w-full transition-all duration-300 ${
-          isHome ? "fixed top-0 left-0 right-0" : "sticky top-0"
-        }`}
+        className={`z-50 w-full ${isHome ? "fixed top-0 right-0 left-0" : "sticky top-0"}`}
       >
-        <TopBar transparent={transparent} text={topBarText} />
+        <TopBar text={topBarText} />
         <header
           className={`w-full transition-all duration-300 ${
-            transparent
-              ? "bg-transparent border-b border-white/10"
-              : "bg-background/95 backdrop-blur-md border-b border-border/60 shadow-sm"
+            overHero
+              ? "border-b border-white/40 bg-white/45 backdrop-blur-xl"
+              : "border-b border-black/[0.06] bg-white/95 shadow-[0_1px_0_rgba(201,169,110,0.25)] backdrop-blur-md"
           }`}
         >
-          <div className="max-w-[var(--site-max)] mx-auto px-[var(--site-px)]">
-            <div className="flex items-center justify-between gap-6 lg:gap-8 h-[var(--nav-height)]">
-              <div className={`flex items-center shrink-0 min-w-[100px] ${transparent ? "drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]" : ""}`}>
+          <div className="mx-auto max-w-[var(--site-max)] px-[var(--site-px)]">
+            <div className="flex h-[var(--nav-height)] items-center justify-between gap-6">
+              <div className="flex min-w-[160px] shrink-0 items-center">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`lg:hidden -ml-2 mr-2 ${transparent ? "text-white hover:bg-white/10 drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : ""}`}
+                  className="-ml-2 mr-1 text-[#1a1a1a] hover:bg-black/5 lg:hidden"
                   onClick={() => setMobileMenuOpen(true)}
                   aria-label="Menu"
                 >
-                  <Menu className="w-5 h-5" />
+                  <Menu className="h-5 w-5" />
                 </Button>
-                <Logo light={transparent} />
+                <Logo />
               </div>
 
-              <nav className="hidden xl:flex items-center justify-center gap-7 2xl:gap-9 flex-1">
-                {links.map((link) => (
-                  <Link
-                    key={link.href + link.label}
-                    href={link.href}
-                    className={`text-[13px] 2xl:text-[14px] whitespace-nowrap tracking-[0.01em] transition-colors ${navClass}`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+              <nav className="hidden flex-1 items-center justify-center gap-7 xl:flex 2xl:gap-9">
+                {links.map((link) => {
+                  const active =
+                    link.href === "/"
+                      ? pathname === "/"
+                      : !link.href.includes("?") &&
+                        !link.href.includes("#") &&
+                        pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href + link.label}
+                      href={link.href}
+                      className={`relative pb-1 text-[12px] tracking-[0.14em] uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:bg-champagne after:transition-all after:duration-300 hover:text-[#0B3D35] hover:after:w-full ${
+                        active
+                          ? "text-[#0B3D35] after:w-full"
+                          : "text-[#2a2a2a]/75 after:w-0"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  );
+                })}
               </nav>
 
-              {/* Compact nav for lg screens */}
-              <nav className="hidden lg:flex xl:hidden items-center justify-center gap-5 flex-1">
+              <nav className="hidden flex-1 items-center justify-center gap-5 lg:flex xl:hidden">
                 {links.slice(0, 5).map((link) => (
                   <Link
                     key={link.href + link.label}
                     href={link.href}
-                    className={`text-[13px] whitespace-nowrap tracking-[0.01em] transition-colors ${navClass}`}
+                    className="text-[11px] tracking-[0.12em] uppercase text-[#2a2a2a]/75 transition-colors hover:text-[#0B3D35]"
                   >
                     {link.label}
                   </Link>
                 ))}
               </nav>
 
-              <div className="flex items-center justify-end gap-0.5 shrink-0 min-w-[100px]">
+              <div className="flex min-w-[160px] shrink-0 items-center justify-end gap-0.5">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
-                  className={`hover:bg-transparent ${iconClass}`}
+                  className="text-[#1a1a1a] hover:bg-transparent hover:text-champagne"
                 >
-                  <Search className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  <Search className="h-4 w-4" strokeWidth={1.4} />
                 </Button>
                 <Link
                   href="/wishlist"
-                  className={`relative inline-flex items-center justify-center size-9 rounded-full transition-colors ${
-                    transparent ? "hover:bg-white/10 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : "hover:bg-muted"
-                  }`}
+                  className="relative inline-flex size-9 items-center justify-center text-[#1a1a1a] transition-colors hover:text-champagne"
                   aria-label="Wishlist"
                 >
-                  <Heart className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  <Heart className="h-4 w-4" strokeWidth={1.4} />
                   {wishlistItems.length > 0 && (
-                    <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] rounded-full flex items-center justify-center">
+                    <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] text-white">
                       {wishlistItems.length}
                     </span>
                   )}
                 </Link>
                 <Link
                   href="/account"
-                  className={`inline-flex items-center justify-center size-9 rounded-full transition-colors ${
-                    transparent ? "hover:bg-white/10 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : "hover:bg-muted"
-                  }`}
+                  className="inline-flex size-9 items-center justify-center text-[#1a1a1a] transition-colors hover:text-champagne"
                   aria-label="Account"
                 >
-                  <User className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  <User className="h-4 w-4" strokeWidth={1.4} />
                 </Link>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setCartOpen(true)}
-                  className={`relative hover:bg-transparent ${iconClass}`}
+                  className="relative text-[#1a1a1a] hover:bg-transparent hover:text-champagne"
                   aria-label="Cart"
                 >
-                  <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.75} />
+                  <ShoppingBag className="h-4 w-4" strokeWidth={1.4} />
                   {totalItems > 0 && (
-                    <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] rounded-full flex items-center justify-center">
+                    <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[8px] text-white">
                       {totalItems}
                     </span>
                   )}
@@ -178,36 +186,36 @@ export default function Header({
       <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-80 overflow-y-auto bg-background">
+        <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
           <SheetHeader>
             <SheetTitle className="font-serif text-2xl">Lumière</SheetTitle>
           </SheetHeader>
-          <nav className="flex flex-col gap-0 mt-6">
+          <nav className="mt-6 flex flex-col gap-0">
             {links.map((link) => (
               <Link
                 key={link.href + link.label}
                 href={link.href}
-                className="py-3 text-sm border-b border-border hover:text-primary"
+                className="border-b border-border py-3 text-sm hover:text-primary"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
-            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-4 mb-2">
+            <p className="mt-4 mb-2 text-[10px] tracking-widest uppercase text-muted-foreground">
               Categories
             </p>
             {categories
               .filter((cat) => cat.productCount > 0)
               .map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/categories/${cat.slug}`}
-                className="py-2.5 text-sm text-muted-foreground hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {cat.name}
-              </Link>
-            ))}
+                <Link
+                  key={cat.slug}
+                  href={`/categories/${cat.slug}`}
+                  className="py-2.5 text-sm text-muted-foreground hover:text-primary"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {cat.name}
+                </Link>
+              ))}
           </nav>
         </SheetContent>
       </Sheet>

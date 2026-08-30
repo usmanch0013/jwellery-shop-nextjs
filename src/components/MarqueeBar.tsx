@@ -32,7 +32,7 @@ export default function MarqueeBar({
     <div
       className={
         isDark
-          ? "overflow-hidden py-4 border-t border-white/10 bg-[#0B3D35]/60 backdrop-blur-sm"
+          ? "overflow-hidden border-t border-white/10 bg-[#0B3D35] py-3.5"
           : "bg-background overflow-hidden py-4 border-t border-border"
       }
     >
@@ -40,8 +40,8 @@ export default function MarqueeBar({
         {[...items, ...items].map((item, i) => (
           <span
             key={i}
-            className={`inline-flex items-center gap-3 mx-6 text-[12px] capitalize tracking-wide ${
-              isDark ? "text-white/75" : "text-foreground/80"
+            className={`mx-8 inline-flex items-center gap-3 text-[11px] tracking-[0.18em] uppercase ${
+              isDark ? "text-white/80" : "text-foreground/80"
             }`}
           >
             <BoxIcon className={isDark ? "text-champagne/80" : "text-sage"} />

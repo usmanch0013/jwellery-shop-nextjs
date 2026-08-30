@@ -101,11 +101,11 @@ export const DEFAULT_TRUST_FEATURES: CmsTrustFeature[] = [
 export const DEFAULT_HEADER_NAV = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
-  { label: "Best selling products", href: "/shop?filter=bestseller" },
+  { label: "Best Sellers", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
-  { label: "Collections", href: "/shop" },
-  { label: "Track Order", href: "/track-order" },
-  { label: "Client Reviews", href: "/#reviews" },
+  { label: "Collections", href: "/#collections" },
+  { label: "Track", href: "/track-order" },
+  { label: "Reviews", href: "/#reviews" },
 ];
 
 export const DEFAULT_FOOTER_USEFUL = [
