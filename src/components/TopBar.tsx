@@ -40,13 +40,18 @@ const socials = [
 ];
 
 export default function TopBar({
+  transparent = false,
   text = "Worldwide Shipping",
 }: {
   transparent?: boolean;
   text?: string;
 }) {
   return (
-    <div className="relative w-full bg-[#0B3D35] text-white">
+    <div
+      className={`relative w-full ${
+        transparent ? "bg-transparent text-white" : "bg-[#0B3D35] text-white"
+      }`}
+    >
       <div className="mx-auto flex h-[var(--topbar-height)] max-w-[var(--site-max)] items-center justify-between px-[var(--site-px)]">
         <div className="hidden items-center gap-5 sm:flex">
           {socials.map(({ icon: Icon, label }) => (
@@ -54,18 +59,34 @@ export default function TopBar({
               key={label}
               href="#"
               aria-label={label}
-              className="text-white/70 transition-colors hover:text-champagne"
+              className={`transition-colors hover:text-champagne ${
+                transparent
+                  ? "text-white/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.65)]"
+                  : "text-white/70"
+              }`}
             >
               <Icon />
             </a>
           ))}
         </div>
 
-        <p className="absolute left-1/2 -translate-x-1/2 text-[10px] font-medium uppercase tracking-[0.32em] text-white/90">
+        <p
+          className={`absolute left-1/2 -translate-x-1/2 text-[10px] font-medium uppercase tracking-[0.32em] ${
+            transparent
+              ? "text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
+              : "text-white/90"
+          }`}
+        >
           {text}
         </p>
 
-        <p className="hidden text-[10px] uppercase tracking-[0.22em] text-champagne/90 lg:block">
+        <p
+          className={`hidden text-[10px] uppercase tracking-[0.22em] lg:block ${
+            transparent
+              ? "text-champagne [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
+              : "text-champagne/90"
+          }`}
+        >
           Complimentary shipping
         </p>
       </div>

@@ -74,11 +74,11 @@ export default function Header({
       <div
         className={`z-50 w-full ${isHome ? "fixed top-0 right-0 left-0" : "sticky top-0"}`}
       >
-        <TopBar text={topBarText} />
+        <TopBar transparent={overHero} text={topBarText} />
         <header
           className={`w-full transition-all duration-300 ${
             overHero
-              ? "border-b border-white/40 bg-white/45 backdrop-blur-xl"
+              ? "bg-transparent"
               : "border-b border-black/[0.06] bg-white/95 shadow-[0_1px_0_rgba(201,169,110,0.25)] backdrop-blur-md"
           }`}
         >
@@ -88,13 +88,15 @@ export default function Header({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="-ml-2 mr-1 text-[#1a1a1a] hover:bg-black/5 lg:hidden"
+                  className={`-ml-2 mr-1 lg:hidden hover:bg-white/10 ${
+                    overHero ? "text-white" : "text-[#1a1a1a] hover:bg-black/5"
+                  }`}
                   onClick={() => setMobileMenuOpen(true)}
                   aria-label="Menu"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
-                <Logo />
+                <Logo light={overHero} />
               </div>
 
               <nav className="hidden flex-1 items-center justify-center gap-7 xl:flex 2xl:gap-9">
@@ -109,10 +111,16 @@ export default function Header({
                     <Link
                       key={link.href + link.label}
                       href={link.href}
-                      className={`relative pb-1 text-[12px] tracking-[0.14em] uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:bg-champagne after:transition-all after:duration-300 hover:text-[#0B3D35] hover:after:w-full ${
+                      className={`relative pb-1 text-[12px] tracking-[0.14em] uppercase transition-colors after:absolute after:bottom-0 after:left-0 after:h-px after:bg-champagne after:transition-all after:duration-300 hover:after:w-full ${
+                        overHero
+                          ? "text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]"
+                          : "hover:text-[#0B3D35]"
+                      } ${
                         active
-                          ? "text-[#0B3D35] after:w-full"
-                          : "text-[#2a2a2a]/75 after:w-0"
+                          ? overHero
+                            ? "text-white after:w-full"
+                            : "text-[#0B3D35] after:w-full"
+                          : "after:w-0 " + (overHero ? "" : "text-[#2a2a2a]/75")
                       }`}
                     >
                       {link.label}
@@ -126,7 +134,11 @@ export default function Header({
                   <Link
                     key={link.href + link.label}
                     href={link.href}
-                    className="text-[11px] tracking-[0.12em] uppercase text-[#2a2a2a]/75 transition-colors hover:text-[#0B3D35]"
+                    className={`text-[11px] tracking-[0.12em] uppercase transition-colors ${
+                      overHero
+                        ? "text-white/90 hover:text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]"
+                        : "text-[#2a2a2a]/75 hover:text-[#0B3D35]"
+                    }`}
                   >
                     {link.label}
                   </Link>
@@ -139,13 +151,17 @@ export default function Header({
                   size="icon"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
-                  className="text-[#1a1a1a] hover:bg-transparent hover:text-champagne"
+                  className={`hover:bg-transparent hover:text-champagne ${
+                    overHero ? "text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]" : "text-[#1a1a1a]"
+                  }`}
                 >
                   <Search className="h-4 w-4" strokeWidth={1.4} />
                 </Button>
                 <Link
                   href="/wishlist"
-                  className="relative inline-flex size-9 items-center justify-center text-[#1a1a1a] transition-colors hover:text-champagne"
+                  className={`relative inline-flex size-9 items-center justify-center transition-colors hover:text-champagne ${
+                    overHero ? "text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]" : "text-[#1a1a1a]"
+                  }`}
                   aria-label="Wishlist"
                 >
                   <Heart className="h-4 w-4" strokeWidth={1.4} />
@@ -157,7 +173,9 @@ export default function Header({
                 </Link>
                 <Link
                   href="/account"
-                  className="inline-flex size-9 items-center justify-center text-[#1a1a1a] transition-colors hover:text-champagne"
+                  className={`inline-flex size-9 items-center justify-center transition-colors hover:text-champagne ${
+                    overHero ? "text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]" : "text-[#1a1a1a]"
+                  }`}
                   aria-label="Account"
                 >
                   <User className="h-4 w-4" strokeWidth={1.4} />
@@ -166,7 +184,9 @@ export default function Header({
                   variant="ghost"
                   size="icon"
                   onClick={() => setCartOpen(true)}
-                  className="relative text-[#1a1a1a] hover:bg-transparent hover:text-champagne"
+                  className={`relative hover:bg-transparent hover:text-champagne ${
+                    overHero ? "text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.6)]" : "text-[#1a1a1a]"
+                  }`}
                   aria-label="Cart"
                 >
                   <ShoppingBag className="h-4 w-4" strokeWidth={1.4} />
