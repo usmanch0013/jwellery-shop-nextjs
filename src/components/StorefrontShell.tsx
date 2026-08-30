@@ -30,7 +30,7 @@ export default function StorefrontShell({
         headerNav={cms.headerNav}
         topBarText={cms.site.topBarText}
       />
-      <main className="flex-1 w-full">{children}</main>
+      <main className="w-full flex-1 bg-white">{children}</main>
       <Footer
         categories={categories}
         site={cms.site}

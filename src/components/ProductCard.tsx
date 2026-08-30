@@ -41,7 +41,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         setActiveImage(product.image);
       }}
     >
-      <div className="relative mb-2.5 aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f2efe3]">
+      <div className="relative mb-2.5 aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f5f5f5]">
         <Link href={productHref} className="absolute inset-0 block">
           <Image
             src={product.image}

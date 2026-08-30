@@ -3,8 +3,8 @@ import { MapPin } from "lucide-react";
 
 export default function StoreLocator() {
   return (
-    <section className="py-14 lg:py-20 bg-background">
-      <div className="max-w-[1400px] mx-auto px-4">
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stores.map((store) => (
             <div

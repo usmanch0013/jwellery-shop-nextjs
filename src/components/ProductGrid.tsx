@@ -13,14 +13,14 @@ export default function ProductGrid({
   onQuickView,
 }: ProductGridProps) {
   return (
-    <section className="py-8 bg-background">
-      <div className="max-w-[1400px] mx-auto px-4">
+    <section className="bg-white py-8 sm:py-10">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         {title && (
-          <h2 className="font-serif text-2xl lg:text-[28px] text-center mb-8 text-foreground capitalize">
+          <h2 className="mb-6 text-center font-serif text-xl text-foreground capitalize sm:mb-8 sm:text-2xl lg:text-[28px]">
             {title}
           </h2>
         )}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 lg:gap-2">
+        <div className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
           {products.length === 0 ? (
             <div className="col-span-full py-16 text-center">
               <p className="font-serif text-xl mb-2">No products yet</p>

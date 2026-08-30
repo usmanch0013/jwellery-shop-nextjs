@@ -27,13 +27,12 @@ const fieldClass =
   "h-10 rounded-lg border border-[var(--admin-border)] bg-white px-3 text-[13px]";
 
 const SHOWCASE_KEYS: Array<{ key: string; label: string }> = [
-  { key: "necklace-sets", label: "Necklace sets section" },
-  { key: "earrings", label: "Earrings section" },
-  { key: "most-loved", label: "Most loved products" },
-  { key: "best-selling", label: "Best selling products" },
-  { key: "bracelet", label: "Bracelet section" },
-  { key: "bridal-sets", label: "Bridal sets section" },
+  { key: "bridal-sets", label: "Bridal section" },
+  { key: "necklace-sets", label: "Necklace section" },
+  { key: "bracelet", label: "Bracelets section" },
   { key: "new-arrivals", label: "New arrivals section" },
+  { key: "earrings", label: "Earrings section" },
+  { key: "best-selling", label: "Best selling products" },
 ];
 
 const VIDEO_ICON_OPTIONS = [

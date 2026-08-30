@@ -29,8 +29,8 @@ export default function Footer({
   const footerLinks =
     usefulLinks?.map((l) => ({ label: l.label, href: l.href })) ?? defaultFooterLinks;
   return (
-    <footer className="bg-background border-t border-border mt-auto">
-      <div className="max-w-[1400px] mx-auto px-4 py-14">
+    <footer className="mt-auto border-t border-border bg-white">
+      <div className="mx-auto max-w-[1400px] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           <div>
             <h3 className="text-lg font-semibold mb-4">{brandName}</h3>

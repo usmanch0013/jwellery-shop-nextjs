@@ -31,8 +31,8 @@ export default async function CategoryPage({
   });
 
   return (
-    <div className="py-10 bg-background">
-      <div className="max-w-[1400px] mx-auto px-4">
+    <div className="bg-white py-8 sm:py-10">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <Breadcrumbs
           items={[{ label: "Shop", href: "/shop" }, { label: category.name }]}
         />

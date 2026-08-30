@@ -8,10 +8,10 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
   if (posts.length === 0) return null;
 
   return (
-    <section className="py-14 lg:py-20">
-      <div className="mx-auto max-w-[1400px] px-4">
-        <div className="mb-10 flex items-end justify-between gap-4">
-          <h2 className="text-2xl font-medium">Blog posts</h2>
+    <section className="bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
+          <h2 className="text-xl font-medium sm:text-2xl">Blog</h2>
           <Link
             href="/blog"
             className="text-sm text-muted-foreground hover:text-primary"

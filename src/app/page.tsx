@@ -1,33 +1,27 @@
 import HomePageContent from "@/components/HomePageContent";
 import { getLatestBlogPosts } from "@/lib/blog/queries";
 import { getCmsBundle } from "@/lib/cms/queries";
-import {
-  getCategories,
-  getFeaturedProducts,
-  getProducts,
-} from "@/lib/products/queries";
+import { getCategories, getProducts } from "@/lib/products/queries";
 
 export default async function HomePage() {
   const [
     categories,
-    necklace,
-    earrings,
-    bracelet,
     bridal,
-    bestSelling,
+    necklace,
+    bracelet,
     newArrivals,
-    mostLoved,
+    earrings,
+    bestSelling,
     blogPosts,
     cms,
   ] = await Promise.all([
     getCategories(),
-    getProducts({ category: "necklace-sets", limit: 8 }),
-    getProducts({ category: "earrings", limit: 8 }),
-    getProducts({ category: "bracelet", limit: 8 }),
     getProducts({ category: "bridal-sets", limit: 8 }),
-    getFeaturedProducts({ bestseller: true, limit: 8 }),
-    getFeaturedProducts({ isNew: true, limit: 8 }),
-    getProducts({ sort: "popular", limit: 4 }),
+    getProducts({ category: "necklace-sets", limit: 8 }),
+    getProducts({ category: "bracelet", limit: 8 }),
+    getProducts({ filter: "new", limit: 8, sort: "newest" }),
+    getProducts({ category: "earrings", limit: 8 }),
+    getProducts({ filter: "bestseller", limit: 8, sort: "popular" }),
     getLatestBlogPosts(3),
     getCmsBundle(),
   ]);
@@ -39,9 +33,10 @@ export default async function HomePage() {
       earringProducts={earrings.products}
       braceletProducts={bracelet.products}
       bridalProducts={bridal.products}
-      bestSelling={bestSelling}
-      newArrivals={newArrivals}
-      mostLoved={mostLoved.products}
+      bestSelling={bestSelling.products}
+      bestSellingCount={bestSelling.total}
+      newArrivals={newArrivals.products}
+      newArrivalsCount={newArrivals.total}
       blogPosts={blogPosts}
       hero={cms.hero}
       homepage={cms.homepage}

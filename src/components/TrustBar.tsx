@@ -14,9 +14,9 @@ export default function TrustBar({
   features?: CmsTrustFeature[];
 }) {
   return (
-    <section className="border-y border-sage/30 bg-background">
-      <div className="max-w-[1400px] mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <section className="border-y border-border bg-white">
+      <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {features.map((feature) => {
             const Icon = iconMap[feature.icon as keyof typeof iconMap] ?? Shield;
             return (

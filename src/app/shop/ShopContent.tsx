@@ -46,8 +46,8 @@ export default function ShopContent({
 
   return (
     <>
-      <div className="py-10 bg-background">
-        <div className="max-w-[1400px] mx-auto px-4">
+      <div className="bg-white py-8 sm:py-10">
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <Breadcrumbs items={[{ label: "Shop" }]} />
           <h1 className="font-serif text-2xl lg:text-3xl text-center mb-4 capitalize">
             Shop All Jewellery

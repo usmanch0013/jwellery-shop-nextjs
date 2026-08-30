@@ -44,7 +44,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const productCode = (product.legacyId ?? product.id).slice(0, 22).toUpperCase();
 
   return (
-    <div className="product-zeesy bg-[#fffdf5]">
+    <div className="product-zeesy bg-white">
       <div className="mx-auto max-w-[1280px] px-4 lg:px-8">
         <div className="py-6 lg:py-10">
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 xl:gap-14">

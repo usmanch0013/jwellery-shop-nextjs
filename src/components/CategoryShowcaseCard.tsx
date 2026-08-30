@@ -7,6 +7,7 @@ interface CategoryShowcaseCardProps {
   name: string;
   productCount: number;
   image: string;
+  href?: string;
 }
 
 export default function CategoryShowcaseCard({
@@ -14,24 +15,25 @@ export default function CategoryShowcaseCard({
   name,
   productCount,
   image,
+  href,
 }: CategoryShowcaseCardProps) {
   return (
-    <Link href={`/categories/${slug}`} className="group block h-full">
-      <div className="relative aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f2efe3]">
+    <Link href={href ?? `/categories/${slug}`} className="group block h-full">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f5f5f5]">
         <Image
           src={image}
           alt={name}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-700"
-          sizes="25vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, 25vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute top-4 right-4 w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-sm">
-          <ShoppingBag className="w-4 h-4 text-[#333]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <div className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
+          <ShoppingBag className="h-4 w-4 text-[#333]" />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-          <p className="text-xs text-white/80 mb-1">{productCount} products</p>
-          <p className="text-sm font-medium uppercase tracking-[0.15em]">
+        <div className="absolute bottom-0 left-0 right-0 p-3 text-white sm:p-5">
+          <p className="mb-1 text-[11px] text-white/80 sm:text-xs">{productCount} products</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.15em] sm:text-sm">
             {name}
           </p>
         </div>

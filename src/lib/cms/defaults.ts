@@ -49,13 +49,12 @@ export const DEFAULT_HOMEPAGE: CmsHomepageSections = {
     { label: "Under 2000", href: "/shop?max=2000", bgColor: "primary" },
   ],
   showcaseTitles: {
-    "necklace-sets": "Necklace Sets",
+    "bridal-sets": "Bridal",
+    "necklace-sets": "Necklace",
+    bracelet: "Bracelets",
+    "new-arrivals": "New Arrivals",
     earrings: "Earrings",
-    "most-loved": "Our Most Loved Products",
-    "best-selling": "Best selling products",
-    bracelet: "Bracelet",
-    "bridal-sets": "Bridal Jewellery Sets",
-    "new-arrivals": "What's New",
+    "best-selling": "Best Selling Products",
   },
   testimonials: {
     badge: "• TESTIMONIALS",

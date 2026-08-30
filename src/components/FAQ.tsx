@@ -23,10 +23,10 @@ export default function FAQ({
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-14 lg:py-20 bg-muted/60">
-      <div className="max-w-[800px] mx-auto px-4">
-        <h2 className="text-2xl font-medium text-center mb-2">{title}</h2>
-        <p className="text-sm text-muted-foreground text-center mb-10">{subtitle}</p>
+    <section id="faq" className="bg-white py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto max-w-[800px] px-4 sm:px-6">
+        <h2 className="mb-2 text-center text-xl font-medium sm:text-2xl">{title}</h2>
+        <p className="mb-8 text-center text-sm text-muted-foreground sm:mb-10">{subtitle}</p>
 
         <div className="space-y-0 border-t border-border">
           {faqs.map((faq, index) => (

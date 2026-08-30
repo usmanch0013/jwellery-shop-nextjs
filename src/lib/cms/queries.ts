@@ -77,7 +77,18 @@ export async function getCmsHero(): Promise<CmsHeroSettings> {
 }
 
 export async function getCmsHomepageSections(): Promise<CmsHomepageSections> {
-  return getSetting("homepage.sections", DEFAULT_HOMEPAGE);
+  const saved = await getSetting("homepage.sections", DEFAULT_HOMEPAGE);
+  return {
+    ...DEFAULT_HOMEPAGE,
+    ...saved,
+    seoBlock: { ...DEFAULT_HOMEPAGE.seoBlock, ...saved.seoBlock },
+    showcaseTitles: {
+      ...saved.showcaseTitles,
+      ...DEFAULT_HOMEPAGE.showcaseTitles,
+    },
+    testimonials: { ...DEFAULT_HOMEPAGE.testimonials, ...saved.testimonials },
+    faq: { ...DEFAULT_HOMEPAGE.faq, ...saved.faq },
+  };
 }
 
 export async function getCmsVideo(): Promise<CmsVideoSettings> {
