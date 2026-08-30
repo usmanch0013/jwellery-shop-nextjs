@@ -20,6 +20,7 @@ export interface CmsHeroSettings {
   headlineLine2: string;
   description: string;
   backgroundImage: string;
+  backgroundVideo: string;
   primaryCtaLabel: string;
   primaryCtaHref: string;
   secondaryCtaLabel: string;

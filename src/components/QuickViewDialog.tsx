@@ -47,7 +47,7 @@ export default function QuickViewDialog({
           <DialogTitle>{product.name}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2">
-          <div className="relative aspect-square bg-muted">
+          <div className="relative aspect-[2/3] overflow-hidden rounded-[1.6rem] bg-[#f2efe3] sm:rounded-none">
             <Image
               src={product.image}
               alt={product.name}
@@ -86,7 +86,7 @@ export default function QuickViewDialog({
             ) : (
               <button
                 onClick={handleAdd}
-                className="flex items-center justify-center gap-2 bg-primary text-white text-sm py-3.5 hover:bg-emerald-dark transition-colors"
+                className="flex items-center justify-center gap-2 rounded-[1.6rem] bg-[#6F112B] py-3.5 text-sm text-[#fffdf5] transition-colors hover:opacity-90"
               >
                 <Plus className="w-4 h-4" />
                 Add to cart

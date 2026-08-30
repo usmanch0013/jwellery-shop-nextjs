@@ -60,11 +60,11 @@ export default function Header({
   }, [pathname]);
 
   const iconClass = transparent
-    ? "text-white hover:text-champagne"
+    ? "text-white hover:text-champagne drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]"
     : "text-foreground hover:text-primary";
   const navClass = transparent
-    ? "text-white/90 hover:text-champagne"
-    : "text-foreground/80 hover:text-primary";
+    ? "text-white hover:text-champagne font-medium [text-shadow:0_1px_10px_rgba(0,0,0,0.85)]"
+    : "text-foreground/80 hover:text-primary font-medium";
 
   return (
     <>
@@ -83,11 +83,11 @@ export default function Header({
         >
           <div className="max-w-[var(--site-max)] mx-auto px-[var(--site-px)]">
             <div className="flex items-center justify-between gap-6 lg:gap-8 h-[var(--nav-height)]">
-              <div className="flex items-center shrink-0 min-w-[100px]">
+              <div className={`flex items-center shrink-0 min-w-[100px] ${transparent ? "drop-shadow-[0_2px_10px_rgba(0,0,0,0.75)]" : ""}`}>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`lg:hidden -ml-2 mr-2 ${transparent ? "text-white hover:bg-white/10" : ""}`}
+                  className={`lg:hidden -ml-2 mr-2 ${transparent ? "text-white hover:bg-white/10 drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : ""}`}
                   onClick={() => setMobileMenuOpen(true)}
                   aria-label="Menu"
                 >
@@ -101,7 +101,7 @@ export default function Header({
                   <Link
                     key={link.href + link.label}
                     href={link.href}
-                    className={`text-[12px] 2xl:text-[13px] whitespace-nowrap transition-colors ${navClass}`}
+                    className={`text-[13px] 2xl:text-[14px] whitespace-nowrap tracking-[0.01em] transition-colors ${navClass}`}
                   >
                     {link.label}
                   </Link>
@@ -114,7 +114,7 @@ export default function Header({
                   <Link
                     key={link.href + link.label}
                     href={link.href}
-                    className={`text-[12px] whitespace-nowrap transition-colors ${navClass}`}
+                    className={`text-[13px] whitespace-nowrap tracking-[0.01em] transition-colors ${navClass}`}
                   >
                     {link.label}
                   </Link>
@@ -129,16 +129,16 @@ export default function Header({
                   aria-label="Search"
                   className={`hover:bg-transparent ${iconClass}`}
                 >
-                  <Search className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  <Search className="w-[18px] h-[18px]" strokeWidth={1.75} />
                 </Button>
                 <Link
                   href="/wishlist"
                   className={`relative inline-flex items-center justify-center size-9 rounded-full transition-colors ${
-                    transparent ? "hover:bg-white/10 text-white" : "hover:bg-muted"
+                    transparent ? "hover:bg-white/10 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : "hover:bg-muted"
                   }`}
                   aria-label="Wishlist"
                 >
-                  <Heart className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  <Heart className="w-[18px] h-[18px]" strokeWidth={1.75} />
                   {wishlistItems.length > 0 && (
                     <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] rounded-full flex items-center justify-center">
                       {wishlistItems.length}
@@ -148,11 +148,11 @@ export default function Header({
                 <Link
                   href="/account"
                   className={`inline-flex items-center justify-center size-9 rounded-full transition-colors ${
-                    transparent ? "hover:bg-white/10 text-white" : "hover:bg-muted"
+                    transparent ? "hover:bg-white/10 text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.85)]" : "hover:bg-muted"
                   }`}
                   aria-label="Account"
                 >
-                  <User className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  <User className="w-[18px] h-[18px]" strokeWidth={1.75} />
                 </Link>
                 <Button
                   variant="ghost"
@@ -161,7 +161,7 @@ export default function Header({
                   className={`relative hover:bg-transparent ${iconClass}`}
                   aria-label="Cart"
                 >
-                  <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                  <ShoppingBag className="w-[18px] h-[18px]" strokeWidth={1.75} />
                   {totalItems > 0 && (
                     <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-primary text-white text-[8px] rounded-full flex items-center justify-center">
                       {totalItems}

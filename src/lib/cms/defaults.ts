@@ -28,14 +28,14 @@ export const DEFAULT_HERO: CmsHeroSettings = {
   headlineLine2: "Togetherness.",
   description:
     "Discover handcrafted artificial jewellery — necklace sets, bridal pieces, earrings & more. Crafted for every celebration.",
-  backgroundImage:
-    "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=1920&h=1200&fit=crop&q=90",
+  backgroundImage: "/hero-jewellery-poster.jpg",
+  backgroundVideo: "/hero-jewellery.mp4",
   primaryCtaLabel: "Shop Collection",
   primaryCtaHref: "/shop",
   secondaryCtaLabel: "New Arrivals",
   secondaryCtaHref: "/shop?filter=new",
   scrollHint: "Scroll",
-  sceneHint: "Auto rotates · drag to explore",
+  sceneHint: "",
 };
 
 export const DEFAULT_HOMEPAGE: CmsHomepageSections = {

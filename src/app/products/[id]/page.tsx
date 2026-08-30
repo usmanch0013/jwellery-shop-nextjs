@@ -40,19 +40,20 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound();
 
   const relatedProducts = await getRelatedProducts(product, 4);
-  const miniRecommendations = relatedProducts.slice(0, 2);
   const galleryImages = getGalleryImages(product);
+  const productCode = (product.legacyId ?? product.id).slice(0, 22).toUpperCase();
 
   return (
-    <div className="bg-background">
-      <div className="max-w-[1200px] mx-auto px-4 lg:px-8">
-        <div className="py-10 lg:py-14">
-          <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-14 xl:gap-20 items-start">
-            <ProductGallery images={galleryImages} productName={product.name} />
-            <ProductPurchasePanel
-              product={product}
-              miniRecommendations={miniRecommendations}
+    <div className="product-zeesy bg-[#fffdf5]">
+      <div className="mx-auto max-w-[1280px] px-4 lg:px-8">
+        <div className="py-6 lg:py-10">
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 xl:gap-14">
+            <ProductGallery
+              images={galleryImages}
+              productName={product.name}
+              productCode={productCode}
             />
+            <ProductPurchasePanel product={product} />
           </div>
         </div>
 
@@ -60,10 +61,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
         {relatedProducts.length > 0 && (
           <section className="pb-16 lg:pb-20">
-            <h2 className="text-[22px] lg:text-[26px] font-medium text-foreground text-center mb-10 lg:mb-12">
+            <h2 className="mb-10 text-center font-sans text-[22px] font-medium text-[#3b3933] lg:mb-12 lg:text-[24px]">
               You may also like
             </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-1.5 lg:gap-2">
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

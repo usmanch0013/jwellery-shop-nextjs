@@ -1,8 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
-import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -10,37 +8,8 @@ import MarqueeBar from "@/components/MarqueeBar";
 import type { CmsHeroSettings } from "@/lib/cms/types";
 import { DEFAULT_HERO } from "@/lib/cms/defaults";
 
-const HeroScene3D = dynamic(() => import("./HeroScene3D"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-full rounded-full bg-white/[0.04] animate-pulse" />
-  ),
-});
-
-const HERO_IMAGE_FALLBACK = DEFAULT_HERO.backgroundImage;
-const HERO_IMAGE_LOCAL = "/testimonial-bg-cignet.jpg";
-
-class Hero3DErrorBoundary extends Component<
-  { children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-
-  render() {
-    if (this.state.failed) {
-      return (
-        <div className="flex h-full w-full items-center justify-center rounded-full border border-champagne/20 bg-white/[0.04]">
-          <div className="h-[70%] w-[70%] rounded-full border border-champagne/30 bg-gradient-to-br from-champagne/20 to-transparent" />
-        </div>
-      );
-    }
-    return this.props.children;
-  }
-}
+const HERO_VIDEO_FALLBACK = "/hero-jewellery.mp4";
+const HERO_POSTER_FALLBACK = DEFAULT_HERO.backgroundImage;
 
 export default function HeroSection({
   hero,
@@ -51,73 +20,76 @@ export default function HeroSection({
 }) {
   const content = hero ?? DEFAULT_HERO;
   const sectionRef = useRef<HTMLElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [mounted, setMounted] = useState(false);
-  const [heroImage, setHeroImage] = useState(
-    content.backgroundImage || HERO_IMAGE_FALLBACK
-  );
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"],
   });
 
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1.05, 1.12]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, 24]);
+  const mediaScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 28]);
 
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    setHeroImage(content.backgroundImage || HERO_IMAGE_FALLBACK);
-  }, [content.backgroundImage]);
+  const videoSrc = content.backgroundVideo || HERO_VIDEO_FALLBACK;
+  const posterSrc = content.backgroundImage || HERO_POSTER_FALLBACK;
 
   useEffect(() => {
-    const onScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      setScrollProgress(
-        Math.min(Math.max(-rect.top / rect.height, 0), 1)
-      );
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReduceMotion(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || videoFailed || reduceMotion) return;
+    video.play().catch(() => setVideoFailed(true));
+  }, [videoSrc, videoFailed, reduceMotion]);
 
   return (
     <section
       ref={sectionRef}
       className="relative flex w-full min-h-[100dvh] flex-col overflow-hidden"
     >
-      {/* Full-bleed background — edge to edge on every screen */}
       <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-screen max-w-none -translate-x-1/2">
-        <motion.div className="absolute inset-0" style={{ scale: imageScale }}>
-          <Image
-            src={heroImage}
-            alt="Luxury necklace jewellery"
-            fill
-            className="object-cover object-center scale-105"
-            priority
-            sizes="100vw"
-            onError={() => {
-              if (heroImage !== HERO_IMAGE_LOCAL) {
-                setHeroImage(HERO_IMAGE_LOCAL);
-              }
-            }}
-          />
+        <motion.div className="absolute inset-0" style={{ scale: mediaScale }}>
+          {!videoFailed && !reduceMotion ? (
+            <video
+              ref={videoRef}
+              className="absolute inset-0 h-full w-full object-cover object-[72%_center] [filter:brightness(1.04)_contrast(1.08)_saturate(1.08)]"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster={posterSrc}
+              aria-hidden
+              onError={() => setVideoFailed(true)}
+            >
+              <source src={`${videoSrc}?v=4`} type="video/mp4" />
+            </video>
+          ) : (
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${posterSrc})` }}
+            />
+          )}
         </motion.div>
-        <div className="absolute inset-0 bg-[#0B3D35]/70" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B3D35]/90 via-[#0B3D35]/75 to-[#0B3D35]/90" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0B3D35]/35 via-transparent to-[#0B3D35]/85" />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0B3D35]/80 via-[#0B3D35]/22 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0B3D35]/55 via-transparent to-transparent" />
+        <div className="absolute inset-x-0 top-0 h-[var(--header-height)] bg-gradient-to-b from-black/65 via-black/35 to-transparent" />
       </div>
 
-      {/* Content — below transparent header, centred */}
       <div
         className="relative z-10 flex w-full flex-1 flex-col"
         style={{ paddingTop: "var(--header-height)" }}
       >
         <div
-          className="flex w-full flex-1 items-center justify-center"
+          className="flex w-full flex-1 items-center"
           style={{
             minHeight:
               "calc(100dvh - var(--header-height) - var(--hero-bottom-bar))",
@@ -130,76 +102,55 @@ export default function HeroSection({
               paddingBottom: "var(--hero-v-pad)",
             }}
           >
-            <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-8 xl:gap-12">
-              {/* Copy */}
-              <motion.div style={{ y: contentY }} className="w-full max-w-[580px]">
-                <div
-                  className="flex flex-col"
-                  style={{ gap: "var(--hero-stack)" }}
-                >
-                  <div className="space-y-3 sm:space-y-4">
-                    <p className="text-champagne text-[10px] sm:text-[11px] md:text-xs font-medium uppercase tracking-[0.32em] sm:tracking-[0.38em]">
-                      {content.eyebrow}
-                    </p>
-                    <div className="h-px w-10 sm:w-12 bg-champagne/60" />
-                  </div>
-
-                  <div className="space-y-0.5 sm:space-y-1">
-                    <h1 className="font-serif text-[clamp(1.875rem,5vw,3.5rem)] leading-[1.08] text-white">
-                      {content.headlineLine1}
-                    </h1>
-                    <p className="font-script text-[clamp(2.5rem,6.5vw,4.75rem)] leading-[0.95] text-champagne">
-                      {content.headlineLine2}
-                    </p>
-                  </div>
-
-                  <p className="max-w-[480px] text-[14px] sm:text-[15px] md:text-base leading-[1.7] sm:leading-[1.75] text-white/70">
-                    {content.description}
+            <motion.div
+              style={{ y: contentY }}
+              className="w-full max-w-[640px]"
+            >
+              <div
+                className="flex flex-col"
+                style={{ gap: "var(--hero-stack)" }}
+              >
+                <div className="space-y-3 sm:space-y-4">
+                  <p className="text-champagne text-[10px] sm:text-[11px] md:text-xs font-medium uppercase tracking-[0.32em] sm:tracking-[0.38em]">
+                    {content.eyebrow}
                   </p>
-
-                  <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
-                    <Link
-                      href={content.primaryCtaHref}
-                      className="inline-flex items-center justify-center gap-2.5 bg-champagne px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-foreground transition-colors hover:bg-champagne-dark sm:min-w-[168px]"
-                    >
-                      {content.primaryCtaLabel}
-                      <ArrowRight className="h-4 w-4 shrink-0" />
-                    </Link>
-                    <Link
-                      href={content.secondaryCtaHref}
-                      className="inline-flex items-center justify-center border border-white/35 px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-white transition-colors hover:bg-white/10 sm:min-w-[148px]"
-                    >
-                      {content.secondaryCtaLabel}
-                    </Link>
-                  </div>
+                  <div className="h-px w-10 sm:w-12 bg-champagne/60" />
                 </div>
-              </motion.div>
 
-              {/* 3D */}
-              <div className="hidden lg:flex w-full max-w-[520px] justify-self-end xl:max-w-[560px]">
-                <div className="relative ml-auto w-full max-w-[min(42vw,560px)]">
-                  <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                    <div className="h-[88%] w-[88%] rounded-full border border-champagne/15" />
-                    <div className="absolute h-[72%] w-[72%] rounded-full border border-white/8" />
-                  </div>
-                  <div className="relative aspect-square w-full">
-                    {mounted && (
-                      <Hero3DErrorBoundary>
-                        <HeroScene3D scrollProgress={scrollProgress} />
-                      </Hero3DErrorBoundary>
-                    )}
-                  </div>
-                  <p className="mt-3 xl:mt-4 text-center text-[9px] xl:text-[10px] uppercase tracking-[0.24em] xl:tracking-[0.28em] text-white/40">
-                    {content.sceneHint}
+                <div className="space-y-0.5 sm:space-y-1">
+                  <h1 className="font-serif text-[clamp(1.875rem,5vw,3.5rem)] leading-[1.08] text-white">
+                    {content.headlineLine1}
+                  </h1>
+                  <p className="font-script text-[clamp(2.5rem,6.5vw,4.75rem)] leading-[0.95] text-champagne">
+                    {content.headlineLine2}
                   </p>
+                </div>
+
+                <p className="max-w-[480px] text-[14px] sm:text-[15px] md:text-base leading-[1.7] sm:leading-[1.75] text-white/75">
+                  {content.description}
+                </p>
+
+                <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4">
+                  <Link
+                    href={content.primaryCtaHref}
+                    className="inline-flex items-center justify-center gap-2.5 bg-champagne px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-foreground transition-colors hover:bg-champagne-dark sm:min-w-[168px]"
+                  >
+                    {content.primaryCtaLabel}
+                    <ArrowRight className="h-4 w-4 shrink-0" />
+                  </Link>
+                  <Link
+                    href={content.secondaryCtaHref}
+                    className="inline-flex items-center justify-center border border-white/35 px-6 sm:px-8 py-3.5 sm:py-4 text-sm font-medium text-white transition-colors hover:bg-white/10 sm:min-w-[148px]"
+                  >
+                    {content.secondaryCtaLabel}
+                  </Link>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
 
-      {/* Bottom bar */}
       <div
         className="relative z-10 w-full shrink-0"
         style={{ minHeight: "var(--hero-bottom-bar)" }}

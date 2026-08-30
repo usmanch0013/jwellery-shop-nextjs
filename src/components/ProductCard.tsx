@@ -41,8 +41,8 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         setActiveImage(product.image);
       }}
     >
-      <div className="relative aspect-[3/4] rounded-md overflow-hidden bg-muted mb-2">
-        <Link href={productHref} className="block absolute inset-0">
+      <div className="relative mb-2.5 aspect-[2/3] overflow-hidden rounded-[16px] bg-[#f2efe3]">
+        <Link href={productHref} className="absolute inset-0 block">
           <Image
             src={product.image}
             alt={product.name}
@@ -63,26 +63,25 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           />
         </Link>
 
-        {/* Brand watermark */}
-        <div className="absolute top-3 left-1/2 -translate-x-1/2 pointer-events-none">
-          <span className="text-[9px] tracking-[0.2em] text-white/90 uppercase font-light drop-shadow">
+        <div className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2">
+          <span className="text-[9px] font-light uppercase tracking-[0.24em] text-white/90 drop-shadow-sm">
             Lumière
           </span>
         </div>
 
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+        <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col gap-1.5">
           {onSale && (
-            <span className="bg-rose-600 text-white text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-sm shadow-sm">
+            <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
               Sale {salePercent > 0 ? `-${salePercent}%` : ""}
             </span>
           )}
           {product.isNew && !product.soldOut && (
-            <span className="bg-primary text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-sm">
+            <span className="rounded-md bg-[#6F112B] px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
               New
             </span>
           )}
           {product.soldOut && (
-            <span className="bg-black/75 text-white text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-sm">
+            <span className="rounded-md bg-black/75 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
               Sold out
             </span>
           )}
@@ -94,40 +93,38 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             e.preventDefault();
             void toggleWishlist(product);
           }}
-          className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-colors ${
+          className={`absolute right-3 top-3 z-10 rounded-full p-2 transition-colors ${
             wished
               ? "bg-rose-500 text-white"
-              : "bg-white/80 text-foreground hover:bg-white"
+              : "bg-white/85 text-[#3b3933] hover:bg-white"
           }`}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
-            className="w-4 h-4"
+            className="h-4 w-4"
             fill={wished ? "currentColor" : "none"}
             strokeWidth={1.5}
           />
         </button>
 
-        {/* Quick view button */}
         {onQuickView && !product.soldOut && (
           <button
             onClick={(e) => {
               e.preventDefault();
               onQuickView(product);
             }}
-            className={`absolute bottom-0 left-0 right-0 bg-primary text-white text-sm py-3.5 transition-all duration-300 ${
+            className={`absolute bottom-0 left-0 right-0 bg-[#6F112B] py-3.5 text-sm text-white transition-all duration-300 ${
               isHovered
-                ? "opacity-100 translate-y-0"
-                : "opacity-0 translate-y-full"
+                ? "translate-y-0 opacity-100"
+                : "translate-y-full opacity-0"
             }`}
           >
             Quick view
           </button>
         )}
 
-        {/* Thumbnail dots on hover */}
         {isHovered && thumbnails.length > 1 && (
-          <div className="absolute bottom-14 left-1/2 -translate-x-1/2 flex gap-2">
+          <div className="absolute bottom-14 left-1/2 flex -translate-x-1/2 gap-2">
             {thumbnails.map((thumb, i) => (
               <button
                 key={i}
@@ -135,9 +132,9 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                   e.preventDefault();
                   setActiveImage(thumb);
                 }}
-                className={`w-8 h-8 rounded-full overflow-hidden border-2 transition-all ${
+                className={`h-8 w-8 overflow-hidden rounded-full border-2 transition-all ${
                   activeImage === thumb
-                    ? "border-white scale-110"
+                    ? "scale-110 border-white"
                     : "border-white/50 opacity-70"
                 }`}
               >
@@ -146,7 +143,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                   alt=""
                   width={32}
                   height={32}
-                  className="object-cover w-full h-full"
+                  className="h-full w-full object-cover"
                 />
               </button>
             ))}
@@ -154,21 +151,21 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
         )}
       </div>
 
-      <Link href={productHref} className="block px-1">
-        <h3 className="text-[15px] text-foreground leading-snug mb-2 font-normal hover:underline">
+      <Link href={productHref} className="block px-0.5">
+        <h3 className="mb-1.5 text-[14px] font-normal leading-snug text-[#3b3933] hover:underline">
           {product.name}
         </h3>
         <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
-        <div className="flex flex-wrap items-center gap-2 mt-2">
-          <p className="text-[15px] font-medium text-foreground">
+        <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          <p className="text-[15px] font-semibold text-[#3b3933]">
             {formatPrice(product.price)}
           </p>
           {onSale && product.originalPrice && (
-            <p className="text-[13px] text-muted-foreground line-through">
+            <p className="text-[13px] text-[#888] line-through">
               {formatPrice(product.originalPrice)}
             </p>
           )}
-          <span className="inline-flex items-center gap-1 text-[10px] text-[#888] border border-[#ddd] rounded px-1.5 py-0.5">
+          <span className="inline-flex items-center gap-1 rounded border border-[#efebdd] px-1.5 py-0.5 text-[10px] text-[#888]">
             🇵🇰 PKR
           </span>
         </div>

@@ -1,33 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Minus, Plus, Heart } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/types";
 import { formatPrice } from "@/lib/products/format";
 import { useCart } from "@/context/CartContext";
-import { useWishlist } from "@/context/WishlistContext";
 import { toast } from "sonner";
 import PaymentBadges from "./PaymentBadges";
-import ProductMiniRecommendations from "./ProductMiniRecommendations";
 
 interface ProductPurchasePanelProps {
   product: Product;
-  miniRecommendations: Product[];
 }
 
 const WHATSAPP_NUMBER = "923001234567";
+const BURGUNDY = "#6F112B";
 
 export default function ProductPurchasePanel({
   product,
-  miniRecommendations,
 }: ProductPurchasePanelProps) {
   const [quantity, setQuantity] = useState(1);
   const [descOpen, setDescOpen] = useState(false);
   const { addToCart } = useCart();
-  const { isInWishlist, toggleWishlist } = useWishlist();
   const router = useRouter();
-  const wished = isInWishlist(product.id);
 
   const stockCount = product.soldOut ? 0 : (product.stock ?? 50);
 
@@ -46,121 +41,122 @@ export default function ProductPurchasePanel({
   );
 
   return (
-    <div className="lg:pl-4 xl:pl-8">
-      <h1 className="text-[22px] lg:text-[26px] font-medium text-foreground leading-snug mb-4 pr-10 relative">
+    <div className="w-full font-sans text-[#3b3933]">
+      <h1 className="font-sans text-[24px] font-semibold leading-[1.3] tracking-[-0.02em] text-[#3b3933] lg:text-[26px]">
         {product.name}
-        <button
-          type="button"
-          onClick={() => toggleWishlist(product)}
-          className="absolute right-0 top-0 p-1"
-          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-        >
-          <Heart
-            className={`w-5 h-5 ${
-              wished ? "fill-primary text-primary" : "text-muted-foreground"
-            }`}
-          />
-        </button>
       </h1>
 
-      <p className="text-[20px] lg:text-[22px] font-medium text-foreground mb-5">
+      <p className="mt-3 font-sans text-[20px] font-medium leading-none text-[#3b3933] lg:text-[22px]">
         {formatPrice(product.price)}
       </p>
 
       {!product.soldOut && stockCount > 0 && (
-        <div className="flex items-center gap-2 mb-6">
-          <span className="w-2 h-2 rounded-full bg-[#e53935]" />
-          <span className="text-sm text-[#555]">
+        <div className="mt-3.5 flex items-center gap-2">
+          <span className="h-[8px] w-[8px] shrink-0 rounded-full bg-[#22c55e]" />
+          <span className="text-[13px] leading-none text-[#3d8b4a]">
             {stockCount} item{stockCount > 1 ? "s" : ""} in stock
           </span>
         </div>
       )}
 
       {product.soldOut && (
-        <p className="text-sm text-[#e53935] mb-6">Sold out</p>
+        <p className="mt-3.5 text-[13px] text-[#e53935]">Sold out</p>
       )}
 
-      <div className="border-t border-border">
+      <div className="mt-7 border-y border-[#e8e2d4]">
         <button
           type="button"
           onClick={() => setDescOpen((o) => !o)}
-          className="flex items-center justify-between w-full py-4 text-left"
+          className="flex w-full items-center justify-between py-[18px] text-left"
         >
-          <span className="text-[15px] font-medium text-foreground">
+          <span className="text-[14px] font-medium text-[#3b3933]">
             Description
           </span>
-          <Plus
-            className={`w-4 h-4 text-muted-foreground transition-transform ${
-              descOpen ? "rotate-45" : ""
-            }`}
-          />
+          <span className="relative flex h-3.5 w-3.5 items-center justify-center">
+            <span className="absolute h-px w-3.5 bg-[#3b3933]" />
+            <span
+              className={`absolute h-3.5 w-px bg-[#3b3933] transition-transform duration-200 ease-out ${
+                descOpen ? "scale-y-0" : "scale-y-100"
+              }`}
+            />
+          </span>
         </button>
-        {descOpen && (
-          <div className="pb-5 text-sm text-muted-foreground leading-relaxed">
-            <p>{product.description}</p>
-            <p className="mt-3 text-[#888]">
-              Material: {product.material}
-            </p>
+
+        <div className="product-zeesy-accordion" data-open={descOpen}>
+          <div className="overflow-hidden">
+            <div className="pb-5 text-[14px] leading-[1.7] text-[#5c5852]">
+              <p>{product.description}</p>
+              {product.material && (
+                <p className="mt-3 text-[#8a8680]">Material: {product.material}</p>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {!product.soldOut && (
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center border border-[#ddd] w-fit rounded overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors"
-              aria-label="Decrease quantity"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <span className="w-12 text-center text-sm font-medium">
-              {quantity}
+        <div className="mt-7">
+          <div className="flex items-center justify-between">
+            <span className="text-[14px] font-semibold text-[#3b3933]">
+              Quantity
             </span>
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => q + 1)}
-              className="w-11 h-11 flex items-center justify-center hover:bg-muted transition-colors"
-              aria-label="Increase quantity"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
+            <div className="flex h-11 w-[108px] items-center justify-between rounded-[16px] border border-[#e8e2d4] bg-[#fffdf5]">
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+              >
+                <Minus className="h-3.5 w-3.5" strokeWidth={2} />
+              </button>
+              <span className="min-w-[20px] text-center text-[14px] font-semibold">
+                {quantity}
+              </span>
+              <button
+                type="button"
+                onClick={() => setQuantity((q) => q + 1)}
+                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-3.5 w-3.5" strokeWidth={2} />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="mt-7 flex flex-col gap-3">
             <button
               type="button"
               onClick={handleAddToCart}
-              className="col-span-1 bg-primary text-white text-sm py-3.5 hover:bg-emerald-dark transition-colors"
+              className="flex h-12 w-full items-center justify-center rounded-[16px] text-[14px] font-medium text-[#fffdf5] transition-opacity duration-200 hover:opacity-90"
+              style={{ backgroundColor: BURGUNDY }}
             >
-              Add to Cart
+              Add to cart
             </button>
+
             <button
               type="button"
               onClick={handleBuyNow}
-              className="col-span-1 border border-primary text-primary text-sm py-3.5 hover:bg-primary/5 transition-colors"
+              className="flex h-12 w-full items-center justify-center rounded-[16px] border bg-transparent text-[14px] font-medium transition-colors duration-200 hover:bg-[#6F112B]/5"
+              style={{ borderColor: BURGUNDY, color: BURGUNDY }}
             >
               Buy it now
             </button>
-          </div>
 
-          <a
-            href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full bg-[#25D366] text-white text-sm py-3.5 hover:bg-[#20bd5a] transition-colors"
-          >
-            <WhatsAppIcon />
-            Order on WhatsApp
-          </a>
+            <a
+              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-[16px] bg-[#25D366] text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#20bd5a]"
+            >
+              <WhatsAppIcon />
+              Order on WhatsApp
+            </a>
+          </div>
 
           <PaymentBadges />
         </div>
       )}
-
-      <ProductMiniRecommendations products={miniRecommendations} />
     </div>
   );
 }

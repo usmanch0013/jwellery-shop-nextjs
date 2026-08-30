@@ -40,7 +40,7 @@ export default function AccountWishlistClient() {
           className="user-card group relative p-2 transition-shadow hover:shadow-md"
         >
           <Link href={productPath(product)}>
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-[var(--user-bg)]">
+            <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-[var(--user-bg)]">
               <Image
                 src={product.image}
                 alt={product.name}

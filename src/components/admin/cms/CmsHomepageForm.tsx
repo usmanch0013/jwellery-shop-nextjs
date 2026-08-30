@@ -190,12 +190,26 @@ export default function CmsHomepageForm({
             </div>
             <div className="space-y-2 sm:col-span-2">
               <CmsImageField
-                label="Background image"
+                label="Background image (video poster / fallback)"
                 value={hero.backgroundImage}
                 onChange={(url) => setHero({ ...hero, backgroundImage: url })}
                 onPick={() => openMedia({ kind: "hero-bg" })}
                 fieldClass={fieldClass}
               />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Background video</Label>
+              <Input
+                className={fieldClass}
+                value={hero.backgroundVideo ?? ""}
+                placeholder="/hero-jewellery.mp4"
+                onChange={(e) =>
+                  setHero({ ...hero, backgroundVideo: e.target.value })
+                }
+              />
+              <p className="text-[12px] text-[var(--admin-text-subdued)]">
+                MP4 URL or public path. Loops silently behind the hero text.
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Headline line 1</Label>
@@ -261,14 +275,6 @@ export default function CmsHomepageForm({
                 className={fieldClass}
                 value={hero.scrollHint}
                 onChange={(e) => setHero({ ...hero, scrollHint: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>3D scene hint</Label>
-              <Input
-                className={fieldClass}
-                value={hero.sceneHint}
-                onChange={(e) => setHero({ ...hero, sceneHint: e.target.value })}
               />
             </div>
           </div>

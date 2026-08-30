@@ -87,7 +87,7 @@ export default function TopBar({
   return (
     <div
       className={`w-full text-white relative transition-all duration-300 ${
-        transparent ? "bg-primary/40 backdrop-blur-md" : "bg-primary"
+        transparent ? "bg-transparent" : "bg-primary"
       }`}
     >
       <div className="max-w-[var(--site-max)] mx-auto px-[var(--site-px)] flex items-center justify-between h-[var(--topbar-height)]">
@@ -97,19 +97,27 @@ export default function TopBar({
               key={label}
               href="#"
               aria-label={label}
-              className="text-white/85 hover:text-white transition-colors"
+              className={`transition-colors hover:text-white ${
+                transparent
+                  ? "text-white drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]"
+                  : "text-white/85"
+              }`}
             >
               <Icon />
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-          <ChevronLeft className="w-3 h-3 text-white/50" strokeWidth={2} />
+        <div
+          className={`flex items-center gap-2 absolute left-1/2 -translate-x-1/2 ${
+            transparent ? "drop-shadow-[0_1px_8px_rgba(0,0,0,0.9)]" : ""
+          }`}
+        >
+          <ChevronLeft className="w-3 h-3 text-white/70" strokeWidth={2} />
           <p className="text-[10px] font-medium tracking-[0.22em] uppercase">
             {text}
           </p>
-          <ChevronRight className="w-3 h-3 text-white/50" strokeWidth={2} />
+          <ChevronRight className="w-3 h-3 text-white/70" strokeWidth={2} />
         </div>
 
         <div className="w-[200px] hidden lg:block" />
