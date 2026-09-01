@@ -5,6 +5,7 @@ import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Product } from "@/types";
 import { formatPrice } from "@/lib/products/format";
+import { discountPercent, isOnSale } from "@/lib/products/sale";
 import { useCart } from "@/context/CartContext";
 import { toast } from "sonner";
 import PaymentBadges from "./PaymentBadges";
@@ -40,15 +41,32 @@ export default function ProductPurchasePanel({
     `Hi, I want to order:\n${product.name}\n${formatPrice(product.price)}\nQty: ${quantity}`
   );
 
+  const onSale = isOnSale(product);
+  const salePercent = discountPercent(product);
+
   return (
     <div className="w-full font-sans text-[#3b3933]">
       <h1 className="font-sans text-[24px] font-semibold leading-[1.3] tracking-[-0.02em] text-[#3b3933] lg:text-[26px]">
         {product.name}
       </h1>
 
-      <p className="mt-3 font-sans text-[20px] font-medium leading-none text-[#3b3933] lg:text-[22px]">
-        {formatPrice(product.price)}
-      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-2.5">
+        <p className="font-sans text-[20px] font-medium leading-none text-[#3b3933] lg:text-[22px]">
+          {formatPrice(product.price)}
+        </p>
+        {onSale && product.originalPrice && (
+          <>
+            <p className="text-[16px] text-[#888] line-through">
+              {formatPrice(product.originalPrice)}
+            </p>
+            {salePercent > 0 && (
+              <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white">
+                Sale -{salePercent}%
+              </span>
+            )}
+          </>
+        )}
+      </div>
 
       {!product.soldOut && stockCount > 0 && (
         <div className="mt-3.5 flex items-center gap-2">

@@ -36,6 +36,7 @@ import {
 import { updateMediaAction } from "@/actions/admin/media";
 import { createProductTagAction } from "@/actions/admin/tags";
 import { cn } from "@/lib/utils";
+import { normalizeSalePrices } from "@/lib/products/sale";
 
 const inputClass =
   "w-full h-10 rounded-xl border border-border/70 bg-background px-3 text-sm";
@@ -101,6 +102,18 @@ function variationStockTotal(rows: VariationRow[]) {
   return rows.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
 }
 
+function adminPriceDefaults(product?: AdminProductDetails | null) {
+  if (!product) return { regular: "", sale: "" };
+  const { price, originalPrice } = normalizeSalePrices(
+    product.price,
+    product.original_price
+  );
+  if (originalPrice && originalPrice > price) {
+    return { regular: String(originalPrice), sale: String(price) };
+  }
+  return { regular: product.price ? String(product.price) : "", sale: "" };
+}
+
 function mapVariation(
   v: AdminProductDetails["variations"][number],
   keepVariationStock: boolean
@@ -130,6 +143,7 @@ export default function ProductEditor({
   product?: AdminProductDetails | null;
 }) {
   const isEdit = Boolean(product);
+  const priceDefaults = adminPriceDefaults(product);
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const skipLeaveSave = useRef(false);
@@ -542,22 +556,27 @@ export default function ProductEditor({
 
               <div hidden={tab !== "inventory"} className="space-y-6">
                   <div className="grid gap-5 sm:grid-cols-3">
-                    <FormField label="Regular price (Rs.)">
+                    <FormField
+                      label="Regular price (Rs.)"
+                      hint="Price before discount"
+                    >
                       <Input
                         name="price"
                         type="number"
-                        defaultValue={product?.price || ""}
+                        min={0}
+                        defaultValue={priceDefaults.regular}
                       />
                     </FormField>
                     <FormField
-                      label="Original price"
-                      hint="Shows as crossed-out price"
+                      label="Sale price (Rs.)"
+                      hint="Customer pays this. Leave empty if not on sale."
                     >
                       <Input
                         name="originalPrice"
                         type="number"
-                        defaultValue={product?.original_price ?? ""}
-                        placeholder="Before discount"
+                        min={0}
+                        defaultValue={priceDefaults.sale}
+                        placeholder="Optional"
                       />
                     </FormField>
                     <FormField

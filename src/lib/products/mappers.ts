@@ -1,6 +1,8 @@
 import type { Category, CategoryInfo, Product } from "@/types";
 import type { DbCategory, DbProduct } from "@/lib/database.types";
 
+import { normalizeSalePrices } from "@/lib/products/sale";
+
 export function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -10,14 +12,18 @@ export function slugify(text: string): string {
 
 export function mapDbProductToProduct(row: DbProduct): Product {
   const categorySlug = (row.categories?.slug ?? "accessories") as Category;
+  const { price, originalPrice } = normalizeSalePrices(
+    row.price,
+    row.original_price
+  );
   return {
     id: row.id,
     slug: row.slug,
     legacyId: row.legacy_id ?? undefined,
     name: row.name,
     description: row.description,
-    price: row.price,
-    originalPrice: row.original_price ?? undefined,
+    price,
+    originalPrice,
     category: categorySlug,
     image: row.image,
     hoverImage: row.hover_image ?? undefined,

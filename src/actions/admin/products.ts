@@ -3,6 +3,7 @@
 import { getAdminClient } from "@/lib/admin/auth";
 import { refreshCategoryProductCounts } from "@/lib/admin/category-counts";
 import { slugify } from "@/lib/products/mappers";
+import { normalizeSalePrices } from "@/lib/products/sale";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -74,6 +75,13 @@ function parseProductForm(formData: FormData) {
     variations = [];
   }
 
+  const { price, originalPrice } = normalizeSalePrices(
+    Number(formData.get("price") || 0),
+    formData.get("originalPrice")
+      ? Number(formData.get("originalPrice"))
+      : null
+  );
+
   return productSchema.safeParse({
     name: formData.get("name"),
     slug: formData.get("slug") || undefined,
@@ -81,8 +89,8 @@ function parseProductForm(formData: FormData) {
     description: formData.get("description"),
     sku: formData.get("sku") || undefined,
     status: formData.get("status") || "published",
-    price: formData.get("price"),
-    originalPrice: formData.get("originalPrice") || undefined,
+    price,
+    originalPrice,
     categoryId: formData.get("categoryId"),
     material: formData.get("material"),
     stock: formData.get("stock"),
@@ -162,6 +170,16 @@ function revalidateProductPaths(slug: string, id?: string) {
   if (id) revalidatePath(`/admin/products/${id}`);
 }
 
+async function nextProductSortOrder(admin: SupabaseClient) {
+  const { data } = await admin
+    .from("products")
+    .select("sort_order")
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data?.sort_order ?? -1) + 1;
+}
+
 export async function createProductAction(formData: FormData) {
   const parsed = parseProductForm(formData);
   if (!parsed.success) return { error: "Invalid product data" };
@@ -171,6 +189,7 @@ export async function createProductAction(formData: FormData) {
   const slug = data.slug || slugify(data.name);
   const stock = data.stock;
   const soldOut = data.soldOut || stock <= 0;
+  const sortOrder = await nextProductSortOrder(admin);
 
   const { data: product, error } = await admin
     .from("products")
@@ -191,6 +210,7 @@ export async function createProductAction(formData: FormData) {
       is_new: data.isNew ?? false,
       is_bestseller: data.isBestseller ?? false,
       sold_out: soldOut,
+      sort_order: sortOrder,
     })
     .select("id")
     .single();
@@ -328,14 +348,19 @@ function parseDraftForm(formData: FormData) {
   const stockRaw = formData.get("stock");
   const originalRaw = formData.get("originalPrice");
 
+  const { price, originalPrice } = normalizeSalePrices(
+    Number(priceRaw || 0),
+    originalRaw === "" || originalRaw == null ? null : Number(originalRaw)
+  );
+
   return draftSchema.safeParse({
     name: String(formData.get("name") ?? "").trim() || undefined,
     slug: formData.get("slug") || undefined,
     shortDescription: formData.get("shortDescription") || "",
     description: formData.get("description") || "",
     sku: formData.get("sku") || undefined,
-    price: priceRaw === "" || priceRaw == null ? 0 : priceRaw,
-    originalPrice: originalRaw === "" || originalRaw == null ? undefined : originalRaw,
+    price,
+    originalPrice,
     categoryId: formData.get("categoryId") || undefined,
     material: formData.get("material") || "",
     stock: stockRaw === "" || stockRaw == null ? 0 : stockRaw,
@@ -412,7 +437,10 @@ export async function saveProductDraftAction(
 
   const { data: product, error } = await admin
     .from("products")
-    .insert(row)
+    .insert({
+      ...row,
+      sort_order: await nextProductSortOrder(admin),
+    })
     .select("id")
     .single();
 
@@ -438,4 +466,163 @@ export async function deleteProductAction(id: string) {
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   redirect("/admin/products");
+}
+
+const bulkUpdateSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1),
+  status: z.enum(["draft", "published"]).optional(),
+  categoryId: z.string().uuid().optional(),
+  isNew: z.boolean().optional(),
+  isBestseller: z.boolean().optional(),
+  soldOut: z.boolean().optional(),
+  stock: z.coerce.number().int().min(0).optional(),
+  regularPrice: z.coerce.number().positive().optional(),
+  salePrice: z.coerce.number().positive().optional(),
+});
+
+function revalidateAllProductPaths() {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/admin/products");
+  revalidatePath("/shop");
+}
+
+export async function bulkDeleteProductsAction(ids: string[]) {
+  if (ids.length === 0) return { error: "Select at least one product" };
+
+  const admin = await getAdminClient();
+  const { error } = await admin.from("products").delete().in("id", ids);
+  if (error) return { error: error.message };
+
+  await refreshCategoryProductCounts(admin);
+  revalidateAllProductPaths();
+  return { success: true, deleted: ids.length };
+}
+
+export async function bulkUpdateProductsAction(formData: FormData) {
+  let ids: string[] = [];
+  try {
+    const raw = formData.get("ids");
+    if (typeof raw === "string") ids = JSON.parse(raw);
+  } catch {
+    return { error: "Invalid product selection" };
+  }
+
+  const regularRaw = formData.get("regularPrice");
+  const saleRaw = formData.get("salePrice");
+  const stockRaw = formData.get("stock");
+  const statusRaw = formData.get("status");
+  const categoryRaw = formData.get("categoryId");
+
+  const parsed = bulkUpdateSchema.safeParse({
+    ids,
+    status:
+      statusRaw === "draft" || statusRaw === "published"
+        ? statusRaw
+        : undefined,
+    categoryId: categoryRaw ? String(categoryRaw) : undefined,
+    isNew:
+      formData.get("isNew") === "true"
+        ? true
+        : formData.get("isNew") === "false"
+          ? false
+          : undefined,
+    isBestseller:
+      formData.get("isBestseller") === "true"
+        ? true
+        : formData.get("isBestseller") === "false"
+          ? false
+          : undefined,
+    soldOut:
+      formData.get("soldOut") === "true"
+        ? true
+        : formData.get("soldOut") === "false"
+          ? false
+          : undefined,
+    stock: stockRaw === "" || stockRaw == null ? undefined : stockRaw,
+    regularPrice:
+      regularRaw === "" || regularRaw == null ? undefined : regularRaw,
+    salePrice: saleRaw === "" || saleRaw == null ? undefined : saleRaw,
+  });
+
+  if (!parsed.success) return { error: "Invalid update data" };
+
+  const { ids: productIds, regularPrice, salePrice, ...rest } = parsed.data;
+  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+
+  if (rest.status) patch.status = rest.status;
+  if (rest.categoryId) patch.category_id = rest.categoryId;
+  if (rest.isNew !== undefined) patch.is_new = rest.isNew;
+  if (rest.isBestseller !== undefined) patch.is_bestseller = rest.isBestseller;
+  if (rest.soldOut !== undefined) patch.sold_out = rest.soldOut;
+  if (rest.stock !== undefined) patch.stock = rest.stock;
+
+  if (regularPrice !== undefined || salePrice !== undefined) {
+    const admin = await getAdminClient();
+    const { data: rows } = await admin
+      .from("products")
+      .select("id, price, original_price")
+      .in("id", productIds);
+
+    for (const row of rows ?? []) {
+      const currentRegular =
+        row.original_price && row.original_price > row.price
+          ? row.original_price
+          : row.price;
+      const currentSale =
+        row.original_price && row.original_price > row.price
+          ? row.price
+          : undefined;
+
+      const { price, originalPrice } = normalizeSalePrices(
+        regularPrice ?? currentRegular,
+        salePrice !== undefined ? salePrice : currentSale ?? null
+      );
+
+      await admin
+        .from("products")
+        .update({
+          price,
+          original_price: originalPrice ?? null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", row.id);
+    }
+  }
+
+  const admin = await getAdminClient();
+  if (Object.keys(patch).length > 1) {
+    const { error } = await admin.from("products").update(patch).in("id", productIds);
+    if (error) return { error: error.message };
+  }
+
+  await refreshCategoryProductCounts(admin);
+  revalidateAllProductPaths();
+  return { success: true, updated: productIds.length };
+}
+
+export async function quickEditProductAction(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return { error: "Product not found" };
+
+  formData.set("ids", JSON.stringify([id]));
+  return bulkUpdateProductsAction(formData);
+}
+
+export async function reorderProductsAction(
+  updates: { id: string; sort_order: number }[]
+) {
+  if (updates.length === 0) return { error: "Nothing to reorder" };
+
+  const admin = await getAdminClient();
+  const results = await Promise.all(
+    updates.map(({ id, sort_order }) =>
+      admin.from("products").update({ sort_order }).eq("id", id)
+    )
+  );
+  const failed = results.find((r) => r.error);
+  if (failed?.error) return { error: failed.error.message };
+
+  revalidateAllProductPaths();
+  return { success: true };
 }

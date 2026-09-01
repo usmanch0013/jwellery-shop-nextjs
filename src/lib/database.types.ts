@@ -51,6 +51,7 @@ export interface DbProduct {
   review_count: number;
   image: string;
   hover_image: string | null;
+  sort_order?: number;
   created_at: string;
   categories?: DbCategory | null;
 }

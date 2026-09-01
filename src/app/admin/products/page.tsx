@@ -1,35 +1,77 @@
 import Link from "next/link";
-import { getAdminProducts } from "@/lib/admin/queries";
+import {
+  getAdminCategories,
+  getAdminProducts,
+  type AdminProductFilters,
+} from "@/lib/admin/queries";
+import AdminProductsClient from "@/components/admin/AdminProductsClient";
 import { buttonVariants } from "@/components/ui/button";
-import { formatPrice } from "@/lib/products/format";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  AdminEmpty,
-  AdminPageHeader,
-  AdminTable,
-  AdminTableElement,
-  AdminTd,
-  AdminTh,
-  AdminThead,
-  AdminTr,
-} from "@/components/admin/AdminShell";
+import { AdminEmpty, AdminPageHeader } from "@/components/admin/AdminShell";
+
+function buildPageUrl(page: number, filters: AdminProductFilters) {
+  const params = new URLSearchParams();
+  if (page > 1) params.set("page", String(page));
+  if (filters.q) params.set("q", filters.q);
+  if (filters.categoryId) params.set("category", filters.categoryId);
+  if (filters.status && filters.status !== "all") params.set("status", filters.status);
+  if (filters.flag && filters.flag !== "all") params.set("flag", filters.flag);
+  if (filters.sort && filters.sort !== "manual") params.set("sort", filters.sort);
+  const qs = params.toString();
+  return qs ? `/admin/products?${qs}` : "/admin/products";
+}
 
 export default async function AdminProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    q?: string;
+    category?: string;
+    status?: string;
+    flag?: string;
+    sort?: string;
+  }>;
 }) {
-  const { page: pageParam } = await searchParams;
-  const page = Math.max(1, Number(pageParam) || 1);
-  const { products, total, limit } = await getAdminProducts(page);
+  const sp = await searchParams;
+  const page = Math.max(1, Number(sp.page) || 1);
+
+  const filters: AdminProductFilters = {
+    page,
+    limit: 50,
+    q: sp.q,
+    categoryId: sp.category,
+    status:
+      sp.status === "draft" || sp.status === "published" ? sp.status : "all",
+    flag:
+      sp.flag === "new" ||
+      sp.flag === "bestseller" ||
+      sp.flag === "sale" ||
+      sp.flag === "sold_out" ||
+      sp.flag === "low_stock"
+        ? sp.flag
+        : "all",
+    sort:
+      sp.sort === "newest" ||
+      sp.sort === "price_asc" ||
+      sp.sort === "price_desc" ||
+      sp.sort === "name"
+        ? sp.sort
+        : "manual",
+  };
+
+  const [{ products, total, limit }, categories] = await Promise.all([
+    getAdminProducts(filters),
+    getAdminCategories(),
+  ]);
   const totalPages = Math.ceil(total / limit) || 1;
 
   return (
     <div className="space-y-6">
       <AdminPageHeader
         title="Products"
-        description={`${total} products in your catalog`}
+        description={`${total} product${total === 1 ? "" : "s"} in your catalog`}
         actions={
           <Link
             href="/admin/products/new"
@@ -41,105 +83,38 @@ export default async function AdminProductsPage({
         }
       />
 
-      {products.length === 0 ? (
+      {products.length === 0 && !sp.q && !sp.category && filters.status === "all" && filters.flag === "all" ? (
         <AdminEmpty
           title="No products yet"
           description="Add your first product to start selling."
         />
       ) : (
-        <AdminTable>
-          <AdminTableElement>
-            <AdminThead>
-              <tr>
-                <AdminTh>Product</AdminTh>
-                <AdminTh>Category</AdminTh>
-                <AdminTh>Price</AdminTh>
-                <AdminTh>Stock</AdminTh>
-                <AdminTh>Status</AdminTh>
-                <AdminTh>Flags</AdminTh>
-              </tr>
-            </AdminThead>
-            <tbody>
-              {products.map((p) => (
-                <AdminTr key={p.id}>
-                  <AdminTd>
-                    <Link
-                      href={`/admin/products/${p.id}`}
-                      className="font-medium hover:text-primary"
-                    >
-                      {p.name}
-                    </Link>
-                    <p className="text-xs text-muted-foreground">{p.slug}</p>
-                  </AdminTd>
-                  <AdminTd className="text-muted-foreground">
-                    {(p.categories as { name: string } | null)?.name ?? "—"}
-                  </AdminTd>
-                  <AdminTd className="font-medium">{formatPrice(p.price)}</AdminTd>
-                  <AdminTd>
-                    <span
-                      className={
-                        p.stock <= 5
-                          ? "text-amber-700 font-medium"
-                          : "text-foreground"
-                      }
-                    >
-                      {p.stock}
-                    </span>
-                  </AdminTd>
-                  <AdminTd>
-                    <span
-                      className={cn(
-                        "rounded-full px-2 py-0.5 text-[10px] font-medium capitalize",
-                        (p as { status?: string }).status === "draft"
-                          ? "bg-slate-100 text-slate-700"
-                          : "bg-emerald-100 text-emerald-800"
-                      )}
-                    >
-                      {(p as { status?: string }).status ?? "published"}
-                    </span>
-                  </AdminTd>
-                  <AdminTd>
-                    <div className="flex flex-wrap gap-1">
-                      {p.is_new && (
-                        <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-medium text-emerald-800">
-                          New
-                        </span>
-                      )}
-                      {p.is_bestseller && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
-                          Bestseller
-                        </span>
-                      )}
-                      {p.sold_out && (
-                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-800">
-                          Sold out
-                        </span>
-                      )}
-                    </div>
-                  </AdminTd>
-                </AdminTr>
-              ))}
-            </tbody>
-          </AdminTableElement>
-        </AdminTable>
+        <AdminProductsClient
+          products={products}
+          categories={categories}
+          total={total}
+          page={page}
+          totalPages={totalPages}
+          filters={filters}
+        />
       )}
 
       {totalPages > 1 && (
-        <div className="flex gap-2 justify-center">
+        <div className="flex justify-center gap-2">
           {page > 1 && (
             <Link
-              href={`/admin/products?page=${page - 1}`}
+              href={buildPageUrl(page - 1, filters)}
               className={cn(buttonVariants({ variant: "outline" }))}
             >
               Previous
             </Link>
           )}
-          <span className="text-sm text-muted-foreground self-center">
+          <span className="self-center text-sm text-muted-foreground">
             Page {page} of {totalPages}
           </span>
           {page < totalPages && (
             <Link
-              href={`/admin/products?page=${page + 1}`}
+              href={buildPageUrl(page + 1, filters)}
               className={cn(buttonVariants({ variant: "outline" }))}
             >
               Next

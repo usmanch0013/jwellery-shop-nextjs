@@ -288,18 +288,84 @@ export async function getAdminOrder(id: string) {
   };
 }
 
-export async function getAdminProducts(page = 1, limit = 20) {
+export type AdminProductFilters = {
+  page?: number;
+  limit?: number;
+  q?: string;
+  categoryId?: string;
+  status?: "all" | "draft" | "published";
+  flag?: "all" | "new" | "bestseller" | "sale" | "sold_out" | "low_stock";
+  sort?: "manual" | "newest" | "price_asc" | "price_desc" | "name";
+};
+
+export async function getAdminProducts(filters: AdminProductFilters = {}) {
   const admin = await getAdminClient();
+  const page = filters.page ?? 1;
+  const limit = filters.limit ?? 50;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
-  const { data, count } = await admin
+  let query = admin
     .from("products")
-    .select("*, categories(slug, name)", { count: "exact" })
-    .order("created_at", { ascending: false })
-    .range(from, to);
+    .select("*, categories(slug, name)", { count: "exact" });
 
-  return { products: data ?? [], total: count ?? 0, page, limit };
+  const q = filters.q?.trim();
+  if (q) {
+    const pattern = `%${q.replace(/[%_]/g, "")}%`;
+    query = query.or(
+      `name.ilike.${pattern},slug.ilike.${pattern},sku.ilike.${pattern}`
+    );
+  }
+
+  if (filters.categoryId) {
+    query = query.eq("category_id", filters.categoryId);
+  }
+
+  if (filters.status === "draft") {
+    query = query.eq("status", "draft");
+  } else if (filters.status === "published") {
+    query = query.eq("status", "published");
+  }
+
+  if (filters.flag === "new") query = query.eq("is_new", true);
+  if (filters.flag === "bestseller") query = query.eq("is_bestseller", true);
+  if (filters.flag === "sold_out") query = query.eq("sold_out", true);
+  if (filters.flag === "low_stock") query = query.lte("stock", 5);
+  if (filters.flag === "sale") query = query.not("original_price", "is", null);
+
+  switch (filters.sort) {
+    case "newest":
+      query = query.order("created_at", { ascending: false });
+      break;
+    case "price_asc":
+      query = query.order("price", { ascending: true });
+      break;
+    case "price_desc":
+      query = query.order("price", { ascending: false });
+      break;
+    case "name":
+      query = query.order("name", { ascending: true });
+      break;
+    default:
+      query = query
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false });
+  }
+
+  const { data, count, error } = await query.range(from, to);
+  if (error) {
+    return { products: [], total: 0, page, limit };
+  }
+
+  let products = data ?? [];
+
+  if (filters.flag === "sale") {
+    products = products.filter(
+      (p) => p.original_price != null && p.original_price > p.price
+    );
+  }
+
+  return { products, total: count ?? 0, page, limit };
 }
 
 export async function getAdminProduct(id: string) {

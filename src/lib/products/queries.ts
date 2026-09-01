@@ -143,7 +143,9 @@ export async function getProducts(
       query = query.order("review_count", { ascending: false });
       break;
     default:
-      query = query.order("created_at", { ascending: false });
+      query = query
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: false });
   }
 
   const { data, count, error } = await query.range(from, to);
