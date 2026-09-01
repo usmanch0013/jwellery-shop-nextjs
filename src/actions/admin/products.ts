@@ -169,10 +169,7 @@ export async function createProductAction(formData: FormData) {
   const admin = await getAdminClient();
   const data = parsed.data;
   const slug = data.slug || slugify(data.name);
-  const stock =
-    data.variations.length > 0
-      ? data.variations.reduce((sum, v) => sum + v.stock, 0)
-      : data.stock;
+  const stock = data.stock;
   const soldOut = data.soldOut || stock <= 0;
 
   const { data: product, error } = await admin
@@ -218,10 +215,7 @@ export async function updateProductAction(id: string, formData: FormData) {
   const admin = await getAdminClient();
   const data = parsed.data;
   const slug = data.slug || slugify(data.name);
-  const stock =
-    data.variations.length > 0
-      ? data.variations.reduce((sum, v) => sum + v.stock, 0)
-      : data.stock;
+  const stock = data.stock;
   const soldOut = data.soldOut || stock <= 0;
 
   const { error } = await admin
@@ -258,6 +252,180 @@ export async function updateProductAction(id: string, formData: FormData) {
   await refreshCategoryProductCounts(admin);
   revalidateProductPaths(slug, id);
   return { success: true };
+}
+
+async function uniqueProductSlug(
+  admin: SupabaseClient,
+  base: string,
+  excludeId?: string
+) {
+  const root = slugify(base) || `draft-${Date.now()}`;
+  let slug = root;
+  let n = 2;
+  while (true) {
+    const { data } = await admin
+      .from("products")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (!data || data.id === excludeId) return slug;
+    slug = `${root}-${n++}`;
+  }
+}
+
+const draftSchema = z.object({
+  name: z.string().optional(),
+  slug: z.string().optional(),
+  shortDescription: z.string().optional(),
+  description: z.string().optional(),
+  sku: z.string().optional(),
+  price: z.coerce.number().min(0).optional(),
+  originalPrice: z.coerce.number().optional(),
+  categoryId: z.string().uuid().optional(),
+  material: z.string().optional(),
+  stock: z.coerce.number().int().min(0).optional(),
+  image: z.string().optional(),
+  hoverImage: z.string().optional(),
+  isNew: z.coerce.boolean().optional(),
+  isBestseller: z.coerce.boolean().optional(),
+  soldOut: z.coerce.boolean().optional(),
+  gallery: z.array(z.string()).default([]),
+  tagIds: z.array(z.string().uuid()).default([]),
+  variations: z.array(variationInputSchema).default([]),
+});
+
+function parseDraftForm(formData: FormData) {
+  const parsed = parseProductForm(formData);
+  if (parsed.success) {
+    return { success: true as const, data: { ...parsed.data, status: "draft" as const } };
+  }
+
+  let gallery: string[] = [];
+  let tagIds: string[] = [];
+  let variations: z.infer<typeof variationInputSchema>[] = [];
+  try {
+    const galleryRaw = formData.get("galleryJson");
+    if (typeof galleryRaw === "string" && galleryRaw) gallery = JSON.parse(galleryRaw);
+  } catch {
+    gallery = [];
+  }
+  try {
+    const tagsRaw = formData.get("tagIdsJson");
+    if (typeof tagsRaw === "string" && tagsRaw) tagIds = JSON.parse(tagsRaw);
+  } catch {
+    tagIds = [];
+  }
+  try {
+    const variationsRaw = formData.get("variationsJson");
+    if (typeof variationsRaw === "string" && variationsRaw) {
+      variations = JSON.parse(variationsRaw);
+    }
+  } catch {
+    variations = [];
+  }
+
+  const priceRaw = formData.get("price");
+  const stockRaw = formData.get("stock");
+  const originalRaw = formData.get("originalPrice");
+
+  return draftSchema.safeParse({
+    name: String(formData.get("name") ?? "").trim() || undefined,
+    slug: formData.get("slug") || undefined,
+    shortDescription: formData.get("shortDescription") || "",
+    description: formData.get("description") || "",
+    sku: formData.get("sku") || undefined,
+    price: priceRaw === "" || priceRaw == null ? 0 : priceRaw,
+    originalPrice: originalRaw === "" || originalRaw == null ? undefined : originalRaw,
+    categoryId: formData.get("categoryId") || undefined,
+    material: formData.get("material") || "",
+    stock: stockRaw === "" || stockRaw == null ? 0 : stockRaw,
+    image: formData.get("image") || "",
+    hoverImage: formData.get("hoverImage") || undefined,
+    isNew: formData.get("isNew") === "on",
+    isBestseller: formData.get("isBestseller") === "on",
+    soldOut: formData.get("soldOut") === "on",
+    gallery,
+    tagIds,
+    variations: variations.filter((v) => v.name?.trim()),
+  });
+}
+
+export async function saveProductDraftAction(
+  productId: string | null,
+  formData: FormData
+) {
+  const parsed = parseDraftForm(formData);
+  if (!parsed.success) {
+    return { error: "Could not save draft. Add a product name and try again." };
+  }
+
+  const admin = await getAdminClient();
+  const data = parsed.data;
+  const name = (data.name?.trim() || "Auto draft").slice(0, 200);
+  const categoryId = data.categoryId;
+
+  if (!categoryId) {
+    return { error: "Choose a category before saving a draft." };
+  }
+
+  const slug = await uniqueProductSlug(
+    admin,
+    data.slug || name,
+    productId ?? undefined
+  );
+  const variations = "variations" in data ? data.variations : [];
+  const stock = data.stock ?? 0;
+  const image = data.image?.trim() || "/window.svg";
+
+  const row = {
+    name,
+    slug,
+    short_description: data.shortDescription ?? "",
+    sku: data.sku || null,
+    status: "draft" as const,
+    description: data.description ?? "",
+    price: data.price ?? 0,
+    original_price: data.originalPrice ?? null,
+    category_id: categoryId,
+    material: data.material ?? "",
+    stock,
+    image,
+    hover_image: data.hoverImage || null,
+    is_new: data.isNew ?? false,
+    is_bestseller: data.isBestseller ?? false,
+    sold_out: data.soldOut || stock <= 0,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (productId) {
+    const { error } = await admin.from("products").update(row).eq("id", productId);
+    if (error) return { error: error.message };
+    await Promise.all([
+      syncGallery(admin, productId, data.gallery ?? []),
+      syncTags(admin, productId, data.tagIds ?? []),
+      syncVariations(admin, productId, variations),
+    ]);
+    await refreshCategoryProductCounts(admin);
+    revalidateProductPaths(slug, productId);
+    return { success: true, id: productId, slug };
+  }
+
+  const { data: product, error } = await admin
+    .from("products")
+    .insert(row)
+    .select("id")
+    .single();
+
+  if (error || !product) return { error: error?.message ?? "Could not create draft" };
+
+  await Promise.all([
+    syncGallery(admin, product.id, data.gallery ?? []),
+    syncTags(admin, product.id, data.tagIds ?? []),
+    syncVariations(admin, product.id, variations),
+  ]);
+  await refreshCategoryProductCounts(admin);
+  revalidateProductPaths(slug, product.id);
+  return { success: true, id: product.id, slug };
 }
 
 export async function deleteProductAction(id: string) {

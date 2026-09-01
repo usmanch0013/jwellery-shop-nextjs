@@ -59,6 +59,7 @@ export default function MediaLibraryClient({
   const [items, setItems] = useState(initialItems);
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
+  const [uploadAlt, setUploadAlt] = useState("");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -104,12 +105,14 @@ export default function MediaLibraryClient({
     const formData = new FormData();
     formData.set("url", url.trim());
     if (title.trim()) formData.set("title", title.trim());
+    if (uploadAlt.trim()) formData.set("altText", uploadAlt.trim());
     const result = await addMediaAction(formData);
     if (result.error) {
       setError(result.error);
     } else {
       setUrl("");
       setTitle("");
+      setUploadAlt("");
       await refreshLibrary();
       toast.success("Image added to library");
     }
@@ -127,6 +130,7 @@ export default function MediaLibraryClient({
     for (const file of list) {
       const formData = new FormData();
       formData.set("file", file);
+      if (uploadAlt.trim()) formData.set("altText", uploadAlt.trim());
       const result = await uploadMediaFileAction(formData);
       if (result.error) {
         setError(result.error);
@@ -255,6 +259,14 @@ export default function MediaLibraryClient({
             <p className="mt-1 text-sm text-muted-foreground">
               JPG, PNG, WebP, GIF, AVIF — up to 10MB each
             </p>
+            <div className="mx-auto mt-4 max-w-md space-y-2 text-left">
+              <Label className="text-xs">Alt text (applied to uploaded files)</Label>
+              <Input
+                value={uploadAlt}
+                onChange={(e) => setUploadAlt(e.target.value)}
+                placeholder="Describe the image for SEO and accessibility"
+              />
+            </div>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
               <Button
                 type="button"
@@ -315,6 +327,14 @@ export default function MediaLibraryClient({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Ring close-up"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Alt text (optional)</Label>
+              <Input
+                value={uploadAlt}
+                onChange={(e) => setUploadAlt(e.target.value)}
+                placeholder="Gold necklace close-up"
               />
             </div>
             <div className="sm:col-span-2">

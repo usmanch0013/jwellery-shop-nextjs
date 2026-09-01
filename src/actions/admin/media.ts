@@ -147,9 +147,11 @@ export async function uploadMediaFileAction(formData: FormData) {
   } = admin.storage.from("media").getPublicUrl(path);
 
   const title = file.name.replace(/\.[^.]+$/, "");
+  const altText = String(formData.get("altText") ?? "").trim();
   const result = await insertMediaRecord({
     url: publicUrl,
     title,
+    alt_text: altText || null,
     file_name: file.name,
     mime_type: file.type,
   });
@@ -161,17 +163,18 @@ export async function uploadMediaFileAction(formData: FormData) {
 }
 
 export async function updateMediaAction(id: string, formData: FormData) {
-  const title = String(formData.get("title") ?? "").trim();
-  const altText = String(formData.get("altText") ?? "").trim();
+  const patch: { title?: string | null; alt_text?: string | null } = {};
+  if (formData.has("title")) {
+    patch.title = String(formData.get("title") ?? "").trim() || null;
+  }
+  if (formData.has("altText")) {
+    patch.alt_text = String(formData.get("altText") ?? "").trim() || null;
+  }
+
+  if (Object.keys(patch).length === 0) return { success: true };
 
   const admin = await getAdminClient();
-  const { error } = await admin
-    .from("media_library")
-    .update({
-      title: title || null,
-      alt_text: altText || null,
-    })
-    .eq("id", id);
+  const { error } = await admin.from("media_library").update(patch).eq("id", id);
 
   if (error) return { error: error.message };
   revalidatePath("/admin/media");
