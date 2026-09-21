@@ -40,6 +40,7 @@
   --hero-bottom-bar: clamp(5.25rem, 11vh, 6.75rem);
   --hero-scroll-gap: clamp(0.5rem, 1.2vh, 0.875rem);
   --float-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  --float-left: max(0.75rem, env(safe-area-inset-left, 0px));
   --float-right: max(0.75rem, env(safe-area-inset-right, 0px));
   --radius: 0px;
   --btn-radius: 5px;

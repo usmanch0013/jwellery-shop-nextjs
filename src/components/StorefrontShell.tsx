@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WhatsAppWidget from "@/components/WhatsAppWidget";
+import ShopAssistantWidget from "@/components/ShopAssistantWidget";
 import SalePromoPopup from "@/components/SalePromoPopup";
 import type { CategoryInfo } from "@/types";
 import type { CmsBundle } from "@/lib/cms/types";
@@ -41,6 +42,7 @@ export default function StorefrontShell({
         usefulLinks={cms.footerUsefulLinks}
         legalLinks={cms.footerLegalLinks}
       />
+      <ShopAssistantWidget />
       <WhatsAppWidget />
       <SalePromoPopup popup={cms.promoPopup} />
     </>
