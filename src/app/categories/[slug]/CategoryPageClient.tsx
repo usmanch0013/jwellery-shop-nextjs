@@ -32,7 +32,7 @@ export default function CategoryPageClient({
     <>
       <div className="mx-auto mb-8 flex max-w-[1400px] justify-center px-4 sm:px-6 lg:px-8">
         <select
-          className="rounded-lg border px-3 py-2 text-xs uppercase tracking-wider"
+          className="rounded-[5px] border px-3 py-1.5 text-[10px] uppercase tracking-wider"
           value={sort}
           onChange={(e) => setSort(e.target.value)}
           aria-label="Sort products"

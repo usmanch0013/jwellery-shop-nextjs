@@ -55,7 +55,7 @@ export default function AccountProfileForm({
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex h-9 items-center justify-center rounded-lg bg-[var(--user-accent)] px-4 text-[13px] font-semibold text-white hover:bg-[#006e52] disabled:opacity-60"
+        className="inline-flex h-8 items-center justify-center rounded-[5px] bg-[var(--user-accent)] px-4 text-[12px] font-semibold text-white hover:bg-[#006e52] disabled:opacity-60"
       >
         {loading ? "Saving..." : "Save profile"}
       </button>

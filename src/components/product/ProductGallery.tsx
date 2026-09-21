@@ -64,7 +64,7 @@ export default function ProductGallery({
             src={gallery[activeIndex]}
             alt={productName}
             fill
-            className="product-zeesy-image-fade object-cover"
+            className="product-zeesy-image-fade object-contain p-2 sm:p-3"
             priority
             sizes="(max-width: 1024px) 100vw, 42vw"
           />
@@ -83,7 +83,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("up")}
-              className="mb-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mb-2 lg:flex"
+              className="mb-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mb-2 lg:flex"
               aria-label="Previous images"
             >
               <ChevronUp className="h-4 w-4" strokeWidth={1.75} />
@@ -91,7 +91,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("left")}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f2efe3] text-[#8a8680] lg:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] lg:hidden"
               aria-label="Scroll thumbnails left"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -119,7 +119,7 @@ export default function ProductGallery({
                     src={src}
                     alt=""
                     fill
-                    className="object-cover"
+                    className="object-contain p-0.5"
                     sizes="88px"
                   />
                 </button>
@@ -129,7 +129,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("right")}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#f2efe3] text-[#8a8680] lg:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] lg:hidden"
               aria-label="Scroll thumbnails right"
             >
               <ChevronRight className="h-4 w-4" />
@@ -137,7 +137,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("down")}
-              className="mt-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mt-2 lg:flex"
+              className="mt-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mt-2 lg:flex"
               aria-label="Next images"
             >
               <ChevronDown className="h-4 w-4" strokeWidth={1.75} />
@@ -154,17 +154,17 @@ export default function ProductGallery({
           <button
             type="button"
             onClick={() => setLightboxOpen(false)}
-            className="absolute right-2 top-2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#3b3933] shadow-lg"
+            className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-[5px] bg-white/90 text-[#3b3933] shadow-lg"
             aria-label="Close zoom"
           >
             <X className="h-5 w-5" />
           </button>
-          <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[16px] bg-[#f2efe3]">
+          <div className="relative h-[min(82dvh,920px)] w-full overflow-hidden rounded-[16px] bg-[#f2efe3]">
             <Image
               src={gallery[activeIndex]}
               alt={productName}
               fill
-              className="object-cover"
+              className="object-contain p-3 sm:p-4"
               sizes="90vw"
             />
           </div>

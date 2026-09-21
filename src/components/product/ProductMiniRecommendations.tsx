@@ -35,7 +35,7 @@ export default function ProductMiniRecommendations({
                 src={item.image}
                 alt={item.name}
                 fill
-                className="object-cover"
+                className="object-contain p-1"
                 sizes="72px"
               />
             </Link>

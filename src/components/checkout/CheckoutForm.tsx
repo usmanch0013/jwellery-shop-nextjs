@@ -201,7 +201,7 @@ export default function CheckoutForm() {
               key={s}
               type="button"
               onClick={() => i < step && setStep(i)}
-              className={`flex-1 rounded-lg border py-2.5 text-[10px] uppercase tracking-wider transition-colors sm:text-xs ${
+              className={`flex-1 rounded-[5px] border py-2 text-[10px] uppercase tracking-wider transition-colors sm:text-xs ${
                 i === step
                   ? "border-primary bg-primary text-white"
                   : i < step

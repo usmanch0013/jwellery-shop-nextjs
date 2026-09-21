@@ -52,7 +52,7 @@ function HeroSection({ settings }: { settings: Record<string, unknown> }) {
             {str(settings.ctaLabel) && str(settings.ctaHref) && (
               <Link
                 href={str(settings.ctaHref)}
-                className="inline-flex mt-8 px-6 py-3 bg-primary text-white text-sm uppercase tracking-wider rounded-lg hover:bg-emerald-dark transition-colors"
+                className="site-btn mt-8 bg-primary text-white hover:bg-emerald-dark"
               >
                 {str(settings.ctaLabel)}
               </Link>
@@ -238,7 +238,7 @@ function CtaSection({ settings }: { settings: Record<string, unknown> }) {
           {str(settings.buttonLabel) && str(settings.buttonHref) && (
             <Link
               href={str(settings.buttonHref)}
-              className={`inline-flex px-6 py-3 text-sm uppercase tracking-wider rounded-lg transition-colors ${
+              className={`site-btn transition-colors ${
                 dark
                   ? "bg-white text-black hover:bg-white/90"
                   : "bg-primary text-white hover:bg-emerald-dark"
@@ -329,7 +329,7 @@ function ButtonSection({ settings }: { settings: Record<string, unknown> }) {
       <div className="max-w-7xl mx-auto px-4">
         <Link
           href={str(settings.href, "/shop")}
-          className={`inline-flex uppercase tracking-wider rounded-lg transition-colors ${sizeClass} ${styleClass}`}
+          className={`site-btn transition-colors ${sizeClass} ${styleClass}`}
         >
           {str(settings.label, "Button")}
         </Link>

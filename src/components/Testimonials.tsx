@@ -181,7 +181,7 @@ export default function Testimonials({
                     type="button"
                     onClick={() => api?.scrollPrev()}
                     aria-label="Previous review"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-12 sm:w-12"
+                    className="flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black"
                   >
                     <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
                   </button>
@@ -189,7 +189,7 @@ export default function Testimonials({
                     type="button"
                     onClick={() => api?.scrollNext()}
                     aria-label="Next review"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-12 sm:w-12"
+                    className="flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black"
                   >
                     <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
                   </button>

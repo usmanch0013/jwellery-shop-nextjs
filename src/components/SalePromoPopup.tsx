@@ -71,7 +71,7 @@ export default function SalePromoPopup({ popup }: { popup: CmsPromoPopup }) {
           <button
             type="button"
             onClick={handleClose}
-            className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/50"
+            className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-[5px] bg-black/35 text-white backdrop-blur-sm transition-colors hover:bg-black/50"
             aria-label="Close offer"
           >
             <X className="h-4 w-4" />
@@ -120,7 +120,7 @@ export default function SalePromoPopup({ popup }: { popup: CmsPromoPopup }) {
                 <Link
                   href={popup.ctaHref || "/shop"}
                   onClick={handleClose}
-                  className="inline-flex h-11 items-center justify-center rounded-full bg-champagne px-6 text-[12px] font-semibold uppercase tracking-[0.12em] text-charcoal transition-opacity hover:opacity-90"
+                  className="site-btn bg-champagne px-5 text-charcoal transition-opacity hover:opacity-90"
                 >
                   {popup.ctaLabel || "Shop now"}
                 </Link>

@@ -85,7 +85,7 @@ export default function VideoSection({
                 type="button"
                 onClick={() => setVideoOpen(true)}
                 aria-label="Play brand video"
-                className="video-play-btn group flex h-[72px] w-[72px] items-center justify-center rounded-full border border-white/30 bg-champagne text-charcoal shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-all duration-300 hover:scale-105 hover:border-white/60 hover:bg-white lg:h-[85px] lg:w-[85px]"
+                className="video-play-btn group flex h-14 w-14 items-center justify-center rounded-[5px] border border-white/30 bg-champagne text-charcoal shadow-[0_12px_40px_rgba(0,0,0,0.4)] transition-all duration-300 hover:scale-105 hover:border-white/60 hover:bg-white lg:h-16 lg:w-16"
               >
                 <Play
                   className="ml-1 h-7 w-7 fill-current lg:h-8 lg:w-8"

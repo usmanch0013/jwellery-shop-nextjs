@@ -57,7 +57,7 @@ export default function AddressForm() {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex h-8 items-center justify-center rounded-lg bg-[var(--user-accent)] px-4 text-[12px] font-semibold text-white hover:bg-[#006e52] disabled:opacity-60"
+        className="site-btn bg-[var(--user-accent)] px-4 text-white hover:bg-[#006e52] disabled:opacity-60"
       >
         {loading ? "Saving..." : "Add address"}
       </button>

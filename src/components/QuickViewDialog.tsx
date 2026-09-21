@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { productCardImageClass } from "@/lib/products/card-image";
 
 interface QuickViewDialogProps {
   product: Product | null;
@@ -47,12 +48,13 @@ export default function QuickViewDialog({
           <DialogTitle>{product.name}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2">
-          <div className="relative aspect-[2/3] overflow-hidden rounded-[1.6rem] bg-[#f2efe3] sm:rounded-none">
+          <div className="relative aspect-[3/4] overflow-hidden bg-[#f2efe3] sm:rounded-none">
             <Image
               src={product.image}
               alt={product.name}
               fill
-              className="object-cover"
+              className={productCardImageClass(product.image, product.image)}
+              sizes="(max-width: 640px) 100vw, 50vw"
             />
           </div>
           <div className="p-6 lg:p-8 flex flex-col justify-center bg-background">
@@ -86,7 +88,7 @@ export default function QuickViewDialog({
             ) : (
               <button
                 onClick={handleAdd}
-                className="flex items-center justify-center gap-2 rounded-[1.6rem] bg-[#6F112B] py-3.5 text-sm text-[#fffdf5] transition-colors hover:opacity-90"
+                className="flex h-10 items-center justify-center gap-2 rounded-[5px] bg-[#6F112B] text-[13px] text-[#fffdf5] transition-colors hover:opacity-90"
               >
                 <Plus className="w-4 h-4" />
                 Add to cart

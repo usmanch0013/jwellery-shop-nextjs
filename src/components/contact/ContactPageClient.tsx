@@ -128,7 +128,7 @@ export default function ContactPageClient({
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-emerald-dark text-white h-11 uppercase tracking-wider"
+              className="site-btn w-full bg-primary text-white hover:bg-emerald-dark"
             >
               {loading ? "Sending..." : "Send Message"}
             </Button>

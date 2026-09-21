@@ -32,7 +32,7 @@ export default function CartPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex items-center justify-center bg-primary hover:bg-emerald-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
+          className="site-btn bg-primary px-4 text-white hover:bg-emerald-dark"
         >
           Continue Shopping
           <ArrowRight className="w-4 h-4 ml-2" />
@@ -85,7 +85,7 @@ export default function CartPage() {
                         </p>
                       </div>
                   <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center border rounded-lg w-fit">
+                    <div className="flex w-fit items-center overflow-hidden rounded-[5px] border">
                           <button
                             onClick={() =>
                               updateQuantity(item.lineId, item.quantity - 1)
@@ -163,7 +163,7 @@ export default function CartPage() {
                 )}
                 <Link
                   href="/checkout"
-                  className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 uppercase tracking-wider rounded-lg text-sm font-medium"
+                  className="site-btn w-full bg-primary text-white hover:bg-emerald-dark"
                 >
                   Proceed to Checkout
                 </Link>
@@ -173,7 +173,7 @@ export default function CartPage() {
                 </div>
                 <Link
                   href="/shop"
-                  className="flex w-full items-center justify-center h-8 rounded-lg text-sm font-medium hover:bg-muted"
+                  className="flex h-8 w-full items-center justify-center rounded-[5px] text-sm font-medium hover:bg-muted"
                 >
                   Continue Shopping
                 </Link>

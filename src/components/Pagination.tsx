@@ -34,13 +34,13 @@ export default function Pagination({
       {page > 1 ? (
         <Link
           href={buildUrl(page - 1)}
-          className="flex h-10 w-10 items-center justify-center border border-border hover:bg-muted"
+          className="btn-as-link flex h-9 w-9 items-center justify-center rounded-[5px] border border-border hover:bg-muted"
           aria-label="Previous page"
         >
           <ChevronLeft className="h-4 w-4" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center border border-border opacity-40">
+        <span className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-border opacity-40">
           <ChevronLeft className="h-4 w-4" />
         </span>
       )}
@@ -50,13 +50,13 @@ export default function Pagination({
       {page < totalPages ? (
         <Link
           href={buildUrl(page + 1)}
-          className="flex h-10 w-10 items-center justify-center border border-border hover:bg-muted"
+          className="btn-as-link flex h-9 w-9 items-center justify-center rounded-[5px] border border-border hover:bg-muted"
           aria-label="Next page"
         >
           <ChevronRight className="h-4 w-4" />
         </Link>
       ) : (
-        <span className="flex h-10 w-10 items-center justify-center border border-border opacity-40">
+        <span className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-border opacity-40">
           <ChevronRight className="h-4 w-4" />
         </span>
       )}

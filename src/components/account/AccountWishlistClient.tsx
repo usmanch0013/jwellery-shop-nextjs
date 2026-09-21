@@ -24,7 +24,7 @@ export default function AccountWishlistClient() {
         </p>
         <Link
           href="/shop"
-          className="mt-6 inline-flex h-9 items-center justify-center rounded-lg bg-[var(--user-accent)] px-5 text-[13px] font-semibold text-white hover:bg-[#006e52]"
+          className="site-btn mt-6 bg-[var(--user-accent)] px-5 text-white hover:bg-[#006e52]"
         >
           Explore collection
         </Link>
@@ -67,7 +67,7 @@ export default function AccountWishlistClient() {
           <p className="text-[13px] font-semibold">{formatPrice(product.price)}</p>
           <button
             type="button"
-            className="mt-2 flex h-8 w-full items-center justify-center gap-1.5 rounded-lg bg-[var(--user-accent)] text-[12px] font-semibold text-white hover:bg-[#006e52]"
+            className="site-btn mt-2 w-full gap-1.5 bg-[var(--user-accent)] text-white hover:bg-[#006e52]"
             onClick={() => {
               addToCart(product);
               toast.success("Added to cart");

@@ -71,14 +71,14 @@ export default function WhatsAppWidget() {
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-full bg-[#25D366] py-2 pl-3 pr-2.5 text-white shadow-[0_8px_28px_rgba(37,211,102,0.45)] ring-2 ring-white/90 transition-transform hover:scale-[1.02] hover:bg-[#20bd5a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:gap-3 sm:pl-5 sm:pr-4 sm:ring-4"
+        className="flex max-w-[calc(100vw-1.5rem)] items-center gap-2 rounded-[5px] bg-[#25D366] py-1.5 pl-2.5 pr-2 text-white shadow-[0_8px_28px_rgba(37,211,102,0.45)] ring-2 ring-white/90 transition-transform hover:scale-[1.02] hover:bg-[#20bd5a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:gap-2.5 sm:pl-4 sm:pr-3 sm:ring-4"
         aria-label={`Order on WhatsApp — ${BRAND.name}`}
         title="Order on WhatsApp"
       >
         <span className="hidden text-[12px] font-semibold uppercase tracking-[0.12em] sm:inline">
           Order
         </span>
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center sm:h-11 sm:w-11">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center sm:h-9 sm:w-9">
           <WhatsAppGlyph className="h-6 w-6 sm:h-7 sm:w-7" />
         </span>
       </a>

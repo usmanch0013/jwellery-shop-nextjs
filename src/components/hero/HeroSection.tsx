@@ -173,13 +173,13 @@ export default function HeroSection({
               <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:mt-9 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
                 <Link
                   href={content.primaryCtaHref ?? "/shop"}
-                  className="inline-flex h-12 items-center justify-center rounded-full bg-champagne px-8 text-[12px] font-semibold uppercase tracking-[0.14em] text-charcoal shadow-[0_8px_32px_rgba(201,169,110,0.35)] transition-transform hover:scale-[1.02] hover:opacity-95"
+                  className="site-btn bg-champagne px-5 text-charcoal shadow-[0_6px_24px_rgba(201,169,110,0.35)] transition-opacity hover:opacity-95"
                 >
                   {content.primaryCtaLabel ?? "Shop Collection"}
                 </Link>
                 <Link
                   href={content.secondaryCtaHref ?? "/shop?filter=new"}
-                  className="inline-flex h-12 items-center justify-center rounded-full border border-white/35 bg-white/8 px-8 text-[12px] font-medium uppercase tracking-[0.14em] text-white backdrop-blur-md transition-colors hover:border-champagne/50 hover:bg-white/14"
+                  className="site-btn border border-white/35 bg-white/8 px-5 font-medium text-white backdrop-blur-md transition-colors hover:border-champagne/50 hover:bg-white/14"
                 >
                   {content.secondaryCtaLabel ?? "New Arrivals"}
                 </Link>

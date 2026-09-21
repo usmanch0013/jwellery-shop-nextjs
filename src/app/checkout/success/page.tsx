@@ -29,14 +29,14 @@ export default async function CheckoutSuccessPage({
           {orderNumber ? (
             <Link
               href={`/track-order?order=${encodeURIComponent(orderNumber)}`}
-              className="inline-flex h-11 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-primary-foreground"
+              className="site-btn bg-primary px-5 text-primary-foreground"
             >
               Track Order
             </Link>
           ) : null}
           <Link
             href="/shop"
-            className="inline-flex h-11 items-center justify-center rounded-lg border border-border px-6 text-sm font-medium"
+            className="site-btn border border-border px-5 font-medium normal-case"
           >
             Continue Shopping
           </Link>

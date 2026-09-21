@@ -30,7 +30,7 @@ export default async function AccountDashboardPage() {
         actions={
           <Link
             href="/shop"
-            className="inline-flex h-9 items-center justify-center rounded-lg bg-[var(--user-accent)] px-4 text-[13px] font-semibold text-white hover:bg-[#006e52]"
+            className="inline-flex h-8 items-center justify-center rounded-[5px] bg-[var(--user-accent)] px-4 text-[12px] font-semibold text-white hover:bg-[#006e52]"
           >
             Shop now
           </Link>

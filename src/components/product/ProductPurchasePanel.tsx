@@ -136,7 +136,7 @@ export default function ProductPurchasePanel({
           type="button"
           onClick={() => void toggleWishlist(product)}
           className={cn(
-            "mt-1 shrink-0 rounded-full p-2.5 transition-colors",
+            "mt-1 shrink-0 rounded-[5px] p-2 transition-colors",
             wished
               ? "bg-rose-500 text-white"
               : "border border-[#e8e2d4] text-[#3b3933] hover:border-[#3b3933]"
@@ -183,7 +183,7 @@ export default function ProductPurchasePanel({
                   disabled={outOfStock}
                   onClick={() => setSelectedVariationId(variation.id)}
                   className={cn(
-                    "rounded-full border px-4 py-2 text-[13px] font-medium transition-colors",
+                    "rounded-[5px] border px-3 py-1.5 text-[12px] font-medium transition-colors",
                     active
                       ? "border-[#6F112B] bg-[#6F112B] text-white"
                       : "border-[#e8e2d4] bg-white text-[#3b3933] hover:border-[#6F112B]/40",
@@ -250,11 +250,11 @@ export default function ProductPurchasePanel({
             <span className="text-[14px] font-semibold text-[#3b3933]">
               Quantity
             </span>
-            <div className="flex h-11 w-[108px] items-center justify-between rounded-[16px] border border-[#e8e2d4] bg-[#fffdf5]">
+            <div className="flex h-9 w-[100px] items-center justify-between rounded-[5px] border border-[#e8e2d4] bg-[#fffdf5]">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                className="flex h-9 w-8 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
                 disabled={quantity <= 1}
                 aria-label="Decrease quantity"
               >
@@ -268,7 +268,7 @@ export default function ProductPurchasePanel({
                 onClick={() =>
                   setQuantity((q) => Math.min(stockCount, q + 1))
                 }
-                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                className="flex h-9 w-8 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
                 disabled={quantity >= stockCount}
                 aria-label="Increase quantity"
               >
@@ -281,7 +281,7 @@ export default function ProductPurchasePanel({
             <button
               type="button"
               onClick={handleAddToCart}
-              className="flex h-12 w-full items-center justify-center rounded-[16px] text-[14px] font-medium text-[#fffdf5] transition-opacity duration-200 hover:opacity-90"
+              className="flex h-10 w-full items-center justify-center rounded-[5px] text-[13px] font-medium text-[#fffdf5] transition-opacity duration-200 hover:opacity-90"
               style={{ backgroundColor: BURGUNDY }}
             >
               Add to cart
@@ -290,7 +290,7 @@ export default function ProductPurchasePanel({
             <button
               type="button"
               onClick={handleBuyNow}
-              className="flex h-12 w-full items-center justify-center rounded-[16px] border bg-transparent text-[14px] font-medium transition-colors duration-200 hover:bg-[#6F112B]/5"
+              className="flex h-10 w-full items-center justify-center rounded-[5px] border bg-transparent text-[13px] font-medium transition-colors duration-200 hover:bg-[#6F112B]/5"
               style={{ borderColor: BURGUNDY, color: BURGUNDY }}
             >
               Buy it now
@@ -300,7 +300,7 @@ export default function ProductPurchasePanel({
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-12 w-full items-center justify-center gap-2 rounded-[16px] bg-[#25D366] text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#20bd5a]"
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-[5px] bg-[#25D366] text-[13px] font-medium text-white transition-colors duration-200 hover:bg-[#20bd5a]"
             >
               <WhatsAppIcon />
               Order on WhatsApp

@@ -85,7 +85,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                     </p>
 
                     <div className="flex items-center justify-between mt-auto pt-3">
-                      <div className="flex items-center border border-border rounded-md overflow-hidden bg-white">
+                      <div className="flex items-center overflow-hidden rounded-[5px] border border-border bg-white">
                         <button
                           type="button"
                           onClick={() =>
@@ -151,14 +151,14 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 <Link
                   href="/checkout"
                   onClick={() => onOpenChange(false)}
-                  className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 text-sm font-medium transition-colors rounded-lg"
+                  className="flex h-10 w-full items-center justify-center rounded-[5px] bg-primary text-sm font-medium text-white transition-colors hover:bg-emerald-dark"
                 >
                   Proceed to Checkout
                 </Link>
                 <Link
                   href="/cart"
                   onClick={() => onOpenChange(false)}
-                  className="flex w-full items-center justify-center border border-border text-foreground h-10 text-sm font-medium transition-colors rounded-lg hover:bg-muted"
+                  className="flex h-9 w-full items-center justify-center rounded-[5px] border border-border text-sm font-medium text-foreground transition-colors hover:bg-muted"
                 >
                   View Full Cart
                 </Link>

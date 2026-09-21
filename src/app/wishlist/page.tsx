@@ -26,7 +26,7 @@ export default function WishlistPage() {
         </p>
         <Link
           href="/shop"
-          className="inline-flex items-center justify-center bg-primary hover:bg-emerald-dark text-white h-9 px-4 rounded-lg text-sm font-medium"
+          className="site-btn bg-primary px-4 text-white hover:bg-emerald-dark"
         >
           Explore Collection
         </Link>

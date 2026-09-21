@@ -36,7 +36,7 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
             </p>
             <Link
               href="/blog"
-              className="mt-4 inline-flex h-11 items-center justify-center rounded-full bg-[#0B3D35] px-6 text-[12px] font-semibold uppercase tracking-[0.12em] text-white"
+              className="site-btn mt-4 bg-[#0B3D35] px-5 text-white"
             >
               Open blog
             </Link>

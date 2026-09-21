@@ -67,7 +67,7 @@ export default function ShopContent({
 
           <div className="-mx-1 mb-6 flex justify-center overflow-x-auto px-1 pb-1">
             <select
-              className="w-full max-w-[280px] border px-3 py-2 text-xs uppercase tracking-wider sm:w-auto"
+              className="w-full max-w-[280px] rounded-[5px] border px-3 py-2 text-xs uppercase tracking-wider sm:w-auto"
               value={searchParams.sort ?? "newest"}
               onChange={(e) => setSort(e.target.value)}
               aria-label="Sort products"
@@ -91,7 +91,7 @@ export default function ShopContent({
                 key={f.id}
                 type="button"
                 onClick={() => setFilter(f.id)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-[11px] uppercase tracking-wider transition-colors ${
+                className={`shrink-0 rounded-[5px] border px-3 py-1.5 text-[10px] uppercase tracking-wider transition-colors ${
                   activeFilter === f.id
                     ? "border-primary bg-primary text-white"
                     : "border-[#ddd] text-[#555] hover:border-primary"
@@ -105,7 +105,7 @@ export default function ShopContent({
           <div className="-mx-1 mb-10 flex flex-nowrap gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:justify-center">
             <button
               onClick={() => setCategory("all")}
-              className={`shrink-0 px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
+              className={`shrink-0 rounded-[5px] px-3 py-1.5 text-[10px] uppercase tracking-wider border transition-colors ${
                 activeCategory === "all"
                   ? "bg-primary text-white border-primary"
                   : "border-[#ddd] text-[#555] hover:border-primary"
@@ -119,7 +119,7 @@ export default function ShopContent({
               <button
                 key={cat.slug}
                 onClick={() => setCategory(cat.slug)}
-                className={`shrink-0 px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
+                className={`shrink-0 rounded-[5px] px-3 py-1.5 text-[10px] uppercase tracking-wider border transition-colors ${
                   activeCategory === cat.slug
                     ? "bg-primary text-white border-primary"
                     : "border-[#ddd] text-[#555] hover:border-primary"

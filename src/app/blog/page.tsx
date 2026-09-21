@@ -68,7 +68,7 @@ export default async function BlogIndexPage({
           {page > 1 && (
             <Link
               href={`/blog?page=${page - 1}`}
-              className="rounded-full border px-4 py-2 text-sm hover:bg-muted"
+              className="rounded-[5px] border px-3 py-1.5 text-sm hover:bg-muted"
             >
               Previous
             </Link>
@@ -79,7 +79,7 @@ export default async function BlogIndexPage({
           {page < totalPages && (
             <Link
               href={`/blog?page=${page + 1}`}
-              className="rounded-full border px-4 py-2 text-sm hover:bg-muted"
+              className="rounded-[5px] border px-3 py-1.5 text-sm hover:bg-muted"
             >
               Next
             </Link>

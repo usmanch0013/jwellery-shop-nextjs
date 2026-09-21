@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ShoppingBag, Menu, Search, User, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -11,6 +11,14 @@ import TopBar from "@/components/TopBar";
 import Logo from "@/components/Logo";
 import SearchDialog from "@/components/SearchDialog";
 import CartSheet from "@/components/CartSheet";
+import {
+  buildOrderedNav,
+  HeaderMegaDropdown,
+  HeaderNavTriggers,
+  MobileNavMega,
+  resolveNavMegaVariant,
+} from "@/components/header/HeaderNavMega";
+import { HEADER_NAV_LINKS } from "@/lib/nav/store-links";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -18,17 +26,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
-const navLinks = [
-  { label: "Home", href: "/" },
-  { label: "Shop", href: "/shop" },
-  { label: "Best Sellers", href: "/shop?filter=bestseller" },
-  { label: "New Arrivals", href: "/shop?filter=new" },
-  { label: "Collections", href: "/#collections" },
-  { label: "Blog", href: "/blog" },
-  { label: "Track", href: "/track-order" },
-  { label: "Reviews", href: "/#reviews" },
-];
 
 function shortLabel(label: string) {
   const map: Record<string, string> = {
@@ -38,12 +35,6 @@ function shortLabel(label: string) {
     "Track Order": "Track",
   };
   return map[label] ?? label;
-}
-
-function isActive(href: string, pathname: string) {
-  if (href === "/") return pathname === "/";
-  if (href.includes("?") || href.includes("#")) return false;
-  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export default function Header({
@@ -57,17 +48,47 @@ export default function Header({
 }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const links = headerNav?.length
-    ? headerNav.map((l) => ({ label: shortLabel(l.label), href: l.href }))
-    : navLinks;
+  const links = useMemo(() => {
+    if (!headerNav?.length) return HEADER_NAV_LINKS;
+    return HEADER_NAV_LINKS.map((item) => {
+      const fromCms = headerNav.find(
+        (c) =>
+          resolveNavMegaVariant(c.href, c.label) ===
+          resolveNavMegaVariant(item.href, item.label)
+      );
+      if (!fromCms) return item;
+      return { label: shortLabel(fromCms.label), href: fromCms.href };
+    });
+  }, [headerNav]);
+
+  const navItems = useMemo(() => buildOrderedNav(links), [links]);
+
   const { totalItems } = useCart();
   const { items: wishlistItems } = useWishlist();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeMegaId, setActiveMegaId] = useState<string | null>(null);
 
-  const overHero = isHome && !scrolled;
+  const activeItem =
+    navItems.find((i) => i.id === activeMegaId && i.mega) ?? null;
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const megaZoneRef = useRef<HTMLDivElement>(null);
+
+  const megaOpen = activeMegaId != null;
+  const overHero = isHome && !scrolled && !megaOpen;
+
+  const closeMega = useCallback(() => setActiveMegaId(null), []);
+
+  const scheduleCloseMega = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(closeMega, 200);
+  }, [closeMega]);
+
+  const cancelCloseMega = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -76,6 +97,25 @@ export default function Header({
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
+  useEffect(() => {
+    closeMega();
+  }, [pathname, closeMega]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMega();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [closeMega]);
+
+  useEffect(
+    () => () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    },
+    []
+  );
+
   const iconClass = overHero
     ? "text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)] hover:text-champagne"
     : "text-[#1a1a1a] hover:text-champagne";
@@ -83,16 +123,19 @@ export default function Header({
   return (
     <>
       <div
+        ref={megaZoneRef}
         className={`z-50 w-full ${isHome ? "fixed top-0 right-0 left-0" : "sticky top-0"}`}
+        onMouseLeave={scheduleCloseMega}
+        onMouseEnter={cancelCloseMega}
       >
         {!overHero && <TopBar text={topBarText} />}
 
         <header
-          className={`w-full transition-[background,box-shadow] duration-300 ${
+          className={`relative w-full transition-[background,box-shadow] duration-300 ${
             overHero
               ? "bg-transparent"
-              : "border-b border-black/[0.06] bg-white/95 shadow-[0_1px_0_rgba(201,169,110,0.2)]"
-          }`}
+              : "border-b border-black/[0.06] bg-white/98 shadow-[0_1px_0_rgba(201,169,110,0.2)]"
+          } ${megaOpen ? "!bg-white" : ""}`}
         >
           <div className="mx-auto max-w-[var(--site-max)] px-[var(--site-px)]">
             <div
@@ -113,24 +156,17 @@ export default function Header({
                 <Logo light={overHero} />
               </div>
 
-              <nav className="hidden flex-1 items-center justify-center gap-8 xl:flex 2xl:gap-10">
-                {links.map((link) => {
-                  const active = isActive(link.href, pathname);
-                  return (
-                    <Link
-                      key={link.href + link.label}
-                      href={link.href}
-                      className={`relative pb-1 text-[13px] font-medium tracking-[0.04em] transition-colors after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:-translate-x-1/2 after:bg-champagne after:transition-all after:duration-300 hover:after:w-full ${
-                        overHero
-                          ? "text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.65),0_1px_2px_rgba(0,0,0,0.8)] hover:text-champagne"
-                          : "text-[#2c2c2c]/80 hover:text-[#0B3D35]"
-                      } ${active ? "after:w-5 text-champagne" : ""}`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </nav>
+              <HeaderNavTriggers
+                items={navItems}
+                activeId={activeMegaId}
+                overHero={overHero}
+                pathname={pathname}
+                onActivate={(id) => {
+                  cancelCloseMega();
+                  setActiveMegaId(id);
+                }}
+                onDeactivate={closeMega}
+              />
 
               <div className="flex shrink-0 items-center justify-end gap-0 sm:gap-1">
                 <Button
@@ -178,43 +214,38 @@ export default function Header({
               </div>
             </div>
           </div>
+
+          <HeaderMegaDropdown
+            item={activeItem}
+            categories={categories}
+            onClose={closeMega}
+          />
         </header>
       </div>
+
+      {megaOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/25 lg:bg-black/20"
+          style={{ top: 0 }}
+          aria-hidden
+          onClick={closeMega}
+        />
+      )}
 
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
       <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
 
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-        <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
+        <SheetContent side="left" className="z-[80] w-[min(100vw-2rem,22rem)] overflow-y-auto bg-white">
           <SheetHeader>
             <SheetTitle className="font-serif text-2xl">SHE Collection</SheetTitle>
           </SheetHeader>
           <nav className="mt-6 flex flex-col gap-0">
-            {links.map((link) => (
-              <Link
-                key={link.href + link.label}
-                href={link.href}
-                className="border-b border-border py-3 text-sm hover:text-primary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <p className="mt-4 mb-2 text-[10px] tracking-widest uppercase text-muted-foreground">
-              Categories
-            </p>
-            {categories
-              .filter((cat) => cat.productCount > 0)
-              .map((cat) => (
-                <Link
-                  key={cat.slug}
-                  href={`/categories/${cat.slug}`}
-                  className="py-2.5 text-sm text-muted-foreground hover:text-primary"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {cat.name}
-                </Link>
-              ))}
+            <MobileNavMega
+              links={links}
+              categories={categories}
+              onNavigate={() => setMobileMenuOpen(false)}
+            />
           </nav>
         </SheetContent>
       </Sheet>
