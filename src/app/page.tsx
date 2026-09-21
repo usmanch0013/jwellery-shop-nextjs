@@ -12,16 +12,18 @@ export default async function HomePage() {
     newArrivals,
     earrings,
     bestSelling,
+    featured,
     blogPosts,
     cms,
   ] = await Promise.all([
     getCategories(),
-    getProducts({ category: "bridal-sets", limit: 8 }),
-    getProducts({ category: "necklace-sets", limit: 8 }),
-    getProducts({ category: "bracelet", limit: 8 }),
-    getProducts({ filter: "new", limit: 8, sort: "newest" }),
-    getProducts({ category: "earrings", limit: 8 }),
-    getProducts({ filter: "bestseller", limit: 8, sort: "popular" }),
+    getProducts({ category: "bridal-sets", limit: 12 }),
+    getProducts({ category: "necklace-sets", limit: 12 }),
+    getProducts({ category: "bracelet", limit: 12 }),
+    getProducts({ filter: "new", limit: 12, sort: "newest" }),
+    getProducts({ category: "earrings", limit: 12 }),
+    getProducts({ filter: "bestseller", limit: 12, sort: "popular" }),
+    getProducts({ filter: "featured", limit: 12, sort: "newest" }),
     getLatestBlogPosts(3),
     getCmsBundle(),
   ]);
@@ -34,9 +36,8 @@ export default async function HomePage() {
       braceletProducts={bracelet.products}
       bridalProducts={bridal.products}
       bestSelling={bestSelling.products}
-      bestSellingCount={bestSelling.total}
       newArrivals={newArrivals.products}
-      newArrivalsCount={newArrivals.total}
+      featuredProducts={featured.products}
       blogPosts={blogPosts}
       hero={cms.hero}
       homepage={cms.homepage}

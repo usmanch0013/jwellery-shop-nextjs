@@ -1,63 +1,164 @@
 "use client";
 
-import { useState } from "react";
-import { Minus, Plus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Minus, Plus, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Product } from "@/types";
+import { Product, ProductVariation } from "@/types";
 import { formatPrice } from "@/lib/products/format";
-import { discountPercent, isOnSale } from "@/lib/products/sale";
+import { discountPercent, isOnSale, normalizeSalePrices } from "@/lib/products/sale";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
+import { sanitizeHtml } from "@/lib/security/sanitize-html";
 import { toast } from "sonner";
 import PaymentBadges from "./PaymentBadges";
+import { cn } from "@/lib/utils";
+import { whatsAppUrl } from "@/lib/whatsapp";
 
 interface ProductPurchasePanelProps {
   product: Product;
+  onVariationChange?: (variation: ProductVariation | null) => void;
 }
 
-const WHATSAPP_NUMBER = "923001234567";
 const BURGUNDY = "#6F112B";
+
+function variationLabel(variation: ProductVariation) {
+  const attrs = variation.attributes ?? {};
+  const parts = [attrs.size, attrs.color].filter(Boolean);
+  if (parts.length > 0) return parts.join(" · ");
+  return variation.name;
+}
+
+function effectiveProduct(product: Product, variation: ProductVariation | null): Product {
+  if (!variation) return product;
+  const { price, originalPrice } = normalizeSalePrices(
+    variation.price ?? product.price,
+    variation.originalPrice ?? product.originalPrice ?? null
+  );
+  return {
+    ...product,
+    price,
+    originalPrice,
+    stock: variation.stock,
+    soldOut: variation.stock <= 0,
+    image: variation.imageUrl || product.image,
+  };
+}
 
 export default function ProductPurchasePanel({
   product,
+  onVariationChange,
 }: ProductPurchasePanelProps) {
+  const variations = product.variations ?? [];
+  const hasVariations = variations.length > 0;
+  const defaultVariation =
+    variations.find((v) => v.isDefault) ?? variations[0] ?? null;
+
+  const [selectedVariationId, setSelectedVariationId] = useState<string | null>(
+    defaultVariation?.id ?? null
+  );
   const [quantity, setQuantity] = useState(1);
   const [descOpen, setDescOpen] = useState(false);
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const router = useRouter();
+  const wished = isInWishlist(product.id);
 
-  const stockCount = product.soldOut ? 0 : (product.stock ?? 50);
+  const selectedVariation = useMemo(
+    () => variations.find((v) => v.id === selectedVariationId) ?? null,
+    [variations, selectedVariationId]
+  );
+
+  const displayProduct = effectiveProduct(product, selectedVariation);
+  const stockCount = displayProduct.soldOut ? 0 : (displayProduct.stock ?? 0);
+
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariationId]);
+
+  useEffect(() => {
+    onVariationChange?.(selectedVariation);
+  }, [selectedVariation, onVariationChange]);
+
+  const cartOptions =
+    selectedVariation
+      ? {
+          variationId: selectedVariation.id,
+          variationName: variationLabel(selectedVariation),
+        }
+      : undefined;
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    if (hasVariations && !selectedVariation) {
+      toast.error("Please choose an option first");
+      return;
+    }
+    if (selectedVariation && selectedVariation.stock <= 0) {
+      toast.error("This option is out of stock");
+      return;
+    }
+    addToCart(product, quantity, cartOptions);
     toast.success("Added to cart");
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
+    if (hasVariations && !selectedVariation) {
+      toast.error("Please choose an option first");
+      return;
+    }
+    addToCart(product, quantity, cartOptions);
     router.push("/checkout");
   };
 
-  const whatsappMessage = encodeURIComponent(
-    `Hi, I want to order:\n${product.name}\n${formatPrice(product.price)}\nQty: ${quantity}`
+  const whatsappHref = whatsAppUrl(
+    `Hi, I want to order:\n${product.name}${
+      selectedVariation ? ` (${variationLabel(selectedVariation)})` : ""
+    }\n${formatPrice(displayProduct.price)}\nQty: ${quantity}`
   );
 
-  const onSale = isOnSale(product);
-  const salePercent = discountPercent(product);
+  const onSale = isOnSale(displayProduct);
+  const salePercent = discountPercent(displayProduct);
+  const descriptionHtml = sanitizeHtml(product.description);
 
   return (
     <div className="w-full font-sans text-[#3b3933]">
-      <h1 className="font-sans text-[24px] font-semibold leading-[1.3] tracking-[-0.02em] text-[#3b3933] lg:text-[26px]">
-        {product.name}
-      </h1>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-sans text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-[#3b3933] sm:text-[24px] lg:text-[26px]">
+            {product.name}
+          </h1>
+          {product.shortDescription && (
+            <p className="mt-2 text-[14px] leading-relaxed text-[#5c5852]">
+              {product.shortDescription}
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => void toggleWishlist(product)}
+          className={cn(
+            "mt-1 shrink-0 rounded-full p-2.5 transition-colors",
+            wished
+              ? "bg-rose-500 text-white"
+              : "border border-[#e8e2d4] text-[#3b3933] hover:border-[#3b3933]"
+          )}
+          aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <Heart
+            className="h-5 w-5"
+            fill={wished ? "currentColor" : "none"}
+            strokeWidth={1.5}
+          />
+        </button>
+      </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2.5">
         <p className="font-sans text-[20px] font-medium leading-none text-[#3b3933] lg:text-[22px]">
-          {formatPrice(product.price)}
+          {formatPrice(displayProduct.price)}
         </p>
-        {onSale && product.originalPrice && (
+        {onSale && displayProduct.originalPrice && (
           <>
             <p className="text-[16px] text-[#888] line-through">
-              {formatPrice(product.originalPrice)}
+              {formatPrice(displayProduct.originalPrice)}
             </p>
             {salePercent > 0 && (
               <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white">
@@ -68,7 +169,37 @@ export default function ProductPurchasePanel({
         )}
       </div>
 
-      {!product.soldOut && stockCount > 0 && (
+      {hasVariations && (
+        <div className="mt-6 space-y-2.5">
+          <p className="text-[14px] font-semibold text-[#3b3933]">Options</p>
+          <div className="flex flex-wrap gap-2">
+            {variations.map((variation) => {
+              const active = variation.id === selectedVariationId;
+              const outOfStock = variation.stock <= 0;
+              return (
+                <button
+                  key={variation.id}
+                  type="button"
+                  disabled={outOfStock}
+                  onClick={() => setSelectedVariationId(variation.id)}
+                  className={cn(
+                    "rounded-full border px-4 py-2 text-[13px] font-medium transition-colors",
+                    active
+                      ? "border-[#6F112B] bg-[#6F112B] text-white"
+                      : "border-[#e8e2d4] bg-white text-[#3b3933] hover:border-[#6F112B]/40",
+                    outOfStock && "cursor-not-allowed opacity-40"
+                  )}
+                >
+                  {variationLabel(variation)}
+                  {outOfStock ? " (Out of stock)" : ""}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {!displayProduct.soldOut && stockCount > 0 && (
         <div className="mt-3.5 flex items-center gap-2">
           <span className="h-[8px] w-[8px] shrink-0 rounded-full bg-[#22c55e]" />
           <span className="text-[13px] leading-none text-[#3d8b4a]">
@@ -77,7 +208,7 @@ export default function ProductPurchasePanel({
         </div>
       )}
 
-      {product.soldOut && (
+      {displayProduct.soldOut && (
         <p className="mt-3.5 text-[13px] text-[#e53935]">Sold out</p>
       )}
 
@@ -102,17 +233,18 @@ export default function ProductPurchasePanel({
 
         <div className="product-zeesy-accordion" data-open={descOpen}>
           <div className="overflow-hidden">
-            <div className="pb-5 text-[14px] leading-[1.7] text-[#5c5852]">
-              <p>{product.description}</p>
-              {product.material && (
-                <p className="mt-3 text-[#8a8680]">Material: {product.material}</p>
-              )}
-            </div>
+            <div
+              className="prose prose-sm max-w-none pb-5 text-[14px] leading-[1.7] text-[#5c5852]"
+              dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+            />
+            {product.material && (
+              <p className="pb-5 text-[#8a8680]">Material: {product.material}</p>
+            )}
           </div>
         </div>
       </div>
 
-      {!product.soldOut && (
+      {!displayProduct.soldOut && (
         <div className="mt-7">
           <div className="flex items-center justify-between">
             <span className="text-[14px] font-semibold text-[#3b3933]">
@@ -133,8 +265,11 @@ export default function ProductPurchasePanel({
               </span>
               <button
                 type="button"
-                onClick={() => setQuantity((q) => q + 1)}
-                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60"
+                onClick={() =>
+                  setQuantity((q) => Math.min(stockCount, q + 1))
+                }
+                className="flex h-11 w-9 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                disabled={quantity >= stockCount}
                 aria-label="Increase quantity"
               >
                 <Plus className="h-3.5 w-3.5" strokeWidth={2} />
@@ -162,7 +297,7 @@ export default function ProductPurchasePanel({
             </button>
 
             <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${whatsappMessage}`}
+              href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-12 w-full items-center justify-center gap-2 rounded-[16px] bg-[#25D366] text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#20bd5a]"

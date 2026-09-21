@@ -78,7 +78,11 @@ export async function fetchCartItems(): Promise<CartItem[]> {
       (await resolveCanonicalProductId(row.product_id)) ?? row.product_id;
     const product = await getProductById(canonicalId);
     if (product && !product.soldOut) {
-      items.push({ product, quantity: row.quantity });
+      items.push({
+        product,
+        quantity: row.quantity,
+        lineId: product.id,
+      });
     }
   }
   return items;

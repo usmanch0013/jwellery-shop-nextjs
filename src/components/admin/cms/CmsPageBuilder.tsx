@@ -250,8 +250,8 @@ export default function CmsPageBuilder({ page }: { page: CmsPage }) {
   const [history, setHistory] = useState<CmsPageSection[][]>([initialSections]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(initialSections[0]?.id ?? null);
-  const [leftOpen, setLeftOpen] = useState(true);
-  const [rightOpen, setRightOpen] = useState(true);
+  const [leftOpen, setLeftOpen] = useState(false);
+  const [rightOpen, setRightOpen] = useState(false);
   const [leftTab, setLeftTab] = useState<"elements" | "navigator">("elements");
   const [widgetSearch, setWidgetSearch] = useState("");
   const [viewport, setViewport] = useState<Viewport>("desktop");
@@ -272,6 +272,22 @@ export default function CmsPageBuilder({ page }: { page: CmsPage }) {
     [sections, seo, pageTitle]
   );
   const isDirty = savedFingerprint !== "" && contentFingerprint !== savedFingerprint;
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1280px)");
+    const syncPanels = () => {
+      if (mq.matches) {
+        setLeftOpen(true);
+        setRightOpen(true);
+      } else {
+        setLeftOpen(false);
+        setRightOpen(false);
+      }
+    };
+    syncPanels();
+    mq.addEventListener("change", syncPanels);
+    return () => mq.removeEventListener("change", syncPanels);
+  }, []);
 
   useEffect(() => {
     const next = normalizePageSections(page);

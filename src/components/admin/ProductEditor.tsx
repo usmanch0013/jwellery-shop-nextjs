@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowDown,
@@ -37,9 +37,13 @@ import { updateMediaAction } from "@/actions/admin/media";
 import { createProductTagAction } from "@/actions/admin/tags";
 import { cn } from "@/lib/utils";
 import { normalizeSalePrices } from "@/lib/products/sale";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 const inputClass =
   "w-full h-10 rounded-xl border border-border/70 bg-background px-3 text-sm";
+
+const UNSAVED_LEAVE_MESSAGE =
+  "You have unsaved changes. If you leave this page, your changes will be lost.";
 
 function FormField({
   label,
@@ -95,7 +99,7 @@ function emptyVariation(): VariationRow {
 }
 
 function variationsManageStock(rows: VariationRow[]) {
-  return rows.some((v) => v.name.trim() && v.stock.trim() !== "");
+  return rows.some((v) => v.name.trim());
 }
 
 function variationStockTotal(rows: VariationRow[]) {
@@ -114,23 +118,46 @@ function adminPriceDefaults(product?: AdminProductDetails | null) {
   return { regular: product.price ? String(product.price) : "", sale: "" };
 }
 
+function variationAdminPriceDefaults(
+  v: AdminProductDetails["variations"][number]
+) {
+  const { price, originalPrice } = normalizeSalePrices(
+    v.price ?? 0,
+    v.original_price
+  );
+  if (originalPrice && originalPrice > price) {
+    return { regular: String(originalPrice), sale: String(price) };
+  }
+  if (v.price != null) {
+    return { regular: String(v.price), sale: "" };
+  }
+  return { regular: "", sale: "" };
+}
+
 function mapVariation(
-  v: AdminProductDetails["variations"][number],
-  keepVariationStock: boolean
+  v: AdminProductDetails["variations"][number]
 ): VariationRow {
   const attrs = (v.attributes ?? {}) as Record<string, string>;
+  const prices = variationAdminPriceDefaults(v);
   return {
     id: v.id,
     sku: v.sku ?? "",
     name: v.name,
-    price: v.price != null ? String(v.price) : "",
-    originalPrice: v.original_price != null ? String(v.original_price) : "",
-    stock: keepVariationStock ? String(v.stock) : "",
+    price: prices.regular,
+    originalPrice: prices.sale,
+    stock: String(v.stock),
     imageUrl: v.image_url ?? "",
     size: attrs.size ?? "",
     color: attrs.color ?? "",
     isDefault: v.is_default,
   };
+}
+
+function plainTextLength(value: string) {
+  return value
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim().length;
 }
 
 export default function ProductEditor({
@@ -149,6 +176,7 @@ export default function ProductEditor({
   const skipLeaveSave = useRef(false);
   const persistDraftRef = useRef<() => Promise<string | null>>(async () => null);
   const draftIdRef = useRef<string | null>(product?.id ?? null);
+  const savedSnapshotRef = useRef<string>("");
   const [isPending, startTransition] = useTransition();
   const [savingDraft, setSavingDraft] = useState(false);
   const [draftId, setDraftId] = useState(product?.id ?? null);
@@ -175,8 +203,7 @@ export default function ProductEditor({
   const [variations, setVariations] = useState<VariationRow[]>(() => {
     const rows = product?.variations ?? [];
     if (rows.length === 0) return [];
-    const keepVariationStock = rows.some((v) => v.stock > 0);
-    return rows.map((v) => mapVariation(v, keepVariationStock));
+    return rows.map((v) => mapVariation(v));
   });
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mediaMode, setMediaMode] = useState<
@@ -185,6 +212,7 @@ export default function ProductEditor({
   const [variationImageIndex, setVariationImageIndex] = useState<number | null>(
     null
   );
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   const slugPreview = product?.slug ?? "product-slug";
   const filteredTags = tags.filter((t) =>
@@ -220,6 +248,65 @@ export default function ProductEditor({
 
   const usesVariationStock = variationsManageStock(variations);
 
+  const captureSnapshot = useCallback(() => {
+    const form = formRef.current;
+    if (!form) return "";
+
+    const fd = new FormData(form);
+    const variationRows = variations
+      .filter((v) => v.name.trim())
+      .map((v) => ({
+        id: v.id ?? "",
+        sku: v.sku,
+        name: v.name,
+        price: v.price,
+        originalPrice: v.originalPrice,
+        stock: v.stock,
+        imageUrl: v.imageUrl,
+        size: v.size,
+        color: v.color,
+        isDefault: v.isDefault,
+      }));
+
+    return JSON.stringify({
+      name: String(fd.get("name") ?? "").trim(),
+      slug: String(fd.get("slug") ?? "").trim(),
+      sku: String(fd.get("sku") ?? "").trim(),
+      shortDescription: String(fd.get("shortDescription") ?? ""),
+      description: String(fd.get("description") ?? ""),
+      price: String(fd.get("price") ?? ""),
+      originalPrice: String(fd.get("originalPrice") ?? ""),
+      material: String(fd.get("material") ?? "").trim(),
+      status: String(fd.get("status") ?? ""),
+      categoryId: String(fd.get("categoryId") ?? ""),
+      isNew: fd.get("isNew") === "on",
+      isBestseller: fd.get("isBestseller") === "on",
+      soldOut: fd.get("soldOut") === "on",
+      featuredImage,
+      hoverImage,
+      stockQty,
+      gallery,
+      selectedTagIds: [...selectedTagIds].sort(),
+      variations: variationRows,
+    });
+  }, [
+    featuredImage,
+    hoverImage,
+    stockQty,
+    gallery,
+    selectedTagIds,
+    variations,
+  ]);
+
+  const isDirty = useCallback(() => {
+    if (!savedSnapshotRef.current) return false;
+    return captureSnapshot() !== savedSnapshotRef.current;
+  }, [captureSnapshot]);
+
+  const markSaved = useCallback(() => {
+    savedSnapshotRef.current = captureSnapshot();
+  }, [captureSnapshot]);
+
   function applyEditorFields(formData: FormData) {
     formData.set("image", featuredImage);
     formData.set("hoverImage", hoverImage);
@@ -229,25 +316,38 @@ export default function ProductEditor({
     );
     formData.set("galleryJson", JSON.stringify(gallery));
     formData.set("tagIdsJson", JSON.stringify(selectedTagIds));
+    const variationRows = variations.filter((v) => v.name.trim());
+    const defaultIndex = Math.max(
+      0,
+      variationRows.findIndex((v) => v.isDefault)
+    );
+
     formData.set(
       "variationsJson",
       JSON.stringify(
-        variations
-          .filter((v) => v.name.trim())
-          .map((v, index) => ({
-            id: v.id,
-            sku: v.sku || undefined,
-            name: v.name.trim(),
-            price: v.price ? Number(v.price) : null,
-            originalPrice: v.originalPrice ? Number(v.originalPrice) : null,
-            stock: Number(v.stock) || 0,
-            imageUrl: v.imageUrl || undefined,
-            attributes: {
-              ...(v.size ? { size: v.size } : {}),
-              ...(v.color ? { color: v.color } : {}),
-            },
-            isDefault: v.isDefault || index === 0,
-          }))
+        variationRows.map((v, index) => {
+          const regular = v.price.trim() ? Number(v.price) : null;
+          const sale = v.originalPrice.trim() ? Number(v.originalPrice) : null;
+          const normalized = normalizeSalePrices(
+            regular ?? sale ?? 0,
+            sale
+          );
+          return {
+          id: v.id,
+          sku: v.sku || undefined,
+          name: v.name.trim(),
+          price:
+            regular != null || sale != null ? normalized.price : null,
+          originalPrice: normalized.originalPrice ?? null,
+          stock: Number(v.stock) || 0,
+          imageUrl: v.imageUrl || undefined,
+          attributes: {
+            ...(v.size ? { size: v.size } : {}),
+            ...(v.color ? { color: v.color } : {}),
+          },
+          isDefault: index === defaultIndex,
+        };
+        })
       )
     );
   }
@@ -279,6 +379,7 @@ export default function ProductEditor({
         window.history.replaceState(null, "", `/admin/products/${result.id}`);
       }
       setSuccess("Draft saved.");
+      markSaved();
     }
     return result.id ?? null;
   }
@@ -288,41 +389,63 @@ export default function ProductEditor({
   });
 
   useEffect(() => {
-    const shouldAutosave = !product || product.status === "draft";
-    if (!shouldAutosave) return;
+    const timer = window.setTimeout(() => {
+      markSaved();
+      setHasUnsavedChanges(false);
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [product?.id, markSaved]);
 
-    const onClick = (event: MouseEvent) => {
-      if (skipLeaveSave.current) return;
+  useEffect(() => {
+    const syncDirty = () => {
+      setHasUnsavedChanges(isDirty());
+    };
+    syncDirty();
+    const form = formRef.current;
+    if (!form) return;
+    form.addEventListener("input", syncDirty);
+    form.addEventListener("change", syncDirty);
+    const interval = window.setInterval(syncDirty, 800);
+    return () => {
+      form.removeEventListener("input", syncDirty);
+      form.removeEventListener("change", syncDirty);
+      window.clearInterval(interval);
+    };
+  }, [isDirty, product?.id, featuredImage, gallery, variations, selectedTagIds]);
+
+  useEffect(() => {
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (skipLeaveSave.current || !isDirty()) return;
+      event.preventDefault();
+      event.returnValue = UNSAVED_LEAVE_MESSAGE;
+    };
+
+    const onDocumentClick = (event: MouseEvent) => {
+      if (skipLeaveSave.current || !isDirty()) return;
+
       const anchor = (event.target as HTMLElement).closest("a");
       if (!anchor || anchor.target === "_blank") return;
       const href = anchor.getAttribute("href");
       if (!href || href.startsWith("#")) return;
-      if (/^https?:\/\//i.test(href) && !href.includes(window.location.host)) {
+      if (anchor.hasAttribute("download")) return;
+
+      if (
+        !window.confirm(`${UNSAVED_LEAVE_MESSAGE}\n\nLeave this page?`)
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
         return;
       }
-      if (draftIdRef.current && href.includes(`/admin/products/${draftIdRef.current}`)) {
-        return;
-      }
-      event.preventDefault();
-      event.stopPropagation();
       skipLeaveSave.current = true;
-      void persistDraftRef.current().finally(() => {
-        router.push(href);
-      });
     };
 
-    const onPageHide = () => {
-      if (skipLeaveSave.current) return;
-      void persistDraftRef.current();
-    };
-
-    document.addEventListener("click", onClick, true);
-    window.addEventListener("pagehide", onPageHide);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    document.addEventListener("click", onDocumentClick, true);
     return () => {
-      document.removeEventListener("click", onClick, true);
-      window.removeEventListener("pagehide", onPageHide);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      document.removeEventListener("click", onDocumentClick, true);
     };
-  }, [product, router]);
+  }, [isDirty]);
 
   function addGalleryUrl() {
     const url = imageUrlInput.trim();
@@ -398,26 +521,43 @@ export default function ProductEditor({
       return;
     }
 
+    const status = String(formData.get("status") ?? "published").trim();
     const description = String(formData.get("description") ?? "").trim();
     const material = String(formData.get("material") ?? "").trim();
     const price = Number(formData.get("price"));
-    if (description.length < 10) {
-      setError("Add a product description (at least 10 characters) before publishing.");
-      setTab("general");
-      return;
-    }
-    if (!Number.isFinite(price) || price <= 0) {
-      setError("Add a price before publishing.");
-      setTab("inventory");
-      return;
-    }
-    if (material.length < 2) {
-      setError("Add a material before publishing.");
-      setTab("inventory");
-      return;
+    const namedVariations = variations.filter((v) => v.name.trim());
+
+    if (status === "published") {
+      if (plainTextLength(description) < 10) {
+        setError(
+          "Add a full description (at least 10 characters) before publishing."
+        );
+        setTab("general");
+        return;
+      }
+      if (!Number.isFinite(price) || price <= 0) {
+        setError("Add a price before publishing.");
+        setTab("inventory");
+        return;
+      }
+      if (material.length < 2) {
+        setError("Add a material before publishing.");
+        setTab("inventory");
+        return;
+      }
+      if (namedVariations.length > 0) {
+        const invalidVariation = namedVariations.find(
+          (v) => Number(v.stock) < 0 || !v.name.trim()
+        );
+        if (invalidVariation) {
+          setError("Check variation names and stock in the Variations tab.");
+          setTab("variations");
+          return;
+        }
+      }
     }
 
-    formData.set("status", "published");
+    formData.set("status", status);
     applyEditorFields(formData);
 
     startTransition(async () => {
@@ -430,9 +570,42 @@ export default function ProductEditor({
       if (result && "error" in result && result.error) {
         skipLeaveSave.current = false;
         setError(result.error);
-      } else if (id) {
-        setSuccess("Product published.");
+        return;
       }
+
+      const isPublishing =
+        status === "published" && product?.status !== "published";
+
+      const createdId =
+        result &&
+        typeof result === "object" &&
+        "id" in result &&
+        typeof result.id === "string"
+          ? result.id
+          : null;
+
+      if (createdId && !id) {
+        setDraftId(createdId);
+        draftIdRef.current = createdId;
+        window.history.replaceState(null, "", `/admin/products/${createdId}`);
+      }
+
+      markSaved();
+      setHasUnsavedChanges(false);
+
+      if (isPublishing) {
+        router.push("/admin/products");
+      } else {
+        skipLeaveSave.current = false;
+        setSuccess(
+          product?.status === "published"
+            ? "Product updated."
+            : status === "published"
+              ? "Product published."
+              : "Product saved."
+        );
+      }
+      router.refresh();
     });
   }
 
@@ -451,6 +624,30 @@ export default function ProductEditor({
         className="grid items-start gap-8 xl:grid-cols-[minmax(0,1fr)_320px]"
       >
         <div className="min-w-0 space-y-6">
+          {(isEdit || draftId) && (
+            <div className="flex flex-col gap-3 rounded-xl border border-[#008060]/25 bg-[#008060]/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-[#004c3f]">
+                  {isEdit ? "Update product" : "New product"}
+                </p>
+                <p className="text-[13px] text-[#5c5852]">
+                  {hasUnsavedChanges
+                    ? "You have unsaved changes — save before leaving this page."
+                    : "All changes saved. Status is set in the panel on the right."}
+                </p>
+              </div>
+              <Button type="submit" disabled={isPending} className="shrink-0">
+                {isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save changes"
+                )}
+              </Button>
+            </div>
+          )}
           {error && (
             <p className="rounded-xl bg-red-50 p-4 text-sm text-red-600">
               {error}
@@ -503,18 +700,14 @@ export default function ProductEditor({
                 </FormField>
               </div>
 
-              <FormField
+              <RichTextEditor
+                name="shortDescription"
                 label="Short description"
-                hint="Shown on product cards and listings"
-              >
-                <textarea
-                  name="shortDescription"
-                  defaultValue={product?.short_description ?? ""}
-                  rows={3}
-                  className={`${inputClass} min-h-[88px] resize-y py-2.5`}
-                  placeholder="Brief summary for listings"
-                />
-              </FormField>
+                defaultValue={product?.short_description ?? ""}
+                rows={5}
+                placeholder="Brief summary for listings and product page"
+                showHelper
+              />
             </div>
 
             <div className="flex overflow-x-auto border-b border-border/50">
@@ -540,22 +733,18 @@ export default function ProductEditor({
 
             <div className="p-6">
               <div hidden={tab !== "general"}>
-                <FormField
+                <RichTextEditor
+                  name="description"
                   label="Full description"
-                  hint="Detailed product information for the product page"
-                >
-                  <textarea
-                    name="description"
-                    defaultValue={product?.description}
-                    rows={10}
-                    className={`${inputClass} min-h-[220px] resize-y py-3`}
-                    placeholder="Full product description..."
-                  />
-                </FormField>
+                  defaultValue={product?.description ?? ""}
+                  rows={14}
+                  placeholder="Detailed product information for the product page"
+                  showHelper
+                />
               </div>
 
               <div hidden={tab !== "inventory"} className="space-y-6">
-                  <div className="grid gap-5 sm:grid-cols-3">
+                  <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                     <FormField
                       label="Regular price (Rs.)"
                       hint="Price before discount"
@@ -687,22 +876,39 @@ export default function ProductEditor({
                                 placeholder="SKU-001"
                               />
                             </FormField>
-                            <FormField label="Price (Rs.)">
+                            <FormField
+                              label="Regular price (Rs.)"
+                              hint="MRP for this option"
+                            >
                               <Input
                                 type="number"
+                                min={0}
                                 value={v.price}
                                 onChange={(e) =>
                                   updateVariation(index, {
                                     price: e.target.value,
                                   })
                                 }
-                                placeholder="Leave empty for base price"
+                                placeholder="Optional — uses product price"
                               />
                             </FormField>
                             <FormField
-                              label="Stock"
-                              hint="Leave empty to manage stock in Inventory"
+                              label="Sale price (Rs.)"
+                              hint="Customer pays this"
                             >
+                              <Input
+                                type="number"
+                                min={0}
+                                value={v.originalPrice}
+                                onChange={(e) =>
+                                  updateVariation(index, {
+                                    originalPrice: e.target.value,
+                                  })
+                                }
+                                placeholder="Optional"
+                              />
+                            </FormField>
+                            <FormField label="Stock">
                               <Input
                                 type="number"
                                 min={0}
@@ -969,8 +1175,8 @@ export default function ProductEditor({
           </AdminCard>
         </div>
 
-        <aside className="space-y-5 xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
-          <AdminCard title="Publish">
+        <aside className="space-y-5 lg:max-w-none xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto">
+          <AdminCard title={isEdit ? "Save & status" : "Publish"}>
             <div className="space-y-4">
               <FormField label="Status">
                 <select
@@ -988,8 +1194,10 @@ export default function ProductEditor({
                   {isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Publishing...
+                      Saving...
                     </>
+                  ) : isEdit ? (
+                    "Save changes"
                   ) : (
                     "Publish product"
                   )}
@@ -1104,12 +1312,12 @@ export default function ProductEditor({
                   ))
                 )}
               </div>
-              <div className="flex gap-2 border-t border-border/50 pt-4">
+              <div className="flex flex-col gap-2 border-t border-border/50 pt-4 sm:flex-row">
                 <Input
                   value={newTagName}
                   onChange={(e) => setNewTagName(e.target.value)}
                   placeholder="New tag name"
-                  className="h-9"
+                  className="h-9 min-w-0 flex-1"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -1152,6 +1360,14 @@ export default function ProductEditor({
                   defaultChecked={product?.is_bestseller}
                 />
                 Bestseller
+              </label>
+              <label className="flex cursor-pointer items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  defaultChecked={product?.is_featured}
+                />
+                Featured on homepage
               </label>
               <label className="flex cursor-pointer items-center gap-2.5">
                 <input

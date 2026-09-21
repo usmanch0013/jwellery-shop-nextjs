@@ -24,6 +24,7 @@ export default function ShopContent({
   const router = useRouter();
   const urlParams = useSearchParams();
   const activeCategory = searchParams.category ?? "all";
+  const activeFilter = searchParams.filter ?? "all";
 
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(
     null
@@ -33,6 +34,14 @@ export default function ShopContent({
     const params = new URLSearchParams(urlParams.toString());
     if (slug === "all") params.delete("category");
     else params.set("category", slug);
+    params.delete("page");
+    router.push(`/shop?${params.toString()}`);
+  }
+
+  function setFilter(filter: string) {
+    const params = new URLSearchParams(urlParams.toString());
+    if (filter === "all") params.delete("filter");
+    else params.set("filter", filter);
     params.delete("page");
     router.push(`/shop?${params.toString()}`);
   }
@@ -56,9 +65,9 @@ export default function ShopContent({
             {initialData.total} products
           </p>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-6">
+          <div className="-mx-1 mb-6 flex justify-center overflow-x-auto px-1 pb-1">
             <select
-              className="border px-3 py-2 text-xs uppercase tracking-wider"
+              className="w-full max-w-[280px] border px-3 py-2 text-xs uppercase tracking-wider sm:w-auto"
               value={searchParams.sort ?? "newest"}
               onChange={(e) => setSort(e.target.value)}
               aria-label="Sort products"
@@ -70,10 +79,33 @@ export default function ShopContent({
             </select>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
+          <div className="-mx-1 mb-6 flex flex-nowrap justify-start gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:justify-center">
+            {[
+              { id: "all", label: "All products" },
+              { id: "new", label: "New arrivals" },
+              { id: "bestseller", label: "Best sellers" },
+              { id: "featured", label: "Featured" },
+              { id: "sale", label: "On sale" },
+            ].map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setFilter(f.id)}
+                className={`shrink-0 rounded-full border px-4 py-2 text-[11px] uppercase tracking-wider transition-colors ${
+                  activeFilter === f.id
+                    ? "border-primary bg-primary text-white"
+                    : "border-[#ddd] text-[#555] hover:border-primary"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="-mx-1 mb-10 flex flex-nowrap gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:justify-center">
             <button
               onClick={() => setCategory("all")}
-              className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
+              className={`shrink-0 px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                 activeCategory === "all"
                   ? "bg-primary text-white border-primary"
                   : "border-[#ddd] text-[#555] hover:border-primary"
@@ -87,7 +119,7 @@ export default function ShopContent({
               <button
                 key={cat.slug}
                 onClick={() => setCategory(cat.slug)}
-                className={`px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
+                className={`shrink-0 px-4 py-2 text-[11px] uppercase tracking-wider border transition-colors ${
                   activeCategory === cat.slug
                     ? "bg-primary text-white border-primary"
                     : "border-[#ddd] text-[#555] hover:border-primary"

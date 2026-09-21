@@ -35,6 +35,24 @@ export interface CmsPromoBanner {
   bgColor: "champagne" | "primary";
 }
 
+/** Storefront sale / offer popup — edit in Admin → CMS → Homepage */
+export interface CmsPromoPopup {
+  enabled: boolean;
+  /** Bump when you change the offer so visitors see the popup again */
+  version: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  productName: string;
+  discountText: string;
+  description: string;
+  imageUrl: string;
+  ctaLabel: string;
+  ctaHref: string;
+  /** Hide popup for this many days after dismiss */
+  dismissDays: number;
+}
+
 export interface CmsHomepageSections {
   seoBlock: { title: string; body: string };
   collectionsTitle: string;
@@ -102,6 +120,7 @@ export interface CmsBundle {
   hero: CmsHeroSettings;
   homepage: CmsHomepageSections;
   video: CmsVideoSettings;
+  promoPopup: CmsPromoPopup;
   trustFeatures: CmsTrustFeature[];
   testimonials: CmsTestimonial[];
   faqs: CmsFaq[];

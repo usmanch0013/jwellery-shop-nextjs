@@ -44,7 +44,11 @@ export default async function CategoryPage({
         </p>
       </div>
 
-      <CategoryPageClient products={result.products} />
+      <CategoryPageClient
+        products={result.products}
+        slug={slug}
+        sort={sp.sort ?? "newest"}
+      />
       <Pagination
         basePath={`/categories/${slug}`}
         pagination={result}

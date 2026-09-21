@@ -11,6 +11,7 @@ import type {
   CmsTestimonial,
   CmsTrustFeature,
   CmsVideoSettings,
+  CmsPromoPopup,
 } from "@/lib/cms/types";
 import { createSection } from "@/lib/cms/page-sections";
 import type { CmsPageSection } from "@/lib/cms/page-sections";
@@ -62,6 +63,12 @@ export async function saveCmsHomepageSectionsAction(sections: CmsHomepageSection
 
 export async function saveCmsVideoAction(video: CmsVideoSettings) {
   const result = await upsertSetting("homepage.video", video);
+  revalidatePath("/admin/cms/homepage");
+  return result;
+}
+
+export async function saveCmsPromoPopupAction(popup: CmsPromoPopup) {
+  const result = await upsertSetting("promo.popup", popup);
   revalidatePath("/admin/cms/homepage");
   return result;
 }
@@ -122,7 +129,7 @@ export async function createCmsPageAction(title: string, slugInput?: string) {
     title: titleTrim,
     eyebrow: null,
     content: "",
-    seo_title: `${titleTrim} | Lumière Jewellery`,
+    seo_title: `${titleTrim} | SHE Collection`,
     seo_description: "",
     hero_image: null,
     blocks: [section],

@@ -45,18 +45,20 @@ export default function ContactPageClient({
       icon: Phone,
       title: "Call Us",
       text: site.phone,
+      href: site.phone ? `tel:${site.phone.replace(/\s/g, "")}` : undefined,
     },
     {
       icon: Mail,
       title: "Email Us",
       text: site.email,
+      href: site.email ? `mailto:${site.email}` : undefined,
     },
     {
       icon: Clock,
       title: "Opening Hours",
       text: site.hours,
     },
-  ];
+  ] as const;
 
   return (
     <div className="py-12 lg:py-16">
@@ -67,7 +69,7 @@ export default function ContactPageClient({
           <p className="text-gold uppercase tracking-[0.3em] text-sm mb-2">
             {eyebrow}
           </p>
-          <h1 className="text-4xl lg:text-5xl font-serif font-semibold">
+          <h1 className="text-3xl font-serif font-semibold sm:text-4xl lg:text-5xl">
             {pageTitle}
           </h1>
         </div>
@@ -81,7 +83,16 @@ export default function ContactPageClient({
                 </div>
                 <div>
                   <h3 className="font-medium mb-1">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.text}</p>
+                  {"href" in item && item.href ? (
+                    <a
+                      href={item.href}
+                      className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      {item.text}
+                    </a>
+                  ) : (
+                    <p className="text-muted-foreground text-sm">{item.text}</p>
+                  )}
                 </div>
               </div>
             ))}
@@ -89,7 +100,7 @@ export default function ContactPageClient({
 
           <form
             onSubmit={handleSubmit}
-            className="p-8 border border-border rounded-lg space-y-6"
+            className="space-y-6 rounded-lg border border-border p-5 sm:p-8"
           >
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>

@@ -10,6 +10,7 @@ import {
   DEFAULT_HEADER_NAV,
   DEFAULT_HERO,
   DEFAULT_HOMEPAGE,
+  DEFAULT_PROMO_POPUP,
   DEFAULT_SITE,
   DEFAULT_TRUST_FEATURES,
   DEFAULT_VIDEO,
@@ -25,6 +26,7 @@ import type {
   CmsTestimonial,
   CmsTrustFeature,
   CmsVideoSettings,
+  CmsPromoPopup,
 } from "@/lib/cms/types";
 import {
   SITE_PAGE_REGISTRY,
@@ -34,6 +36,12 @@ import {
 } from "@/lib/cms/page-registry";
 import { getPagePublicPath } from "@/lib/cms/page-utils";
 import { faqs as defaultFaqs, testimonials as defaultTestimonials } from "@/data/site";
+import {
+  LEGAL_PAGES,
+  LEGAL_PAGE_SLUGS,
+  type LegalPageSlug,
+} from "@/lib/cms/legal-content";
+import { ABOUT_PAGE_CONTENT, ABOUT_PAGE_SEO } from "@/lib/cms/about-content";
 
 export interface AdminSitePageRow {
   slug: string;
@@ -68,12 +76,46 @@ async function getSetting<T>(key: string, defaults: T): Promise<T> {
   }
 }
 
+function isLegacySite(site: CmsSiteSettings): boolean {
+  const blob = `${site.brandName} ${site.marqueeText} ${site.seoTitle}`.toLowerCase();
+  return blob.includes("lumière") || blob.includes("lumiere") || blob.includes("award winning");
+}
+
 export async function getCmsSiteSettings(): Promise<CmsSiteSettings> {
-  return getSetting("site", DEFAULT_SITE);
+  const stored = await getSetting("site", DEFAULT_SITE);
+  if (isLegacySite(stored)) {
+    return { ...DEFAULT_SITE };
+  }
+  return { ...DEFAULT_SITE, ...stored };
+}
+
+function isLegacyHero(hero: CmsHeroSettings): boolean {
+  const headline = `${hero.headlineLine1} ${hero.headlineLine2}`.toLowerCase();
+  return (
+    headline.includes("togetherness") ||
+    headline.includes("celebrate") ||
+    headline.includes("wear your") ||
+    /award winning/i.test(hero.eyebrow ?? "") ||
+    (hero.backgroundImage?.includes("unsplash") ?? false) ||
+    hero.backgroundVideo?.includes("intro-video") === true
+  );
+}
+
+export function normalizeHeroSettings(hero: CmsHeroSettings): CmsHeroSettings {
+  if (isLegacyHero(hero)) {
+    return { ...DEFAULT_HERO };
+  }
+  return {
+    ...DEFAULT_HERO,
+    ...hero,
+    backgroundVideo: DEFAULT_HERO.backgroundVideo,
+    backgroundImage: DEFAULT_HERO.backgroundImage,
+  };
 }
 
 export async function getCmsHero(): Promise<CmsHeroSettings> {
-  return getSetting("homepage.hero", DEFAULT_HERO);
+  const stored = await getSetting("homepage.hero", DEFAULT_HERO);
+  return normalizeHeroSettings(stored);
 }
 
 export async function getCmsHomepageSections(): Promise<CmsHomepageSections> {
@@ -93,6 +135,11 @@ export async function getCmsHomepageSections(): Promise<CmsHomepageSections> {
 
 export async function getCmsVideo(): Promise<CmsVideoSettings> {
   return getSetting("homepage.video", DEFAULT_VIDEO);
+}
+
+export async function getCmsPromoPopup(): Promise<CmsPromoPopup> {
+  const stored = await getSetting("promo.popup", DEFAULT_PROMO_POPUP);
+  return { ...DEFAULT_PROMO_POPUP, ...stored };
 }
 
 export async function getCmsTrustFeatures(): Promise<CmsTrustFeature[]> {
@@ -185,6 +232,51 @@ export async function getCmsFaqs(): Promise<CmsFaq[]> {
   }
 }
 
+function toNavLinks(
+  location: CmsNavLink["location"],
+  items: Array<{ label: string; href: string }>
+): CmsNavLink[] {
+  return items.map((l, i) => ({
+    id: `${location}-${i}`,
+    location,
+    label: l.label,
+    href: l.href,
+    sort_order: i + 1,
+    is_visible: true,
+  }));
+}
+
+function ensureBlogNavLink(
+  location: CmsNavLink["location"],
+  links: CmsNavLink[]
+): CmsNavLink[] {
+  const hasBlog = links.some(
+    (l) => l.href === "/blog" || l.label.toLowerCase() === "blog"
+  );
+  if (hasBlog) return links;
+
+  const blogLink: CmsNavLink = {
+    id: `${location}-blog`,
+    location,
+    label: "Blog",
+    href: "/blog",
+    sort_order: links.length + 1,
+    is_visible: true,
+  };
+
+  if (location === "header") {
+    const collectionsAt = links.findIndex((l) =>
+      l.href.includes("#collections")
+    );
+    const insertAt = collectionsAt >= 0 ? collectionsAt + 1 : Math.max(links.length - 2, 0);
+    return [...links.slice(0, insertAt), blogLink, ...links.slice(insertAt)];
+  }
+
+  const aboutAt = links.findIndex((l) => l.href === "/about");
+  const insertAt = aboutAt >= 0 ? aboutAt + 1 : links.length;
+  return [...links.slice(0, insertAt), blogLink, ...links.slice(insertAt)];
+}
+
 export async function getCmsNavLinks(
   location: CmsNavLink["location"]
 ): Promise<CmsNavLink[]> {
@@ -196,14 +288,7 @@ export async function getCmsNavLinks(
         : DEFAULT_FOOTER_LEGAL;
 
   if (!isSupabaseConfigured()) {
-    return fallback.map((l, i) => ({
-      id: `${location}-${i}`,
-      location,
-      label: l.label,
-      href: l.href,
-      sort_order: i + 1,
-      is_visible: true,
-    }));
+    return ensureBlogNavLink(location, toNavLinks(location, fallback));
   }
   try {
     const client = (await getPublicCmsClient()) ?? getCmsAdminReadClient();
@@ -215,25 +300,11 @@ export async function getCmsNavLinks(
       .eq("is_visible", true)
       .order("sort_order", { ascending: true });
     if (!data?.length) {
-      return fallback.map((l, i) => ({
-        id: `${location}-${i}`,
-        location,
-        label: l.label,
-        href: l.href,
-        sort_order: i + 1,
-        is_visible: true,
-      }));
+      return ensureBlogNavLink(location, toNavLinks(location, fallback));
     }
-    return data as CmsNavLink[];
+    return ensureBlogNavLink(location, data as CmsNavLink[]);
   } catch {
-    return fallback.map((l, i) => ({
-      id: `${location}-${i}`,
-      location,
-      label: l.label,
-      href: l.href,
-      sort_order: i + 1,
-      is_visible: true,
-    }));
+    return ensureBlogNavLink(location, toNavLinks(location, fallback));
   }
 }
 
@@ -259,6 +330,37 @@ export async function getAdminCmsNavLinks(
   }
 }
 
+function enrichLegalPage(page: CmsPage): CmsPage {
+  const blocks = page.blocks ?? [];
+  const hasBuilderBlocks = Array.isArray(blocks) && blocks.length > 0;
+
+  if (page.slug === "about" && !hasBuilderBlocks) {
+    return {
+      ...page,
+      title: "About SHE Collection",
+      eyebrow: page.eyebrow ?? "Our Story",
+      content: ABOUT_PAGE_CONTENT,
+      seo_title: ABOUT_PAGE_SEO.title,
+      seo_description: ABOUT_PAGE_SEO.description,
+    };
+  }
+
+  if (!LEGAL_PAGE_SLUGS.includes(page.slug as LegalPageSlug)) return page;
+  const legal = LEGAL_PAGES[page.slug as LegalPageSlug];
+  if (!legal) return page;
+  if (!hasBuilderBlocks) {
+    return {
+      ...page,
+      title: legal.title,
+      eyebrow: legal.eyebrow,
+      content: legal.content,
+      seo_title: legal.seo_title,
+      seo_description: legal.seo_description,
+    };
+  }
+  return page;
+}
+
 export async function getCmsPage(slug: string): Promise<CmsPage | null> {
   if (!isSupabaseConfigured()) {
     const fallback = DEFAULT_CMS_PAGES.find((p) => p.slug === slug);
@@ -272,7 +374,7 @@ export async function getCmsPage(slug: string): Promise<CmsPage | null> {
       .select("*")
       .eq("slug", slug)
       .maybeSingle();
-    if (data) return data as CmsPage;
+    if (data) return enrichLegalPage(data as CmsPage);
     const fallback = DEFAULT_CMS_PAGES.find((p) => p.slug === slug);
     return fallback ? ({ ...fallback, blocks: [...fallback.blocks] } as CmsPage) : null;
   } catch {
@@ -364,6 +466,7 @@ export async function getCmsBundle(): Promise<CmsBundle> {
     hero,
     homepage,
     video,
+    promoPopup,
     trustFeatures,
     testimonials,
     faqs,
@@ -375,6 +478,7 @@ export async function getCmsBundle(): Promise<CmsBundle> {
     getCmsHero(),
     getCmsHomepageSections(),
     getCmsVideo(),
+    getCmsPromoPopup(),
     getCmsTrustFeatures(),
     getCmsTestimonials(),
     getCmsFaqs(),
@@ -388,6 +492,7 @@ export async function getCmsBundle(): Promise<CmsBundle> {
     hero,
     homepage,
     video,
+    promoPopup,
     trustFeatures,
     testimonials: testimonials.filter((t) => t.is_published),
     faqs: faqs.filter((f) => f.is_published),

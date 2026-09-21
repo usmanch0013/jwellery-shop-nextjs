@@ -155,6 +155,14 @@ export default function ProductForm({
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
+            name="isFeatured"
+            defaultChecked={product?.is_featured}
+          />
+          Featured
+        </label>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
             name="soldOut"
             defaultChecked={product?.sold_out}
           />

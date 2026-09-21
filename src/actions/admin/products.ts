@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { sanitizeHtml } from "@/lib/security/sanitize-html";
 
 const variationInputSchema = z.object({
   id: z.string().optional(),
@@ -25,18 +26,19 @@ const productSchema = z.object({
   name: z.string().min(2),
   slug: z.string().optional(),
   shortDescription: z.string().optional(),
-  description: z.string().min(10),
+  description: z.string().min(1),
   sku: z.string().optional(),
   status: z.enum(["draft", "published"]).default("published"),
-  price: z.coerce.number().positive(),
+  price: z.coerce.number().min(0),
   originalPrice: z.coerce.number().optional(),
   categoryId: z.string().uuid(),
-  material: z.string().min(2),
+  material: z.string().min(1).default("Mixed"),
   stock: z.coerce.number().int().min(0),
   image: z.string().min(1),
   hoverImage: z.string().optional(),
   isNew: z.coerce.boolean().optional(),
   isBestseller: z.coerce.boolean().optional(),
+  isFeatured: z.coerce.boolean().optional(),
   soldOut: z.coerce.boolean().optional(),
   gallery: z.array(z.string().min(1)).default([]),
   tagIds: z.array(z.string().uuid()).default([]),
@@ -92,12 +94,13 @@ function parseProductForm(formData: FormData) {
     price,
     originalPrice,
     categoryId: formData.get("categoryId"),
-    material: formData.get("material"),
+    material: String(formData.get("material") ?? "").trim() || "Mixed",
     stock: formData.get("stock"),
     image: formData.get("image"),
     hoverImage: formData.get("hoverImage"),
     isNew: formData.get("isNew") === "on",
     isBestseller: formData.get("isBestseller") === "on",
+    isFeatured: formData.get("isFeatured") === "on",
     soldOut: formData.get("soldOut") === "on",
     gallery,
     tagIds,
@@ -180,9 +183,18 @@ async function nextProductSortOrder(admin: SupabaseClient) {
   return (data?.sort_order ?? -1) + 1;
 }
 
+function formatProductFormError(
+  parsed: { success: false; error: z.ZodError }
+) {
+  const message = parsed.error.issues
+    .map((issue: z.ZodIssue) => issue.message)
+    .join(" · ");
+  return message || "Invalid product data";
+}
+
 export async function createProductAction(formData: FormData) {
   const parsed = parseProductForm(formData);
-  if (!parsed.success) return { error: "Invalid product data" };
+  if (!parsed.success) return { error: formatProductFormError(parsed) };
 
   const admin = await getAdminClient();
   const data = parsed.data;
@@ -196,10 +208,10 @@ export async function createProductAction(formData: FormData) {
     .insert({
       name: data.name,
       slug,
-      short_description: data.shortDescription ?? "",
+      short_description: sanitizeHtml(data.shortDescription ?? ""),
       sku: data.sku || null,
       status: data.status,
-      description: data.description,
+      description: sanitizeHtml(data.description),
       price: data.price,
       original_price: data.originalPrice ?? null,
       category_id: data.categoryId,
@@ -209,6 +221,7 @@ export async function createProductAction(formData: FormData) {
       hover_image: data.hoverImage || null,
       is_new: data.isNew ?? false,
       is_bestseller: data.isBestseller ?? false,
+      is_featured: data.isFeatured ?? false,
       sold_out: soldOut,
       sort_order: sortOrder,
     })
@@ -225,12 +238,17 @@ export async function createProductAction(formData: FormData) {
 
   await refreshCategoryProductCounts(admin);
   revalidateProductPaths(slug, product.id);
-  redirect(`/admin/products/${product.id}`);
+
+  if (data.status === "published") {
+    redirect("/admin/products");
+  }
+
+  return { success: true as const, id: product.id };
 }
 
 export async function updateProductAction(id: string, formData: FormData) {
   const parsed = parseProductForm(formData);
-  if (!parsed.success) return { error: "Invalid product data" };
+  if (!parsed.success) return { error: formatProductFormError(parsed) };
 
   const admin = await getAdminClient();
   const data = parsed.data;
@@ -243,10 +261,10 @@ export async function updateProductAction(id: string, formData: FormData) {
     .update({
       name: data.name,
       slug,
-      short_description: data.shortDescription ?? "",
+      short_description: sanitizeHtml(data.shortDescription ?? ""),
       sku: data.sku || null,
       status: data.status,
-      description: data.description,
+      description: sanitizeHtml(data.description),
       price: data.price,
       original_price: data.originalPrice ?? null,
       category_id: data.categoryId,
@@ -256,6 +274,7 @@ export async function updateProductAction(id: string, formData: FormData) {
       hover_image: data.hoverImage || null,
       is_new: data.isNew ?? false,
       is_bestseller: data.isBestseller ?? false,
+      is_featured: data.isFeatured ?? false,
       sold_out: soldOut,
       updated_at: new Date().toISOString(),
     })
@@ -308,6 +327,7 @@ const draftSchema = z.object({
   hoverImage: z.string().optional(),
   isNew: z.coerce.boolean().optional(),
   isBestseller: z.coerce.boolean().optional(),
+  isFeatured: z.coerce.boolean().optional(),
   soldOut: z.coerce.boolean().optional(),
   gallery: z.array(z.string()).default([]),
   tagIds: z.array(z.string().uuid()).default([]),
@@ -368,6 +388,7 @@ function parseDraftForm(formData: FormData) {
     hoverImage: formData.get("hoverImage") || undefined,
     isNew: formData.get("isNew") === "on",
     isBestseller: formData.get("isBestseller") === "on",
+    isFeatured: formData.get("isFeatured") === "on",
     soldOut: formData.get("soldOut") === "on",
     gallery,
     tagIds,
@@ -405,10 +426,10 @@ export async function saveProductDraftAction(
   const row = {
     name,
     slug,
-    short_description: data.shortDescription ?? "",
+    short_description: sanitizeHtml(data.shortDescription ?? ""),
     sku: data.sku || null,
     status: "draft" as const,
-    description: data.description ?? "",
+    description: sanitizeHtml(data.description ?? ""),
     price: data.price ?? 0,
     original_price: data.originalPrice ?? null,
     category_id: categoryId,
@@ -418,6 +439,7 @@ export async function saveProductDraftAction(
     hover_image: data.hoverImage || null,
     is_new: data.isNew ?? false,
     is_bestseller: data.isBestseller ?? false,
+    is_featured: data.isFeatured ?? false,
     sold_out: data.soldOut || stock <= 0,
     updated_at: new Date().toISOString(),
   };
@@ -474,6 +496,7 @@ const bulkUpdateSchema = z.object({
   categoryId: z.string().uuid().optional(),
   isNew: z.boolean().optional(),
   isBestseller: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
   soldOut: z.boolean().optional(),
   stock: z.coerce.number().int().min(0).optional(),
   regularPrice: z.coerce.number().positive().optional(),
@@ -533,6 +556,12 @@ export async function bulkUpdateProductsAction(formData: FormData) {
         : formData.get("isBestseller") === "false"
           ? false
           : undefined,
+    isFeatured:
+      formData.get("isFeatured") === "true"
+        ? true
+        : formData.get("isFeatured") === "false"
+          ? false
+          : undefined,
     soldOut:
       formData.get("soldOut") === "true"
         ? true
@@ -554,6 +583,7 @@ export async function bulkUpdateProductsAction(formData: FormData) {
   if (rest.categoryId) patch.category_id = rest.categoryId;
   if (rest.isNew !== undefined) patch.is_new = rest.isNew;
   if (rest.isBestseller !== undefined) patch.is_bestseller = rest.isBestseller;
+  if (rest.isFeatured !== undefined) patch.is_featured = rest.isFeatured;
   if (rest.soldOut !== undefined) patch.sold_out = rest.soldOut;
   if (rest.stock !== undefined) patch.stock = rest.stock;
 

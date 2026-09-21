@@ -1,16 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  calculateOrderTotal,
+  calculateShipping,
   FREE_SHIPPING_THRESHOLD,
   PAYMENT_METHOD_LABELS,
   PK_PROVINCES,
-  STANDARD_SHIPPING_FEE,
 } from "@/lib/constants/commerce";
 import { formatPrice } from "@/lib/products/format";
 import { placeOrderAction, validateCoupon } from "@/actions/orders";
@@ -56,9 +58,8 @@ export default function CheckoutForm() {
     notes: "",
   });
 
-  const shipping =
-    totalPrice >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_FEE;
-  const total = Math.max(0, totalPrice - discount + shipping);
+  const shipping = calculateShipping(totalPrice);
+  const total = calculateOrderTotal(totalPrice, discount, shipping);
 
   function validateShipping(): string | null {
     const result = shippingAddressSchema.safeParse({
@@ -180,33 +181,36 @@ export default function CheckoutForm() {
 
   if (!items.length) {
     return (
-      <p className="text-center py-20 text-muted-foreground">
-        Your cart is empty.{" "}
-        <a href="/shop" className="text-primary underline">
-          Continue shopping
-        </a>
-      </p>
+      <div className="py-16 text-center sm:py-20">
+        <p className="text-muted-foreground">
+          Your cart is empty.{" "}
+          <Link href="/shop" className="font-medium text-primary underline">
+            Continue shopping
+          </Link>
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="grid lg:grid-cols-3 gap-10">
-      <div className="lg:col-span-2 space-y-6">
-        <div className="flex gap-2 mb-6">
+    <div className="grid gap-8 lg:grid-cols-3 lg:gap-10">
+      <div className="space-y-6 lg:col-span-2">
+        <div className="mb-2 flex gap-1.5 sm:gap-2">
           {STEPS.map((s, i) => (
             <button
               key={s}
               type="button"
               onClick={() => i < step && setStep(i)}
-              className={`flex-1 py-2 text-xs uppercase tracking-wider border ${
+              className={`flex-1 rounded-lg border py-2.5 text-[10px] uppercase tracking-wider transition-colors sm:text-xs ${
                 i === step
-                  ? "bg-primary text-white border-primary"
+                  ? "border-primary bg-primary text-white"
                   : i < step
                     ? "border-primary text-primary"
                     : "border-border text-muted-foreground"
               }`}
             >
-              {i + 1}. {s}
+              <span className="hidden sm:inline">{i + 1}. </span>
+              {s}
             </button>
           ))}
         </div>
@@ -279,7 +283,7 @@ export default function CheckoutForm() {
               <div>
                 <Label>Province</Label>
                 <select
-                  className="w-full h-9 border border-input px-3 text-sm"
+                  className="mt-1.5 flex h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
                   value={form.province}
                   onChange={(e) =>
                     setForm({
@@ -307,10 +311,10 @@ export default function CheckoutForm() {
             {Object.entries(PAYMENT_METHOD_LABELS).map(([key, label]) => (
               <label
                 key={key}
-                className={`flex items-center gap-3 p-4 border cursor-pointer ${
+                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-4 transition-colors ${
                   form.paymentMethod === key
                     ? "border-primary bg-primary/5"
-                    : "border-border"
+                    : "border-border hover:border-primary/30"
                 }`}
               >
                 <input
@@ -325,7 +329,7 @@ export default function CheckoutForm() {
             ))}
 
             {form.paymentMethod === "bank_transfer" && (
-              <div className="bg-muted p-4 text-sm space-y-1">
+              <div className="rounded-lg bg-muted p-4 text-sm space-y-1">
                 <p>
                   <strong>Bank:</strong>{" "}
                   {process.env.NEXT_PUBLIC_BANK_NAME ?? "HBL"}
@@ -377,7 +381,7 @@ export default function CheckoutForm() {
 
         {step === 2 && (
           <div className="space-y-4">
-            <div className="bg-muted p-4 text-sm space-y-2">
+            <div className="rounded-lg bg-muted p-4 text-sm space-y-2">
               <p>
                 <strong>Ship to:</strong> {form.fullName}, {form.line1},{" "}
                 {form.city}, {form.province}
@@ -402,24 +406,27 @@ export default function CheckoutForm() {
         )}
       </div>
 
-      <div className="border border-border p-6 h-fit space-y-4">
+      <div className="h-fit space-y-4 rounded-xl border border-border bg-white p-5 sm:p-6 lg:sticky lg:top-28">
         <h2 className="font-serif text-lg">Order Summary</h2>
+        <div className="max-h-48 space-y-2 overflow-y-auto sm:max-h-none">
         {items.map((item) => (
-          <div key={item.product.id} className="flex justify-between text-sm">
-            <span>
+          <div key={item.product.id} className="flex justify-between gap-3 text-sm">
+            <span className="min-w-0 flex-1 truncate">
               {item.product.name} × {item.quantity}
             </span>
-            <span>{formatPrice(item.product.price * item.quantity)}</span>
+            <span className="shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
           </div>
         ))}
-        <div className="border-t pt-3 space-y-2 text-sm">
-          <div className="flex gap-2">
+        </div>
+        <div className="space-y-2 border-t pt-3 text-sm">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Input
               placeholder="Coupon code"
               value={couponCode}
               onChange={(e) => setCouponCode(e.target.value)}
+              className="flex-1"
             />
-            <Button type="button" variant="outline" onClick={applyCoupon}>
+            <Button type="button" variant="outline" className="shrink-0" onClick={applyCoupon}>
               Apply
             </Button>
           </div>
@@ -439,7 +446,12 @@ export default function CheckoutForm() {
               {shipping === 0 ? "Free" : formatPrice(shipping)}
             </span>
           </div>
-          <div className="flex justify-between font-medium text-base pt-2 border-t">
+          {totalPrice < FREE_SHIPPING_THRESHOLD && (
+            <p className="text-xs text-muted-foreground">
+              Add {formatPrice(FREE_SHIPPING_THRESHOLD - totalPrice)} more for free shipping
+            </p>
+          )}
+          <div className="flex justify-between border-t pt-2 text-base font-medium">
             <span>Total</span>
             <span>{formatPrice(total)}</span>
           </div>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 48" fill="none" role="img" aria-label="SHE Collection sheco.pk">
+  <g transform="translate(0,4)">
+    <rect width="40" height="40" rx="10" fill="#0B3D35"/>
+    <path d="M11 34V14h4l5.2 10 5.2-10h4v20h-3.8V24.8L22.6 34h-3.2l-4.6-8.8V34H11z" fill="#E8D5A8"/>
+    <path d="M29 14h3.6c4 0 6.6 2.2 6.6 6 0 2.4-1.2 4.2-3.2 5.2L38 34h-4.6l-3.4-5.2h-1.6V34H29V14zm3.6 8.8h1.2c1.6 0 2.4-.8 2.4-2.2s-.8-2.2-2.4-2.2h-1.2v4.4z" fill="#C9A96E"/>
+  </g>
+  <text x="52" y="22" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="500" fill="#1a1a1a">SHE</text>
+  <text x="52" y="40" font-family="Georgia, 'Times New Roman', serif" font-size="13" letter-spacing="0.22em" fill="#6b6560">COLLECTION</text>
+  <text x="198" y="36" font-family="system-ui, sans-serif" font-size="11" font-weight="600" letter-spacing="0.06em" fill="#0B3D35">sheco.pk</text>
+</svg>

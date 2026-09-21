@@ -1,12 +1,14 @@
 import Link from "next/link";
 import type { CategoryInfo } from "@/types";
 import type { CmsNavLink, CmsSiteSettings } from "@/lib/cms/types";
+import { BRAND } from "@/lib/brand";
 
 const defaultFooterLinks = [
   { label: "Track Your Order", href: "/track-order" },
   { label: "How To Order?", href: "/shipping-policy" },
   { label: "Shipping Rates", href: "/shipping-policy" },
   { label: "About Us", href: "/about" },
+  { label: "Blog", href: "/blog" },
   { label: "Contact Us", href: "/contact" },
   { label: "FAQs", href: "/#faq" },
 ];
@@ -22,10 +24,10 @@ export default function Footer({
   usefulLinks?: CmsNavLink[];
   legalLinks?: CmsNavLink[];
 }) {
-  const brandName = site?.brandName ?? "Lumière.pk";
+  const brandName = site?.brandName ?? BRAND.name;
   const brandDescription =
     site?.footerDescription ??
-    "Pakistan's award winning artificial jewellery brand. Premium quality pieces for every occasion since 2009.";
+    `Contemporary artificial jewellery from Pakistan since ${BRAND.foundedYear}. ${BRAND.tagline}`;
   const footerLinks =
     usefulLinks?.map((l) => ({ label: l.label, href: l.href })) ?? defaultFooterLinks;
   return (
@@ -90,6 +92,7 @@ export default function Footer({
                     { label: "Refund Policy", href: "/refund-policy" },
                     { label: "Privacy Policy", href: "/privacy" },
                     { label: "Shipping Policy", href: "/shipping-policy" },
+                    { label: "Cookie Policy", href: "/cookie-policy" },
                   ]
               ).map((item) => (
                 <li key={item.label}>
@@ -115,6 +118,9 @@ export default function Footer({
             </Link>
             <Link href="/privacy" className="hover:text-primary">
               Privacy
+            </Link>
+            <Link href="/cookie-policy" className="hover:text-primary">
+              Cookies
             </Link>
           </div>
         </div>

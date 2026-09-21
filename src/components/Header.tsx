@@ -25,6 +25,7 @@ const navLinks = [
   { label: "Best Sellers", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
   { label: "Collections", href: "/#collections" },
+  { label: "Blog", href: "/blog" },
   { label: "Track", href: "/track-order" },
   { label: "Reviews", href: "/#reviews" },
 ];
@@ -42,7 +43,7 @@ function shortLabel(label: string) {
 function isActive(href: string, pathname: string) {
   if (href === "/") return pathname === "/";
   if (href.includes("?") || href.includes("#")) return false;
-  return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export default function Header({
@@ -95,15 +96,15 @@ export default function Header({
         >
           <div className="mx-auto max-w-[var(--site-max)] px-[var(--site-px)]">
             <div
-              className={`flex items-center justify-between gap-6 ${
+              className={`flex items-center justify-between gap-2 sm:gap-4 ${
                 overHero ? "h-[4.75rem] lg:h-[5.25rem]" : "h-[var(--nav-height)]"
               }`}
             >
-              <div className="flex min-w-[168px] shrink-0 items-center">
+              <div className="flex min-w-0 flex-1 items-center xl:flex-initial">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`-ml-2 mr-1 lg:hidden ${iconClass}`}
+                  className={`-ml-2 mr-1 shrink-0 xl:hidden ${iconClass}`}
                   onClick={() => setMobileMenuOpen(true)}
                   aria-label="Menu"
                 >
@@ -131,35 +132,19 @@ export default function Header({
                 })}
               </nav>
 
-              <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex xl:hidden">
-                {links.slice(0, 5).map((link) => (
-                  <Link
-                    key={link.href + link.label}
-                    href={link.href}
-                    className={`text-[12px] font-medium tracking-[0.04em] transition-colors ${
-                      overHero
-                        ? "text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.65)] hover:text-champagne"
-                        : "text-[#2c2c2c]/80 hover:text-[#0B3D35]"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="flex min-w-[168px] shrink-0 items-center justify-end gap-1">
+              <div className="flex shrink-0 items-center justify-end gap-0 sm:gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setSearchOpen(true)}
                   aria-label="Search"
-                  className={`hover:bg-transparent ${iconClass}`}
+                  className={`size-8 hover:bg-transparent sm:size-9 ${iconClass}`}
                 >
-                  <Search className="h-[18px] w-[18px]" strokeWidth={1.6} />
+                  <Search className="h-[17px] w-[17px] sm:h-[18px] sm:w-[18px]" strokeWidth={1.6} />
                 </Button>
                 <Link
                   href="/wishlist"
-                  className={`relative inline-flex size-9 items-center justify-center transition-colors ${iconClass}`}
+                  className={`relative inline-flex size-8 items-center justify-center transition-colors sm:size-9 ${iconClass}`}
                   aria-label="Wishlist"
                 >
                   <Heart className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -171,16 +156,16 @@ export default function Header({
                 </Link>
                 <Link
                   href="/account"
-                  className={`inline-flex size-9 items-center justify-center transition-colors ${iconClass}`}
+                  className={`inline-flex size-8 items-center justify-center transition-colors sm:size-9 ${iconClass}`}
                   aria-label="Account"
                 >
-                  <User className="h-[18px] w-[18px]" strokeWidth={1.6} />
+                  <User className="h-[17px] w-[17px] sm:h-[18px] sm:w-[18px]" strokeWidth={1.6} />
                 </Link>
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setCartOpen(true)}
-                  className={`relative hover:bg-transparent ${iconClass}`}
+                  className={`relative size-8 hover:bg-transparent sm:size-9 ${iconClass}`}
                   aria-label="Cart"
                 >
                   <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.6} />
@@ -202,7 +187,7 @@ export default function Header({
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="left" className="w-80 overflow-y-auto bg-white">
           <SheetHeader>
-            <SheetTitle className="font-serif text-2xl">Lumière</SheetTitle>
+            <SheetTitle className="font-serif text-2xl">SHE Collection</SheetTitle>
           </SheetHeader>
           <nav className="mt-6 flex flex-col gap-0">
             {links.map((link) => (

@@ -1,13 +1,14 @@
 import type { DbInvoice, DbOrder, DbOrderItem } from "@/lib/database.types";
 import { PAYMENT_METHOD_LABELS } from "@/lib/constants/commerce";
+import { BRAND } from "@/lib/brand";
 
 export const STORE_INFO = {
-  name: "Lumière Jewellery",
-  tagline: "Premium Artificial Jewellery — Pakistan",
-  email: "hello@lumiere.pk",
-  phone: "+92 300 0000000",
-  address: "Lahore, Punjab, Pakistan",
-  website: "https://jwelleryshophsp.netlify.app",
+  name: BRAND.name,
+  tagline: BRAND.promise,
+  email: BRAND.email,
+  phone: BRAND.phone,
+  address: BRAND.address,
+  website: BRAND.siteUrl,
 };
 
 export interface InvoiceSnapshot {

@@ -3,7 +3,7 @@ import { getProfile } from "@/actions/auth";
 import UserDashboardLayout from "@/components/account/UserDashboardLayout";
 import { adminFont } from "@/lib/fonts/admin";
 
-export const metadata = { title: "My Account | Lumière Jewellery" };
+export const metadata = { title: "My Account | SHE Collection" };
 
 export default async function AccountLayout({
   children,

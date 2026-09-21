@@ -4,32 +4,36 @@ import type {
   CmsSiteSettings,
   CmsTrustFeature,
   CmsVideoSettings,
+  CmsPromoPopup,
 } from "@/lib/cms/types";
+import { LEGAL_PAGES } from "@/lib/cms/legal-content";
+import { ABOUT_PAGE_CONTENT, ABOUT_PAGE_SEO } from "@/lib/cms/about-content";
+import { BRAND } from "@/lib/brand";
 
 export const DEFAULT_SITE: CmsSiteSettings = {
-  brandName: "Lumière.pk",
-  tagline: "Pakistan's award winning artificial jewellery brand",
+  brandName: BRAND.name,
+  tagline: BRAND.tagline,
   footerDescription:
-    "Pakistan's award winning artificial jewellery brand. Premium quality pieces for every occasion since 2009.",
-  email: "hello@lumiere.pk",
-  phone: "+92 300 0000000",
-  address: "Lahore, Punjab, Pakistan",
+    `Contemporary artificial jewellery from Pakistan since ${BRAND.foundedYear}. ${BRAND.promise} Shop at ${BRAND.domain}.`,
+  email: BRAND.email,
+  phone: BRAND.phone,
+  address: BRAND.address,
   hours: "Mon–Sat: 10AM – 8PM",
-  seoTitle: "Artificial Jewellery in Pakistan | Lumière Jewellery",
+  seoTitle: `Artificial Jewellery in Pakistan | ${BRAND.name}`,
   seoDescription:
-    "Pakistan's award winning artificial jewellery brand. Shop necklace sets, earrings, bangles, bridal sets and more.",
-  topBarText: "Worldwide Shipping",
-  marqueeText: "Pakistan's 1st award winning Artificial Jewellery brand",
+    `Shop sleek artificial jewellery at ${BRAND.domain} — necklace sets, earrings, bangles & occasion wear. ${BRAND.tagline}`,
+  topBarText: "Nationwide & International Shipping",
+  marqueeText: `${BRAND.name} — Elegant Design · Trusted Quality · Contemporary Art`,
 };
 
 export const DEFAULT_HERO: CmsHeroSettings = {
-  eyebrow: "Pakistan's Award Winning Brand",
-  headlineLine1: "Jewels That Celebrate",
-  headlineLine2: "Togetherness.",
+  eyebrow: `${BRAND.name} · Since ${BRAND.foundedYear}`,
+  headlineLine1: "Elegant Artificial Jewellery",
+  headlineLine2: "For Every Occasion",
   description:
-    "Discover handcrafted artificial jewellery — necklace sets, bridal pieces, earrings & more. Crafted for every celebration.",
-  backgroundImage: "/hero-jewellery-poster.jpg",
-  backgroundVideo: "/hero-jewellery.mp4",
+    "Necklace sets, earrings, bangles & bridal pieces with contemporary design and premium finishing — trusted Pakistani style since 2017. Wear Your Art.",
+  backgroundImage: "/she-hero-poster.jpg",
+  backgroundVideo: "/she-hero.mp4",
   primaryCtaLabel: "Shop Collection",
   primaryCtaHref: "/shop",
   secondaryCtaLabel: "New Arrivals",
@@ -40,8 +44,8 @@ export const DEFAULT_HERO: CmsHeroSettings = {
 
 export const DEFAULT_HOMEPAGE: CmsHomepageSections = {
   seoBlock: {
-    title: "Artificial Jewellery in Pakistan",
-    body: "We as the growing and customer's favourite Artificial Jewellery Brand in Pakistan have a huge collection of precious jewels made from highest grade of materials and attention to detail.",
+    title: "Artificial Jewellery in Pakistan | SHE Collection",
+    body: `SHE Collection (${BRAND.domain}) is a trusted Pakistani artificial jewellery brand since ${BRAND.foundedYear}. Explore contemporary necklace sets, earrings, bangles, and statement pieces crafted with high-quality finishing for casual and formal wear.`,
   },
   collectionsTitle: "Our Collections",
   promoBanners: [
@@ -55,6 +59,7 @@ export const DEFAULT_HOMEPAGE: CmsHomepageSections = {
     "new-arrivals": "New Arrivals",
     earrings: "Earrings",
     "best-selling": "Best Selling Products",
+    featured: "Featured Products",
   },
   testimonials: {
     badge: "• TESTIMONIALS",
@@ -69,15 +74,31 @@ export const DEFAULT_HOMEPAGE: CmsHomepageSections = {
 };
 
 export const DEFAULT_VIDEO: CmsVideoSettings = {
-  backgroundVideo: "/intro-video.mp4",
-  posterImage: "/intro-video-poster.png",
-  youtubeUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+  backgroundVideo: "/hero-jewellery.mp4",
+  posterImage: "/hero-jewellery-poster.jpg",
+  youtubeUrl: "",
   features: [
-    { title: "Jewellery Exchanges", icon: "exchange" },
-    { title: "The Purity Guarantee", icon: "scale" },
-    { title: "Complete Transparent", icon: "diamond" },
-    { title: "Lifetime Maintenance", icon: "maintenance" },
+    { title: "Contemporary Designs", icon: "diamond" },
+    { title: "Premium Finishing", icon: "scale" },
+    { title: "Nationwide Delivery", icon: "exchange" },
+    { title: "Trusted Since 2017", icon: "maintenance" },
   ],
+};
+
+export const DEFAULT_PROMO_POPUP: CmsPromoPopup = {
+  enabled: true,
+  version: "1",
+  badge: "Limited Sale",
+  title: "Today’s Pick",
+  subtitle: "Special offer on selected jewellery",
+  productName: "Bridal Necklace Set",
+  discountText: "15% OFF",
+  description:
+    "Elegant artificial jewellery with premium finishing — perfect for weddings & parties. Update this popup anytime from Admin → Homepage.",
+  imageUrl: "/she-hero-poster.jpg",
+  ctaLabel: "Shop this deal",
+  ctaHref: "/shop?filter=sale",
+  dismissDays: 1,
 };
 
 export const DEFAULT_TRUST_FEATURES: CmsTrustFeature[] = [
@@ -104,6 +125,7 @@ export const DEFAULT_HEADER_NAV = [
   { label: "Best Sellers", href: "/shop?filter=bestseller" },
   { label: "New Arrivals", href: "/shop?filter=new" },
   { label: "Collections", href: "/#collections" },
+  { label: "Blog", href: "/blog" },
   { label: "Track", href: "/track-order" },
   { label: "Reviews", href: "/#reviews" },
 ];
@@ -113,6 +135,7 @@ export const DEFAULT_FOOTER_USEFUL = [
   { label: "How To Order?", href: "/shipping-policy" },
   { label: "Shipping Rates", href: "/shipping-policy" },
   { label: "About Us", href: "/about" },
+  { label: "Blog", href: "/blog" },
   { label: "Contact Us", href: "/contact" },
   { label: "FAQs", href: "/#faq" },
 ];
@@ -122,56 +145,67 @@ export const DEFAULT_FOOTER_LEGAL = [
   { label: "Refund Policy", href: "/refund-policy" },
   { label: "Privacy Policy", href: "/privacy" },
   { label: "Shipping Policy", href: "/shipping-policy" },
+  { label: "Cookie Policy", href: "/cookie-policy" },
 ];
 
 export const DEFAULT_CMS_PAGES = [
   {
     slug: "about",
-    title: "About Us",
+    title: "About SHE Collection",
     eyebrow: "Our Story",
-    content: "",
-    seo_title: "About Us | Lumière Jewellery",
-    seo_description: "Learn about Lumière jewellery.",
+    content: ABOUT_PAGE_CONTENT,
+    seo_title: ABOUT_PAGE_SEO.title,
+    seo_description: ABOUT_PAGE_SEO.description,
     hero_image: null,
     blocks: [],
   },
   {
     slug: "terms",
-    title: "Terms of Service",
-    eyebrow: null,
-    content: "By using Lumière Jewellery website, you agree to these terms.",
-    seo_title: "Terms of Service | Lumière Jewellery",
-    seo_description: "Terms of service.",
+    title: LEGAL_PAGES.terms.title,
+    eyebrow: LEGAL_PAGES.terms.eyebrow,
+    content: LEGAL_PAGES.terms.content,
+    seo_title: LEGAL_PAGES.terms.seo_title,
+    seo_description: LEGAL_PAGES.terms.seo_description,
     hero_image: null,
     blocks: [],
   },
   {
     slug: "privacy",
-    title: "Privacy Policy",
-    eyebrow: null,
-    content: "Lumière Jewellery respects your privacy.",
-    seo_title: "Privacy Policy | Lumière Jewellery",
-    seo_description: "Privacy policy.",
+    title: LEGAL_PAGES.privacy.title,
+    eyebrow: LEGAL_PAGES.privacy.eyebrow,
+    content: LEGAL_PAGES.privacy.content,
+    seo_title: LEGAL_PAGES.privacy.seo_title,
+    seo_description: LEGAL_PAGES.privacy.seo_description,
     hero_image: null,
     blocks: [],
   },
   {
     slug: "refund-policy",
-    title: "Refund Policy",
-    eyebrow: null,
-    content: "Our refund and return policy.",
-    seo_title: "Refund Policy | Lumière Jewellery",
-    seo_description: "Refund policy.",
+    title: LEGAL_PAGES["refund-policy"].title,
+    eyebrow: LEGAL_PAGES["refund-policy"].eyebrow,
+    content: LEGAL_PAGES["refund-policy"].content,
+    seo_title: LEGAL_PAGES["refund-policy"].seo_title,
+    seo_description: LEGAL_PAGES["refund-policy"].seo_description,
     hero_image: null,
     blocks: [],
   },
   {
     slug: "shipping-policy",
-    title: "Shipping Policy",
-    eyebrow: null,
-    content: "Shipping rates and delivery information.",
-    seo_title: "Shipping Policy | Lumière Jewellery",
-    seo_description: "Shipping policy.",
+    title: LEGAL_PAGES["shipping-policy"].title,
+    eyebrow: LEGAL_PAGES["shipping-policy"].eyebrow,
+    content: LEGAL_PAGES["shipping-policy"].content,
+    seo_title: LEGAL_PAGES["shipping-policy"].seo_title,
+    seo_description: LEGAL_PAGES["shipping-policy"].seo_description,
+    hero_image: null,
+    blocks: [],
+  },
+  {
+    slug: "cookie-policy",
+    title: LEGAL_PAGES["cookie-policy"].title,
+    eyebrow: LEGAL_PAGES["cookie-policy"].eyebrow,
+    content: LEGAL_PAGES["cookie-policy"].content,
+    seo_title: LEGAL_PAGES["cookie-policy"].seo_title,
+    seo_description: LEGAL_PAGES["cookie-policy"].seo_description,
     hero_image: null,
     blocks: [],
   },
@@ -180,8 +214,8 @@ export const DEFAULT_CMS_PAGES = [
     title: "Contact Us",
     eyebrow: "Get in Touch",
     content: "We would love to hear from you.",
-    seo_title: "Contact | Lumière Jewellery",
-    seo_description: "Contact support.",
+    seo_title: `Contact | ${BRAND.name}`,
+    seo_description: `Contact ${BRAND.name} at ${BRAND.email} — orders, shipping, and product questions.`,
     hero_image: null,
     blocks: [],
   },

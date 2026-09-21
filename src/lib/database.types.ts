@@ -46,6 +46,7 @@ export interface DbProduct {
   stock: number;
   is_new: boolean;
   is_bestseller: boolean;
+  is_featured?: boolean;
   sold_out: boolean;
   rating_avg: number;
   review_count: number;

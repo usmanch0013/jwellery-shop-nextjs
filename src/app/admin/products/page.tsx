@@ -5,6 +5,7 @@ import {
   type AdminProductFilters,
 } from "@/lib/admin/queries";
 import AdminProductsClient from "@/components/admin/AdminProductsClient";
+import ProductExportMenu from "@/components/admin/ProductExportMenu";
 import { buttonVariants } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,7 +18,7 @@ function buildPageUrl(page: number, filters: AdminProductFilters) {
   if (filters.categoryId) params.set("category", filters.categoryId);
   if (filters.status && filters.status !== "all") params.set("status", filters.status);
   if (filters.flag && filters.flag !== "all") params.set("flag", filters.flag);
-  if (filters.sort && filters.sort !== "manual") params.set("sort", filters.sort);
+  if (filters.sort && filters.sort !== "newest") params.set("sort", filters.sort);
   const qs = params.toString();
   return qs ? `/admin/products?${qs}` : "/admin/products";
 }
@@ -47,18 +48,20 @@ export default async function AdminProductsPage({
     flag:
       sp.flag === "new" ||
       sp.flag === "bestseller" ||
+      sp.flag === "featured" ||
       sp.flag === "sale" ||
       sp.flag === "sold_out" ||
       sp.flag === "low_stock"
         ? sp.flag
         : "all",
     sort:
+      sp.sort === "manual" ||
       sp.sort === "newest" ||
       sp.sort === "price_asc" ||
       sp.sort === "price_desc" ||
       sp.sort === "name"
         ? sp.sort
-        : "manual",
+        : "newest",
   };
 
   const [{ products, total, limit }, categories] = await Promise.all([
@@ -73,13 +76,16 @@ export default async function AdminProductsPage({
         title="Products"
         description={`${total} product${total === 1 ? "" : "s"} in your catalog`}
         actions={
-          <Link
-            href="/admin/products/new"
-            className={cn(buttonVariants(), "inline-flex gap-1.5")}
-          >
-            <Plus className="w-4 h-4" />
-            Add product
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <ProductExportMenu />
+            <Link
+              href="/admin/products/new"
+              className={cn(buttonVariants(), "inline-flex gap-1.5")}
+            >
+              <Plus className="w-4 h-4" />
+              Add product
+            </Link>
+          </div>
         }
       />
 

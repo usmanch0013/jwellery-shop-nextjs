@@ -13,7 +13,7 @@ export async function generateMetadata({
   return {
     title: data
       ? `${data.order.order_number} | My Orders`
-      : "Order | Lumière Jewellery",
+      : "Order | SHE Collection Jewellery",
   };
 }
 

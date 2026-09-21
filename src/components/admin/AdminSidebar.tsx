@@ -120,7 +120,7 @@ export default function AdminSidebar({
         </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[var(--admin-text)]">
-            Lumière
+            SHE Collection
           </p>
           <p className="truncate text-[11px] text-[var(--admin-text-subdued)]">
             Admin
@@ -184,8 +184,8 @@ export default function AdminSidebar({
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-[240px] shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-sidebar)] min-h-screen">
+      {/* Desktop sidebar — h-screen keeps logout pinned at the bottom */}
+      <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col border-r border-[var(--admin-border)] bg-[var(--admin-sidebar)] lg:flex">
         {content}
       </aside>
 
@@ -229,7 +229,7 @@ export function AdminTopBar({
         <Menu className="h-5 w-5" />
       </button>
 
-      <form onSubmit={handleSearch} className="relative flex-1 max-w-xl">
+      <form onSubmit={handleSearch} className="relative min-w-0 flex-1 max-w-xl">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-subdued)]" />
         <input
           name="q"
@@ -245,6 +245,17 @@ export function AdminTopBar({
         <BarChart3 className="h-4 w-4" />
         Analytics
       </Link>
+
+      <form action={logoutAction} className="ml-auto sm:ml-0">
+        <button
+          type="submit"
+          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-medium text-[var(--admin-text-subdued)] hover:bg-[var(--admin-bg)]"
+          title="Log out"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden sm:inline">Log out</span>
+        </button>
+      </form>
     </header>
   );
 }

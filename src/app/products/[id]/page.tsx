@@ -1,8 +1,10 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BRAND, absoluteUrl } from "@/lib/brand";
 import ProductCard from "@/components/ProductCard";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import CustomerReviews from "@/components/product/CustomerReviews";
-import ProductGallery from "@/components/product/ProductGallery";
-import ProductPurchasePanel from "@/components/product/ProductPurchasePanel";
+import ProductDetailView from "@/components/product/ProductDetailView";
 import {
   getProductBySlug,
   getRelatedProducts,
@@ -15,22 +17,29 @@ interface ProductPageProps {
   params: Promise<{ id: string }>;
 }
 
-function getGalleryImages(product: {
-  image: string;
-  hoverImage?: string;
-  images?: string[];
-}) {
-  const fromProduct = [
-    product.image,
-    product.hoverImage,
-    ...(product.images ?? []),
-  ].filter((img): img is string => Boolean(img));
+export async function generateMetadata({
+  params,
+}: ProductPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProductBySlug(id);
+  if (!product) return { title: "Product not found" };
 
-  const unique = [...new Set(fromProduct)];
-  while (unique.length < 4 && unique.length > 0) {
-    unique.push(unique[unique.length % fromProduct.length]);
-  }
-  return unique.slice(0, 5);
+  const title = `${product.name} | ${BRAND.name}`;
+  const description =
+    product.description?.replace(/<[^>]+>/g, " ").slice(0, 160).trim() ||
+    `Buy ${product.name} — artificial jewellery from ${BRAND.name}. Shop at ${BRAND.domain}.`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/products/${id}` },
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(`/products/${id}`),
+      images: product.image ? [{ url: product.image }] : undefined,
+    },
+  };
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
@@ -40,20 +49,48 @@ export default async function ProductPage({ params }: ProductPageProps) {
   if (!product) notFound();
 
   const relatedProducts = await getRelatedProducts(product, 4);
-  const galleryImages = getGalleryImages(product);
   const productCode = (product.legacyId ?? product.id).slice(0, 22).toUpperCase();
+
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    image: product.image ? [product.image] : undefined,
+    description: product.description?.slice(0, 500),
+    sku: product.sku ?? productCode,
+    brand: { "@type": "Brand", name: BRAND.name },
+    offers: {
+      "@type": "Offer",
+      url: absoluteUrl(`/products/${id}`),
+      priceCurrency: "PKR",
+      price: product.price,
+      availability:
+        !product.soldOut && (product.stock ?? 1) > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+    },
+  };
 
   return (
     <div className="product-zeesy bg-white">
-      <div className="mx-auto max-w-[1280px] px-4 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
         <div className="py-6 lg:py-10">
+          <Breadcrumbs
+            items={[
+              { label: "Shop", href: "/shop" },
+              {
+                label: product.category.replace(/-/g, " "),
+                href: `/categories/${product.category}`,
+              },
+              { label: product.name },
+            ]}
+          />
           <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10 xl:gap-14">
-            <ProductGallery
-              images={galleryImages}
-              productName={product.name}
-              productCode={productCode}
-            />
-            <ProductPurchasePanel product={product} />
+            <ProductDetailView product={product} productCode={productCode} />
           </div>
         </div>
 

@@ -127,7 +127,7 @@ export default function Testimonials({
           </div>
 
           {/* Heading */}
-          <h2 className="text-left font-serif text-[44px] font-normal leading-[1.2] text-white lg:text-[60px]">
+          <h2 className="text-left font-serif text-[28px] font-normal leading-[1.2] text-white sm:text-[36px] lg:text-[60px]">
             {title}
           </h2>
 
@@ -154,43 +154,47 @@ export default function Testimonials({
 
             {/* Divider + author — Cignet exact */}
             <div className="relative mt-[60px] border-t border-white/20 pt-6">
-              <div className="flex items-center gap-3.5">
-                <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-full">
-                  <Image
-                    src={current.image ?? "/testimonial-author-1.jpg"}
-                    alt={current.name}
-                    fill
-                    className="object-cover"
-                    sizes="50px"
-                    unoptimized
-                  />
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3.5">
+                  <div className="relative h-[50px] w-[50px] shrink-0 overflow-hidden rounded-full">
+                    <Image
+                      src={current.image ?? "/testimonial-author-1.jpg"}
+                      alt={current.name}
+                      fill
+                      className="object-cover"
+                      sizes="50px"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="text-left">
+                    <p className="mb-[5px] font-serif text-base font-normal leading-snug text-white">
+                      {current.name}
+                    </p>
+                    <p className="text-sm font-normal text-white/90">
+                      {current.role}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="mb-[5px] font-serif text-base font-normal leading-snug text-white">
-                    {current.name}
-                  </p>
-                  <p className="text-sm font-normal text-white/90">
-                    {current.role}
-                  </p>
+
+                <div className="flex gap-2 sm:gap-3">
+                  <button
+                    type="button"
+                    onClick={() => api?.scrollPrev()}
+                    aria-label="Previous review"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-12 sm:w-12"
+                  >
+                    <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => api?.scrollNext()}
+                    aria-label="Next review"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-12 sm:w-12"
+                  >
+                    <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+                  </button>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={() => api?.scrollPrev()}
-                aria-label="Previous review"
-                className="absolute left-[81%] top-1/2 flex h-[40px] w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-[50px] sm:w-[50px]"
-              >
-                <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
-              </button>
-              <button
-                type="button"
-                onClick={() => api?.scrollNext()}
-                aria-label="Next review"
-                className="absolute right-0 top-1/2 flex h-[40px] w-[40px] -translate-y-1/2 items-center justify-center rounded-full bg-[#2f2a26]/90 text-white transition-colors hover:bg-[#c9d85a] hover:text-black sm:h-[50px] sm:w-[50px]"
-              >
-                <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
-              </button>
             </div>
           </div>
         </div>

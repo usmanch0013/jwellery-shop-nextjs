@@ -7,7 +7,7 @@ export interface ProductQueryParams {
   sort?: ProductSort;
   minPrice?: number;
   maxPrice?: number;
-  filter?: "new" | "bestseller" | "sale";
+  filter?: "new" | "bestseller" | "sale" | "featured";
   search?: string;
 }
 

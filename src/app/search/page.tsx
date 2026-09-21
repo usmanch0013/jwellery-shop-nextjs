@@ -12,7 +12,7 @@ interface SearchPageProps {
   }>;
 }
 
-export const metadata = { title: "Search | Lumière Jewellery" };
+export const metadata = { title: "Search | SHE Collection" };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
@@ -27,7 +27,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   });
 
   return (
-    <div className="py-10 px-4 max-w-[1400px] mx-auto">
+    <div className="py-10 sm:py-12">
+      <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
       <Breadcrumbs items={[{ label: "Search" }]} />
       <h1 className="font-serif text-2xl lg:text-3xl text-center mb-2">
         Search Results
@@ -51,6 +52,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           />
         </>
       )}
+      </div>
     </div>
   );
 }

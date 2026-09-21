@@ -2,7 +2,7 @@ import { getProfile } from "@/actions/auth";
 import AccountProfileForm from "@/components/account/AccountProfileForm";
 import { UserCard, UserPageHeader } from "@/components/account/UserShell";
 
-export const metadata = { title: "Profile | Lumière Jewellery" };
+export const metadata = { title: "Profile | SHE Collection" };
 
 export default async function AccountProfilePage() {
   const profile = await getProfile();

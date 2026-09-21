@@ -51,7 +51,41 @@ export default function UserOrdersList({
         </div>
       )}
 
-      <div className="overflow-x-auto">
+      <div className="divide-y divide-[var(--user-border)] sm:hidden">
+        {orders.map((order) => (
+          <Link
+            key={order.id}
+            href={`/account/orders/${order.id}`}
+            className="block px-4 py-4 transition-colors hover:bg-[#fafbfb]"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-medium text-[var(--user-accent)]">
+                  {order.order_number}
+                </p>
+                <p className="mt-1 text-[12px] text-[var(--user-text-subdued)]">
+                  {new Date(order.created_at).toLocaleDateString("en-PK", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="font-medium">{formatPrice(order.total)}</p>
+                <div className="mt-2">
+                  <OrderStatusBadge status={order.status} />
+                </div>
+              </div>
+            </div>
+            <p className="mt-2 text-[12px] text-[var(--user-text-subdued)]">
+              {ORDER_STATUS_LABELS[order.status]}
+            </p>
+          </Link>
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto sm:block">
         <table className="w-full text-[13px]">
           <thead className="border-b border-[var(--user-border)] bg-[#fafbfb] text-left">
             <tr>
@@ -64,7 +98,7 @@ export default function UserOrdersList({
               <th className="px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] lg:px-5">
                 Status
               </th>
-              <th className="hidden px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] sm:table-cell lg:px-5">
+              <th className="hidden px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--user-text-subdued)] md:table-cell lg:px-5">
                 Date
               </th>
             </tr>
@@ -89,7 +123,7 @@ export default function UserOrdersList({
                 <td className="px-4 py-3 lg:px-5">
                   <OrderStatusBadge status={order.status} />
                 </td>
-                <td className="hidden px-4 py-3 text-[var(--user-text-subdued)] sm:table-cell lg:px-5">
+                <td className="hidden px-4 py-3 text-[var(--user-text-subdued)] md:table-cell lg:px-5">
                   {new Date(order.created_at).toLocaleDateString("en-PK", {
                     day: "numeric",
                     month: "short",

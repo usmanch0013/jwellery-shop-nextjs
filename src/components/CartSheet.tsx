@@ -10,6 +10,11 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { useCart } from "@/context/CartContext";
+import {
+  calculateOrderTotal,
+  calculateShipping,
+  FREE_SHIPPING_THRESHOLD,
+} from "@/lib/constants/commerce";
 import { formatPrice, productPath } from "@/lib/products/format";
 
 interface CartSheetProps {
@@ -21,8 +26,8 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems } =
     useCart();
 
-  const shipping = totalPrice >= 5000 ? 0 : 200;
-  const grandTotal = totalPrice + shipping;
+  const shipping = calculateShipping(totalPrice);
+  const grandTotal = calculateOrderTotal(totalPrice);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -50,7 +55,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
             <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5 bg-background">
               {items.map((item) => (
                 <div
-                  key={item.product.id}
+                  key={item.lineId}
                   className="flex gap-4 pb-5 border-b border-border last:border-0 last:pb-0"
                 >
                   <Link
@@ -84,7 +89,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                         <button
                           type="button"
                           onClick={() =>
-                            updateQuantity(item.product.id, item.quantity - 1)
+                            updateQuantity(item.lineId, item.quantity - 1)
                           }
                           className="w-9 h-9 flex items-center justify-center hover:bg-muted transition-colors text-foreground"
                           aria-label="Decrease quantity"
@@ -97,7 +102,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                         <button
                           type="button"
                           onClick={() =>
-                            updateQuantity(item.product.id, item.quantity + 1)
+                            updateQuantity(item.lineId, item.quantity + 1)
                           }
                           className="w-9 h-9 flex items-center justify-center hover:bg-muted transition-colors text-foreground"
                           aria-label="Increase quantity"
@@ -108,7 +113,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
                       <button
                         type="button"
-                        onClick={() => removeFromCart(item.product.id)}
+                        onClick={() => removeFromCart(item.lineId)}
                         className="p-2 text-muted-foreground hover:text-rose transition-colors"
                         aria-label="Remove item"
                       >
@@ -142,13 +147,28 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 </div>
               </div>
 
-              <Link
-                href="/checkout"
-                onClick={() => onOpenChange(false)}
-                className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 text-sm font-medium transition-colors"
-              >
-                View Cart &amp; Checkout
-              </Link>
+              <div className="space-y-2">
+                <Link
+                  href="/checkout"
+                  onClick={() => onOpenChange(false)}
+                  className="flex w-full items-center justify-center bg-primary hover:bg-emerald-dark text-white h-12 text-sm font-medium transition-colors rounded-lg"
+                >
+                  Proceed to Checkout
+                </Link>
+                <Link
+                  href="/cart"
+                  onClick={() => onOpenChange(false)}
+                  className="flex w-full items-center justify-center border border-border text-foreground h-10 text-sm font-medium transition-colors rounded-lg hover:bg-muted"
+                >
+                  View Full Cart
+                </Link>
+              </div>
+              {totalPrice < FREE_SHIPPING_THRESHOLD && (
+                <p className="mt-3 text-center text-xs text-muted-foreground">
+                  Add {formatPrice(FREE_SHIPPING_THRESHOLD - totalPrice)} more for
+                  free shipping
+                </p>
+              )}
             </div>
           </>
         )}

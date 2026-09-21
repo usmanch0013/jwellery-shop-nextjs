@@ -5,7 +5,7 @@ import { formatBlogDate } from "@/lib/blog/format";
 import { ArrowRight } from "lucide-react";
 
 export const metadata = {
-  title: "Blog | Lumière Jewellery",
+  title: "Blog | SHE Collection",
   description: "Jewellery care tips, styling guides, and fashion inspiration.",
 };
 
@@ -24,7 +24,7 @@ export default async function BlogIndexPage({
       <div className="mb-10 text-center">
         <h1 className="font-serif text-3xl lg:text-4xl">Blog</h1>
         <p className="mt-3 text-muted-foreground">
-          Jewellery care, styling tips, and inspiration from Lumière
+          Jewellery care, styling tips, and inspiration from SHE Collection
         </p>
       </div>
 

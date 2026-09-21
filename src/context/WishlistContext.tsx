@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Product } from "@/types";
-import { toggleWishlistAction } from "@/actions/wishlist";
+import { toggleWishlistAction, fetchWishlistItems } from "@/actions/wishlist";
 
 interface WishlistContextType {
   items: Product[];
@@ -30,13 +30,27 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
-      if (stored) setItems(JSON.parse(stored));
-    } catch {
-      // ignore
+    async function hydrate() {
+      try {
+        const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
+        const localItems: Product[] = stored ? JSON.parse(stored) : [];
+        const serverItems = await fetchWishlistItems();
+
+        if (serverItems.length > 0) {
+          const merged = [...serverItems];
+          for (const item of localItems) {
+            if (!merged.some((p) => p.id === item.id)) merged.push(item);
+          }
+          setItems(merged);
+        } else if (localItems.length > 0) {
+          setItems(localItems);
+        }
+      } catch {
+        // ignore
+      }
+      setIsHydrated(true);
     }
-    setIsHydrated(true);
+    void hydrate();
   }, []);
 
   useEffect(() => {

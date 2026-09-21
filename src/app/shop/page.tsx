@@ -1,7 +1,16 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import ShopContent from "./ShopContent";
 import { getProducts, getCategories } from "@/lib/products/queries";
 import type { ProductSort } from "@/lib/products/types";
+import { BRAND } from "@/lib/brand";
+
+export const metadata: Metadata = {
+  title: `Shop Artificial Jewellery | ${BRAND.name}`,
+  description:
+    `Browse necklace sets, earrings, bangles, bridal & everyday artificial jewellery at ${BRAND.domain}. Contemporary Pakistani designs since ${BRAND.foundedYear}.`,
+  alternates: { canonical: "/shop" },
+};
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -26,7 +35,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
       sort,
       category: category && category !== "all" ? category : undefined,
       maxPrice,
-      filter: params.filter as "new" | "bestseller" | "sale" | undefined,
+      filter: params.filter as "new" | "bestseller" | "sale" | "featured" | undefined,
     }),
     getCategories(),
   ]);

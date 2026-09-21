@@ -1,7 +1,7 @@
 import AccountWishlistClient from "@/components/account/AccountWishlistClient";
 import { UserPageHeader } from "@/components/account/UserShell";
 
-export const metadata = { title: "Wishlist | Lumière Jewellery" };
+export const metadata = { title: "Wishlist | SHE Collection" };
 
 export default function AccountWishlistPage() {
   return (

@@ -2,7 +2,7 @@ import { getUserOrders } from "@/actions/orders";
 import { UserPageHeader } from "@/components/account/UserShell";
 import UserOrdersList from "@/components/account/UserOrdersList";
 
-export const metadata = { title: "My Orders | Lumière Jewellery" };
+export const metadata = { title: "My Orders | SHE Collection" };
 
 export default async function AccountOrdersPage() {
   const orders = await getUserOrders();

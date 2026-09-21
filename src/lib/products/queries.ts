@@ -5,7 +5,11 @@ import {
 } from "@/data/products";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
-import { mapDbCategory, mapDbProductToProduct } from "@/lib/products/mappers";
+import {
+  attachProductDetail,
+  mapDbCategory,
+  mapDbProductToProduct,
+} from "@/lib/products/mappers";
 import type { DbProduct } from "@/lib/database.types";
 import { isOnSale } from "@/lib/products/sale";
 import { PRODUCTS_PER_PAGE } from "@/lib/constants/commerce";
@@ -58,6 +62,8 @@ function filterStaticProducts(params: ProductQueryParams): PaginatedProducts {
   if (params.filter === "new") filtered = filtered.filter((p) => p.isNew);
   if (params.filter === "bestseller")
     filtered = filtered.filter((p) => p.isBestseller);
+  if (params.filter === "featured")
+    filtered = filtered.filter((p) => p.isFeatured);
   if (params.filter === "sale")
     filtered = filtered.filter((p) => isOnSale(p));
   if (params.search) {
@@ -125,6 +131,7 @@ export async function getProducts(
   if (params.maxPrice !== undefined) query = query.lte("price", params.maxPrice);
   if (params.filter === "new") query = query.eq("is_new", true);
   if (params.filter === "bestseller") query = query.eq("is_bestseller", true);
+  if (params.filter === "featured") query = query.eq("is_featured", true);
   if (params.filter === "sale") query = query.not("original_price", "is", null);
   if (params.search) {
     query = query.textSearch("search_vector", params.search, {
@@ -155,6 +162,33 @@ export async function getProducts(
   }
 
   const products = (data as DbProduct[]).map(mapDbProductToProduct);
+  const ids = products.map((p) => p.id);
+  if (ids.length > 0) {
+    const { data: gallery } = await supabase
+      .from("product_images")
+      .select("product_id, url, sort_order")
+      .in("product_id", ids)
+      .order("sort_order", { ascending: true });
+
+    if (gallery?.length) {
+      const byProduct = new Map<string, string[]>();
+      for (const row of gallery) {
+        const list = byProduct.get(row.product_id) ?? [];
+        if (row.url) list.push(row.url);
+        byProduct.set(row.product_id, list);
+      }
+      for (const product of products) {
+        const urls = byProduct.get(product.id);
+        if (urls?.length) {
+          product.images = urls;
+          if (!product.hoverImage) {
+            product.hoverImage = urls.find((url) => url !== product.image) ?? urls[0];
+          }
+        }
+      }
+    }
+  }
+
   const total = count ?? 0;
 
   return {
@@ -208,7 +242,27 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return null;
   }
 
-  return mapDbProductToProduct(data as DbProduct);
+  const product = mapDbProductToProduct(data as DbProduct);
+  const productId = data.id as string;
+
+  const [galleryRes, variationsRes] = await Promise.all([
+    supabase
+      .from("product_images")
+      .select("*")
+      .eq("product_id", productId)
+      .order("sort_order"),
+    supabase
+      .from("product_variations")
+      .select("*")
+      .eq("product_id", productId)
+      .order("sort_order"),
+  ]);
+
+  return attachProductDetail(
+    product,
+    galleryRes.data ?? [],
+    variationsRes.data ?? []
+  );
 }
 
 export async function getProductById(id: string): Promise<Product | null> {

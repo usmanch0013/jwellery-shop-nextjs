@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Product } from "@/types";
 import ProductCard from "./ProductCard";
 
@@ -23,16 +24,13 @@ export default function ProductGrid({
         <div className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
           {products.length === 0 ? (
             <div className="col-span-full py-16 text-center">
-              <p className="font-serif text-xl mb-2">No products yet</p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Add products from the admin dashboard to populate this page.
+              <p className="mb-2 font-serif text-xl">No products found</p>
+              <p className="mb-6 text-sm text-muted-foreground">
+                Try a different category or browse our full collection.
               </p>
-              <a
-                href="/shop"
-                className="text-sm text-primary underline"
-              >
-                View all shop
-              </a>
+              <Link href="/shop" className="text-sm font-medium text-primary underline">
+                Browse all products
+              </Link>
             </div>
           ) : (
             products.map((product) => (

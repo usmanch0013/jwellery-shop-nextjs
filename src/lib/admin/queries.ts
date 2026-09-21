@@ -294,7 +294,7 @@ export type AdminProductFilters = {
   q?: string;
   categoryId?: string;
   status?: "all" | "draft" | "published";
-  flag?: "all" | "new" | "bestseller" | "sale" | "sold_out" | "low_stock";
+  flag?: "all" | "new" | "bestseller" | "featured" | "sale" | "sold_out" | "low_stock";
   sort?: "manual" | "newest" | "price_asc" | "price_desc" | "name";
 };
 
@@ -329,6 +329,7 @@ export async function getAdminProducts(filters: AdminProductFilters = {}) {
 
   if (filters.flag === "new") query = query.eq("is_new", true);
   if (filters.flag === "bestseller") query = query.eq("is_bestseller", true);
+  if (filters.flag === "featured") query = query.eq("is_featured", true);
   if (filters.flag === "sold_out") query = query.eq("sold_out", true);
   if (filters.flag === "low_stock") query = query.lte("stock", 5);
   if (filters.flag === "sale") query = query.not("original_price", "is", null);

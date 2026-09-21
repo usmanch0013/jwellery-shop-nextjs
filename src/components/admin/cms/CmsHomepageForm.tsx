@@ -11,6 +11,7 @@ import {
   saveCmsHomepageSectionsAction,
   saveCmsTrustFeaturesAction,
   saveCmsVideoAction,
+  saveCmsPromoPopupAction,
 } from "@/actions/admin/cms";
 import CmsImageField from "@/components/admin/cms/builder/CmsImageField";
 import { MediaPickerModal } from "@/components/admin/MediaPickerModal";
@@ -18,6 +19,7 @@ import type {
   CmsHeroSettings,
   CmsHomepageSections,
   CmsPromoBanner,
+  CmsPromoPopup,
   CmsTrustFeature,
   CmsVideoSettings,
 } from "@/lib/cms/types";
@@ -27,6 +29,7 @@ const fieldClass =
   "h-10 rounded-lg border border-[var(--admin-border)] bg-white px-3 text-[13px]";
 
 const SHOWCASE_KEYS: Array<{ key: string; label: string }> = [
+  { key: "featured", label: "Featured products" },
   { key: "bridal-sets", label: "Bridal section" },
   { key: "necklace-sets", label: "Necklace section" },
   { key: "bracelet", label: "Bracelets section" },
@@ -45,24 +48,28 @@ const VIDEO_ICON_OPTIONS = [
 type MediaTarget =
   | { kind: "hero-bg" }
   | { kind: "testimonials-bg" }
-  | { kind: "video-poster" };
+  | { kind: "video-poster" }
+  | { kind: "promo-popup" };
 
 export default function CmsHomepageForm({
   hero: initialHero,
   sections: initialSections,
   video: initialVideo,
   trustFeatures: initialTrust,
+  promoPopup: initialPromo,
 }: {
   hero: CmsHeroSettings;
   sections: CmsHomepageSections;
   video: CmsVideoSettings;
   trustFeatures: CmsTrustFeature[];
+  promoPopup: CmsPromoPopup;
 }) {
   const router = useRouter();
   const [hero, setHero] = useState(initialHero);
   const [sections, setSections] = useState(initialSections);
   const [video, setVideo] = useState(initialVideo);
   const [trust, setTrust] = useState(initialTrust);
+  const [promo, setPromo] = useState(initialPromo);
   const [loading, setLoading] = useState(false);
   const [mediaOpen, setMediaOpen] = useState(false);
   const [mediaTarget, setMediaTarget] = useState<MediaTarget | null>(null);
@@ -83,6 +90,7 @@ export default function CmsHomepageForm({
       }));
     }
     if (mediaTarget.kind === "video-poster") setVideo((v) => ({ ...v, posterImage: url }));
+    if (mediaTarget.kind === "promo-popup") setPromo((p) => ({ ...p, imageUrl: url }));
     setMediaOpen(false);
     setMediaTarget(null);
   }
@@ -163,6 +171,7 @@ export default function CmsHomepageForm({
       saveCmsHomepageSectionsAction(sections),
       saveCmsVideoAction(video),
       saveCmsTrustFeaturesAction(trust),
+      saveCmsPromoPopupAction(promo),
     ]);
     setLoading(false);
     const error = results.find((r) => r.error)?.error;
@@ -541,6 +550,118 @@ export default function CmsHomepageForm({
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="admin-card p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-semibold">Sale popup</h3>
+              <p className="text-[12px] text-[var(--admin-text-subdued)]">
+                Offer modal on the storefront. Bump version when you change the sale so visitors see it again.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 text-[13px]">
+              <input
+                type="checkbox"
+                checked={promo.enabled}
+                onChange={(e) => setPromo((p) => ({ ...p, enabled: e.target.checked }))}
+              />
+              Enabled
+            </label>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Version (e.g. 1, 2, sale-eid)</Label>
+              <Input
+                className={fieldClass}
+                value={promo.version}
+                onChange={(e) => setPromo((p) => ({ ...p, version: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Dismiss for (days)</Label>
+              <Input
+                className={fieldClass}
+                type="number"
+                min={1}
+                value={promo.dismissDays}
+                onChange={(e) =>
+                  setPromo((p) => ({ ...p, dismissDays: Number(e.target.value) || 1 }))
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Badge</Label>
+              <Input
+                className={fieldClass}
+                value={promo.badge}
+                onChange={(e) => setPromo((p) => ({ ...p, badge: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Discount text</Label>
+              <Input
+                className={fieldClass}
+                value={promo.discountText}
+                onChange={(e) => setPromo((p) => ({ ...p, discountText: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Title</Label>
+              <Input
+                className={fieldClass}
+                value={promo.title}
+                onChange={(e) => setPromo((p) => ({ ...p, title: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Subtitle</Label>
+              <Input
+                className={fieldClass}
+                value={promo.subtitle}
+                onChange={(e) => setPromo((p) => ({ ...p, subtitle: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Product name (highlight)</Label>
+              <Input
+                className={fieldClass}
+                value={promo.productName}
+                onChange={(e) => setPromo((p) => ({ ...p, productName: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Description</Label>
+              <textarea
+                className={`${fieldClass} min-h-[72px] w-full py-2`}
+                value={promo.description}
+                onChange={(e) => setPromo((p) => ({ ...p, description: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Button label</Label>
+              <Input
+                className={fieldClass}
+                value={promo.ctaLabel}
+                onChange={(e) => setPromo((p) => ({ ...p, ctaLabel: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Button link</Label>
+              <Input
+                className={fieldClass}
+                value={promo.ctaHref}
+                onChange={(e) => setPromo((p) => ({ ...p, ctaHref: e.target.value }))}
+                placeholder="/products/your-slug or /shop?filter=sale"
+              />
+            </div>
+          </div>
+          <CmsImageField
+            label="Popup image"
+            value={promo.imageUrl}
+            onChange={(url) => setPromo((p) => ({ ...p, imageUrl: url }))}
+            onPick={() => openMedia({ kind: "promo-popup" })}
+          />
         </div>
 
         <div className="admin-card p-5 space-y-4">

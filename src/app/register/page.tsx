@@ -1,6 +1,6 @@
 import RegisterForm from "@/components/auth/RegisterForm";
 
-export const metadata = { title: "Register | Lumière Jewellery" };
+export const metadata = { title: "Register | SHE Collection" };
 
 export default function RegisterPage() {
   return (

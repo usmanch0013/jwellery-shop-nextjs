@@ -29,9 +29,8 @@ interface HomePageContentProps {
   braceletProducts: Product[];
   bridalProducts: Product[];
   bestSelling: Product[];
-  bestSellingCount: number;
   newArrivals: Product[];
-  newArrivalsCount: number;
+  featuredProducts: Product[];
   blogPosts: BlogPostCard[];
   hero: CmsHeroSettings;
   homepage: CmsHomepageSections;
@@ -42,10 +41,6 @@ interface HomePageContentProps {
   video: CmsVideoSettings;
 }
 
-function categoryCount(categories: CategoryInfo[], slug: string) {
-  return categories.find((c) => c.slug === slug)?.productCount ?? 0;
-}
-
 export default function HomePageContent({
   categories,
   necklaceProducts,
@@ -53,9 +48,8 @@ export default function HomePageContent({
   braceletProducts,
   bridalProducts,
   bestSelling,
-  bestSellingCount,
   newArrivals,
-  newArrivalsCount,
+  featuredProducts,
   blogPosts,
   hero,
   homepage,
@@ -73,51 +67,51 @@ export default function HomePageContent({
     <>
       <HeroSection hero={hero} marqueeText={site.marqueeText} />
 
+      {featuredProducts.length > 0 && (
+        <ProductShowcase
+          title={homepage.showcaseTitles.featured ?? "Featured Products"}
+          products={featuredProducts}
+          viewAllHref="/shop?filter=featured"
+          viewAllLabel="View all"
+          onQuickView={setQuickViewProduct}
+        />
+      )}
+
       <ProductShowcase
         title={homepage.showcaseTitles["bridal-sets"] ?? "Bridal"}
         products={bridalProducts}
         categorySlug="bridal-sets"
-        categoryCount={categoryCount(categories, "bridal-sets")}
         onQuickView={setQuickViewProduct}
       />
       <ProductShowcase
         title={homepage.showcaseTitles["necklace-sets"] ?? "Necklace"}
         products={necklaceProducts}
         categorySlug="necklace-sets"
-        categoryCount={categoryCount(categories, "necklace-sets")}
         onQuickView={setQuickViewProduct}
       />
       <ProductShowcase
         title={homepage.showcaseTitles.bracelet ?? "Bracelets"}
         products={braceletProducts}
         categorySlug="bracelet"
-        categoryCount={categoryCount(categories, "bracelet")}
         onQuickView={setQuickViewProduct}
       />
       <ProductShowcase
         title={homepage.showcaseTitles["new-arrivals"] ?? "New Arrivals"}
         products={newArrivals}
         variant="alt"
-        ctaHref="/shop?filter=new"
-        ctaName="New Arrivals"
-        ctaCount={newArrivalsCount}
-        ctaImage={newArrivals[0]?.image}
+        viewAllHref="/shop?filter=new"
         onQuickView={setQuickViewProduct}
       />
       <ProductShowcase
         title={homepage.showcaseTitles.earrings ?? "Earrings"}
         products={earringProducts}
         categorySlug="earrings"
-        categoryCount={categoryCount(categories, "earrings")}
         onQuickView={setQuickViewProduct}
       />
       <ProductShowcase
         title={homepage.showcaseTitles["best-selling"] ?? "Best Selling Products"}
         products={bestSelling}
-        ctaHref="/shop?filter=bestseller"
-        ctaName="Best Selling"
-        ctaCount={bestSellingCount}
-        ctaImage={bestSelling[0]?.image}
+        viewAllHref="/shop?filter=bestseller"
         onQuickView={setQuickViewProduct}
       />
 
@@ -136,12 +130,12 @@ export default function HomePageContent({
           backgroundImage={homepage.testimonials.backgroundImage}
         />
       </div>
-      <BlogSection posts={blogPosts} />
       <FAQ
         faqs={faqs}
         title={homepage.faq.title}
         subtitle={homepage.faq.subtitle}
       />
+      <BlogSection posts={blogPosts} />
       <TrustBar features={trustFeatures} />
 
       <QuickViewDialog

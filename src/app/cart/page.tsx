@@ -8,6 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/context/CartContext";
+import {
+  calculateOrderTotal,
+  calculateShipping,
+  FREE_SHIPPING_THRESHOLD,
+} from "@/lib/constants/commerce";
 import { formatPrice } from "@/lib/products/format";
 
 export default function CartPage() {
@@ -16,8 +21,9 @@ export default function CartPage() {
 
   if (items.length === 0) {
     return (
-      <div className="py-24 text-center">
-        <ShoppingBag className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6" />
+      <div className="py-16 sm:py-24">
+        <div className="mx-auto max-w-lg px-4 text-center sm:px-6">
+          <ShoppingBag className="w-16 h-16 text-muted-foreground/20 mx-auto mb-6" />
         <h1 className="text-3xl font-serif font-semibold mb-4">
           Your Cart is Empty
         </h1>
@@ -31,27 +37,29 @@ export default function CartPage() {
           Continue Shopping
           <ArrowRight className="w-4 h-4 ml-2" />
         </Link>
+        </div>
       </div>
     );
   }
 
-  const shipping = totalPrice >= 5000 ? 0 : 200;
+  const shipping = calculateShipping(totalPrice);
+  const orderTotal = calculateOrderTotal(totalPrice);
 
   return (
     <div className="py-12 lg:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumbs items={[{ label: "Cart" }]} />
-        <h1 className="text-4xl font-serif font-semibold mb-12">
+        <h1 className="mb-8 font-serif text-2xl font-semibold sm:mb-12 sm:text-3xl lg:text-4xl">
           Shopping Cart
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-12">
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <Card key={item.product.id} className="overflow-hidden">
+              <Card key={item.lineId} className="overflow-hidden">
                 <CardContent className="p-0">
-                  <div className="flex gap-6 p-6">
-                    <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded overflow-hidden">
+                  <div className="flex flex-col gap-4 p-4 sm:flex-row sm:gap-6 sm:p-6">
+                    <div className="relative mx-auto h-24 w-24 shrink-0 overflow-hidden rounded sm:mx-0 sm:h-32 sm:w-32">
                       <Image
                         src={item.product.image}
                         alt={item.product.name}
@@ -67,15 +75,20 @@ export default function CartPage() {
                         >
                           {item.product.name}
                         </Link>
+                        {item.product.soldOut && (
+                          <p className="mt-1 text-xs font-medium text-destructive">
+                            Sold out — remove to continue checkout
+                          </p>
+                        )}
                         <p className="text-sm text-muted-foreground mt-1">
                           {item.product.material}
                         </p>
                       </div>
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center border rounded-lg">
+                  <div className="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center border rounded-lg w-fit">
                           <button
                             onClick={() =>
-                              updateQuantity(item.product.id, item.quantity - 1)
+                              updateQuantity(item.lineId, item.quantity - 1)
                             }
                             className="p-2 hover:bg-muted transition-colors"
                             aria-label="Decrease"
@@ -87,7 +100,7 @@ export default function CartPage() {
                           </span>
                           <button
                             onClick={() =>
-                              updateQuantity(item.product.id, item.quantity + 1)
+                              updateQuantity(item.lineId, item.quantity + 1)
                             }
                             className="p-2 hover:bg-muted transition-colors"
                             aria-label="Increase"
@@ -95,19 +108,19 @@ export default function CartPage() {
                             <Plus className="w-4 h-4" />
                           </button>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <span className="font-medium">
-                            {formatPrice(item.product.price * item.quantity)}
-                          </span>
-                          <button
-                            onClick={() => removeFromCart(item.product.id)}
-                            className="p-2 text-muted-foreground hover:text-destructive transition-colors"
-                            aria-label="Remove"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center justify-between gap-4 sm:justify-end">
+                      <span className="font-medium">
+                        {formatPrice(item.product.price * item.quantity)}
+                      </span>
+                      <button
+                        onClick={() => removeFromCart(item.lineId)}
+                        className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                        aria-label="Remove"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
                     </div>
                   </div>
                 </CardContent>
@@ -123,7 +136,7 @@ export default function CartPage() {
           </div>
 
           <div>
-            <Card className="sticky top-28">
+            <Card className="lg:sticky lg:top-28">
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-serif">Order Summary</h2>
                 <div className="space-y-3 text-sm">
@@ -139,13 +152,13 @@ export default function CartPage() {
                   <div className="flex justify-between font-medium text-base">
                     <span>Total</span>
                     <span className="text-gold">
-                      {formatPrice(totalPrice + shipping)}
+                      {formatPrice(orderTotal)}
                     </span>
                   </div>
                 </div>
-                {totalPrice < 5000 && (
+                {totalPrice < FREE_SHIPPING_THRESHOLD && (
                   <p className="text-muted-foreground text-xs">
-                    Add {formatPrice(5000 - totalPrice)} more for free shipping
+                    Add {formatPrice(FREE_SHIPPING_THRESHOLD - totalPrice)} more for free shipping
                   </p>
                 )}
                 <Link

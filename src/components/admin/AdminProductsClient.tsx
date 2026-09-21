@@ -30,7 +30,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  AdminTable,
   AdminTableElement,
   AdminTd,
   AdminTh,
@@ -46,6 +45,7 @@ import {
   quickEditProductAction,
   reorderProductsAction,
 } from "@/actions/admin/products";
+import ProductExportMenu from "@/components/admin/ProductExportMenu";
 import { cn } from "@/lib/utils";
 
 const selectClass =
@@ -64,6 +64,8 @@ type BulkAction =
   | "new-off"
   | "bestseller-on"
   | "bestseller-off"
+  | "featured-on"
+  | "featured-off"
   | "sold-out"
   | "in-stock"
   | "quick-edit";
@@ -90,6 +92,7 @@ function QuickEditPanel({
   const { price, originalPrice } = productPriceDisplay(product);
   const [isNew, setIsNew] = useState(product.is_new);
   const [isBestseller, setIsBestseller] = useState(product.is_bestseller);
+  const [isFeatured, setIsFeatured] = useState(Boolean(product.is_featured));
   const [soldOut, setSoldOut] = useState(product.sold_out);
   const [loading, setLoading] = useState(false);
 
@@ -100,6 +103,7 @@ function QuickEditPanel({
     formData.set("id", product.id);
     formData.set("isNew", isNew ? "true" : "false");
     formData.set("isBestseller", isBestseller ? "true" : "false");
+    formData.set("isFeatured", isFeatured ? "true" : "false");
     formData.set("soldOut", soldOut ? "true" : "false");
     const result = await quickEditProductAction(formData);
     setLoading(false);
@@ -184,6 +188,14 @@ function QuickEditPanel({
         <label className="flex items-center gap-2 text-[13px]">
           <input
             type="checkbox"
+            checked={isFeatured}
+            onChange={(e) => setIsFeatured(e.target.checked)}
+          />
+          Featured
+        </label>
+        <label className="flex items-center gap-2 text-[13px]">
+          <input
+            type="checkbox"
             checked={soldOut}
             onChange={(e) => setSoldOut(e.target.checked)}
           />
@@ -209,7 +221,7 @@ function buildFilterUrl(filters: AdminProductFilters, page = 1) {
   if (filters.categoryId) params.set("category", filters.categoryId);
   if (filters.status && filters.status !== "all") params.set("status", filters.status);
   if (filters.flag && filters.flag !== "all") params.set("flag", filters.flag);
-  if (filters.sort && filters.sort !== "manual") params.set("sort", filters.sort);
+  if (filters.sort && filters.sort !== "newest") params.set("sort", filters.sort);
   const qs = params.toString();
   return qs ? `/admin/products?${qs}` : "/admin/products";
 }
@@ -332,6 +344,11 @@ function SortableProductRow({
             {product.is_bestseller && (
               <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
                 Bestseller
+              </span>
+            )}
+            {product.is_featured && (
+              <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-800">
+                Featured
               </span>
             )}
             {product.sold_out && (
@@ -536,6 +553,8 @@ export default function AdminProductsClient({
       "new-off": { isNew: "false" },
       "bestseller-on": { isBestseller: "true" },
       "bestseller-off": { isBestseller: "false" },
+      "featured-on": { isFeatured: "true" },
+      "featured-off": { isFeatured: "false" },
       "sold-out": { soldOut: "true" },
       "in-stock": { soldOut: "false" },
       "quick-edit": null,
@@ -567,10 +586,10 @@ export default function AdminProductsClient({
 
   return (
     <>
-      <AdminTable>
+      <div className="admin-card overflow-hidden">
         <div className="space-y-3 border-b border-[var(--admin-border)] px-4 py-3 lg:px-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-            <div className="relative min-w-0 flex-1">
+          <div className="flex flex-col gap-3 xl:flex-row xl:flex-wrap xl:items-center">
+            <div className="relative min-w-0 w-full xl:min-w-[200px] xl:flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--admin-text-subdued)]" />
               <Input
                 value={searchInput}
@@ -584,7 +603,7 @@ export default function AdminProductsClient({
               onChange={(e) =>
                 updateFilter({ categoryId: e.target.value || undefined })
               }
-              className={cn(selectClass, "min-w-[160px]")}
+              className={cn(selectClass, "w-full sm:w-auto sm:min-w-[140px]")}
             >
               <option value="">All categories</option>
               {categories.map((c) => (
@@ -600,7 +619,7 @@ export default function AdminProductsClient({
                   status: e.target.value as AdminProductFilters["status"],
                 })
               }
-              className={cn(selectClass, "min-w-[130px]")}
+              className={cn(selectClass, "w-full sm:w-auto sm:min-w-[120px]")}
             >
               <option value="all">All statuses</option>
               <option value="published">Published</option>
@@ -613,23 +632,24 @@ export default function AdminProductsClient({
                   flag: e.target.value as AdminProductFilters["flag"],
                 })
               }
-              className={cn(selectClass, "min-w-[140px]")}
+              className={cn(selectClass, "w-full sm:w-auto sm:min-w-[130px]")}
             >
               <option value="all">All products</option>
               <option value="new">New arrivals</option>
               <option value="bestseller">Bestsellers</option>
+              <option value="featured">Featured</option>
               <option value="sale">On sale</option>
               <option value="sold_out">Sold out</option>
               <option value="low_stock">Low stock (≤5)</option>
             </select>
             <select
-              value={filters.sort ?? "manual"}
+              value={filters.sort ?? "newest"}
               onChange={(e) =>
                 updateFilter({
                   sort: e.target.value as AdminProductFilters["sort"],
                 })
               }
-              className={cn(selectClass, "min-w-[150px]")}
+              className={cn(selectClass, "w-full sm:w-auto sm:min-w-[140px]")}
             >
               <option value="manual">Manual order</option>
               <option value="newest">Newest first</option>
@@ -649,6 +669,7 @@ export default function AdminProductsClient({
                 Clear
               </Button>
             )}
+            <ProductExportMenu selectedIds={[...selected]} />
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -664,7 +685,7 @@ export default function AdminProductsClient({
           <select
             value={bulkAction}
             onChange={(e) => setBulkAction(e.target.value as BulkAction)}
-            className={cn(selectClass, "min-w-[180px]")}
+            className={cn(selectClass, "w-full min-w-0 sm:w-auto sm:min-w-[160px]")}
           >
             <option value="">Bulk actions</option>
             <option value="publish">Publish</option>
@@ -672,8 +693,10 @@ export default function AdminProductsClient({
             <option value="quick-edit">Quick edit</option>
             <option value="new-on">Mark as new arrival</option>
             <option value="new-off">Remove new arrival</option>
-            <option value="bestseller-on">Mark as bestseller</option>
+              <option value="bestseller-on">Mark as bestseller</option>
             <option value="bestseller-off">Remove bestseller</option>
+            <option value="featured-on">Mark as featured</option>
+            <option value="featured-off">Remove featured</option>
             <option value="sold-out">Mark sold out</option>
             <option value="in-stock">Mark in stock</option>
             <option value="delete">Delete permanently</option>
@@ -701,6 +724,7 @@ export default function AdminProductsClient({
           )}
         </div>
 
+        <div className="overflow-x-auto">
         <AdminTableElement>
           <AdminThead>
             <tr>
@@ -769,7 +793,8 @@ export default function AdminProductsClient({
             </DndContext>
           )}
         </AdminTableElement>
-      </AdminTable>
+        </div>
+      </div>
 
       <Dialog open={bulkEditOpen} onOpenChange={setBulkEditOpen}>
         <DialogContent className="max-w-lg sm:max-w-lg">
@@ -825,6 +850,10 @@ export default function AdminProductsClient({
               <label className="flex items-center gap-2 text-[13px]">
                 <input type="checkbox" name="isBestseller" value="true" />
                 Mark bestseller
+              </label>
+              <label className="flex items-center gap-2 text-[13px]">
+                <input type="checkbox" name="isFeatured" value="true" />
+                Mark featured
               </label>
               <label className="flex items-center gap-2 text-[13px]">
                 <input type="checkbox" name="soldOut" value="true" />

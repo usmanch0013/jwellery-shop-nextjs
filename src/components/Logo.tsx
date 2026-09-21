@@ -1,4 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
+import { BRAND } from "@/lib/brand";
 
 interface LogoProps {
   light?: boolean;
@@ -6,46 +8,48 @@ interface LogoProps {
 
 export default function Logo({ light = false }: LogoProps) {
   return (
-    <Link href="/" className="group flex items-center gap-3">
-      <svg
-        width="34"
-        height="28"
-        viewBox="0 0 40 32"
-        fill="none"
-        aria-hidden
-        className={`shrink-0 ${light ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""}`}
-      >
-        <path
-          d="M20 4C16 10 10 12 6 16c3 2 6 5 10 10 1-1 2-2 4-3 2-3 4-6 4-10 0-4-2-8-4-9z"
-          fill="#C9A96E"
-        />
-        <path
-          d="M20 4c4 6 10 8 14 12-3 2-6 5-10 10-1-1-2-2-4-3-2-3-4-6-4-10 0-4 2-8 4-9z"
-          fill="#D4BC8A"
-        />
-        <path
-          d="M20 8c-2 3-4 4-6 6 2 1 3 2 6 5 3-3 4-4 6-5-2-2-4-3-6-6z"
-          fill="#E8D5A8"
-        />
-      </svg>
-      <span className="flex flex-col leading-none">
-        <span
-          className={`font-serif text-[22px] font-medium tracking-[0.02em] lowercase ${
-            light
-              ? "text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]"
-              : "text-[#1a1a1a]"
-          }`}
-        >
-          lumière
+    <Link
+      href="/"
+      className="group flex min-w-0 items-center gap-2.5 sm:gap-3"
+      aria-label={`${BRAND.name} — ${BRAND.domain}`}
+    >
+      <Image
+        src="/logo-mark.svg"
+        alt=""
+        width={36}
+        height={36}
+        className={`h-8 w-8 shrink-0 sm:h-9 sm:w-9 ${
+          light ? "drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]" : ""
+        }`}
+        priority
+      />
+      <span className="flex min-w-0 flex-col leading-none">
+        <span className="flex items-baseline gap-1.5">
+          <span
+            className={`font-serif text-[20px] font-medium tracking-[0.04em] sm:text-[22px] ${
+              light
+                ? "text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.7)]"
+                : "text-[#1a1a1a]"
+            }`}
+          >
+            SHE
+          </span>
+          <span
+            className={`hidden font-serif text-[11px] font-normal tracking-[0.28em] uppercase sm:inline ${
+              light ? "text-white/90" : "text-[#5c5852]"
+            }`}
+          >
+            Collection
+          </span>
         </span>
         <span
-          className={`mt-1 text-[8px] font-medium uppercase tracking-[0.4em] ${
+          className={`mt-0.5 text-[7px] font-semibold uppercase tracking-[0.22em] sm:text-[8px] sm:tracking-[0.35em] max-[380px]:hidden ${
             light
-              ? "text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
-              : "text-[#8a8680]"
+              ? "text-champagne/95 [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
+              : "text-[#0B3D35]/80"
           }`}
         >
-          Jewellery
+          {BRAND.domain}
         </span>
       </span>
     </Link>

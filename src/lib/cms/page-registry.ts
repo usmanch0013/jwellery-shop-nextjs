@@ -103,6 +103,13 @@ export const SITE_PAGE_REGISTRY: SitePageRegistryEntry[] = [
     showInAdmin: true,
   },
   {
+    slug: "cookie-policy",
+    title: "Cookie Policy",
+    path: "/cookie-policy",
+    source: "builder",
+    showInAdmin: true,
+  },
+  {
     slug: "contact",
     title: "Contact Us",
     path: "/contact",

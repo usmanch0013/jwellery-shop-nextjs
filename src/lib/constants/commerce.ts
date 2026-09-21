@@ -3,6 +3,19 @@ export const FREE_SHIPPING_THRESHOLD = 5000;
 export const STANDARD_SHIPPING_FEE = 200;
 export const GUEST_SESSION_COOKIE = "guest_session_id";
 
+export function calculateShipping(subtotal: number): number {
+  return subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_FEE;
+}
+
+export function calculateOrderTotal(
+  subtotal: number,
+  discount = 0,
+  shipping?: number
+): number {
+  const shippingFee = shipping ?? calculateShipping(subtotal);
+  return Math.max(0, subtotal - discount + shippingFee);
+}
+
 export const PK_PROVINCES = [
   "Punjab",
   "Sindh",

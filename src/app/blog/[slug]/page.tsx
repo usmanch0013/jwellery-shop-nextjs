@@ -17,7 +17,7 @@ export async function generateMetadata({
   if (!post) return { title: "Post not found" };
 
   return {
-    title: post.seo_title || `${post.title} | Lumière Blog`,
+    title: post.seo_title || `${post.title} | SHE Collection Blog`,
     description: post.seo_description || post.excerpt,
   };
 }

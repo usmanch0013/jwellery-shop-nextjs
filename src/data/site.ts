@@ -2,7 +2,7 @@ export const heroSlides = [
   {
     id: "1",
     title: "Jewels That Celebrate Togetherness",
-    subtitle: "Pakistan's Award Winning Artificial Jewellery Brand",
+    subtitle: "SHE Collection — Wear Your Art.",
     image:
       "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=1920&h=1080&fit=crop",
     cta: "Shop Now",
@@ -32,7 +32,7 @@ export const testimonials = [
     name: "Laiba Khan",
     role: "Fashion Influencer",
     content:
-      "The quality and finishing genuinely impressed me. I wore Lumière for a special occasion, and it added the perfect finishing touch to my look. Premium quality at a great price.",
+      "The quality and finishing genuinely impressed me. I wore SHE Collection for a special occasion, and it added the perfect finishing touch to my look. Premium quality at a great price.",
     image:
       "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
     rating: 5,
@@ -42,7 +42,7 @@ export const testimonials = [
     name: "Rabeeca Khan",
     role: "Working Professional",
     content:
-      "Lumière has such beautiful pieces—I can wear them casually or dress them up for an event. I keep coming back for more because the collection is always fresh and stylish!",
+      "SHE Collection has such beautiful pieces—I can wear them casually or dress them up for an event. I keep coming back for more because the collection is always fresh and stylish!",
     image:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop",
     rating: 5,
@@ -52,7 +52,7 @@ export const testimonials = [
     name: "Sanam Jung",
     role: "Television Host",
     content:
-      "A breath of fresh air in artificial jewellery! Lumière stands out with its trendy styles. Every piece feels thoughtfully crafted and perfect for Pakistani celebrations.",
+      "A breath of fresh air in artificial jewellery! SHE Collection stands out with its trendy styles. Every piece feels thoughtfully crafted and perfect for Pakistani celebrations.",
     image:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop",
     rating: 5,
@@ -62,7 +62,7 @@ export const testimonials = [
     name: "Nida Yasir",
     role: "Morning Show Host",
     content:
-      "Love Lumière's unique designs and high-quality pieces at an affordable price! The bridal sets are especially gorgeous—my go-to brand for artificial jewellery in Pakistan.",
+      "Love SHE Collection's unique designs and high-quality pieces at an affordable price! The bridal sets are especially gorgeous—my go-to brand for artificial jewellery in Pakistan.",
     image:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop",
     rating: 5,
@@ -142,6 +142,6 @@ export const faqs = [
   },
   {
     q: "Is it safe to order online?",
-    a: "Yes, it is completely safe. We have been Pakistan's trusted artificial jewellery brand since 2009 with 12,000+ customer reviews.",
+    a: "Yes, it is completely safe. SHE Collection has been a trusted Pakistani artificial jewellery brand since 2017, serving customers nationwide at sheco.pk.",
   },
 ];

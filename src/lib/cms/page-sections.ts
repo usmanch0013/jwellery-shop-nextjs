@@ -167,7 +167,7 @@ export function createSection(type: CmsSectionType): CmsPageSection {
       items: [
         { icon: "✦", title: "Quality", description: "Premium finishing on every piece." },
         { icon: "♡", title: "Care", description: "Dedicated customer support." },
-        { icon: "★", title: "Trust", description: "Trusted since 2009." },
+        { icon: "★", title: "Trust", description: "Trusted since 2017." },
       ],
     },
   };
