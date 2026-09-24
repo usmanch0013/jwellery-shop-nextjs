@@ -8,7 +8,7 @@ export default function TopBar({
   return (
     <div
       className={`relative w-full ${
-        transparent ? "bg-transparent text-white" : "bg-[#0B3D35] text-white"
+        transparent ? "bg-transparent text-white" : "bg-emerald text-white"
       }`}
     >
       <div className="mx-auto flex h-[var(--topbar-height)] max-w-[var(--site-max)] items-center justify-center px-[var(--site-px)] sm:justify-between">

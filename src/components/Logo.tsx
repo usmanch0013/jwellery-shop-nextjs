@@ -36,7 +36,7 @@ export default function Logo({ light = false }: LogoProps) {
           </span>
           <span
             className={`hidden font-serif text-[11px] font-normal tracking-[0.28em] uppercase sm:inline ${
-              light ? "text-white/90" : "text-[#5c5852]"
+              light ? "text-white/90" : "text-ink-muted"
             }`}
           >
             Collection
@@ -46,7 +46,7 @@ export default function Logo({ light = false }: LogoProps) {
           className={`mt-0.5 text-[7px] font-semibold uppercase tracking-[0.22em] sm:text-[8px] sm:tracking-[0.35em] max-[380px]:hidden ${
             light
               ? "text-champagne/95 [text-shadow:0_1px_8px_rgba(0,0,0,0.65)]"
-              : "text-[#0B3D35]/80"
+              : "text-emerald/80"
           }`}
         >
           {BRAND.domain}

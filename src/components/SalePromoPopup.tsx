@@ -67,7 +67,7 @@ export default function SalePromoPopup({ popup }: { popup: CmsPromoPopup }) {
           {popup.title} — {popup.productName}
         </DialogTitle>
 
-        <div className="relative overflow-hidden rounded-2xl bg-[#0B3D35] shadow-2xl ring-1 ring-white/10">
+        <div className="relative overflow-hidden rounded-2xl bg-emerald shadow-2xl ring-1 ring-white/10">
           <button
             type="button"
             onClick={handleClose}
@@ -87,7 +87,7 @@ export default function SalePromoPopup({ popup }: { popup: CmsPromoPopup }) {
                 sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0B3D35]/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-[#0B3D35]/20" />
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald/80 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:to-emerald/20" />
               <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-champagne px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-charcoal">
                   <Sparkles className="h-3 w-3" aria-hidden />

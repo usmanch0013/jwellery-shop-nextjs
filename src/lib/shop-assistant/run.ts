@@ -1,7 +1,7 @@
 import { getCategories, getProducts } from "@/lib/products/queries";
 import type { Product } from "@/types";
 import { parseIntentFromRules } from "./rules";
-import { parseIntentWithOpenAI } from "./llm";
+import { parseIntentWithLLM } from "./llm";
 import { ASSISTANT_QUICK_SUGGESTIONS } from "./copy";
 import type {
   AssistantHistoryItem,
@@ -33,8 +33,9 @@ export async function runShopAssistant(
   const categories = await getCategories();
   const trimmed = message.trim();
 
-  let intent = await parseIntentWithOpenAI(trimmed, categories, history);
-  let engine: ShopAssistantResponse["engine"] = intent ? "openai" : "rules";
+  const llm = await parseIntentWithLLM(trimmed, categories, history);
+  let intent = llm?.intent;
+  let engine: ShopAssistantResponse["engine"] = llm?.engine ?? "rules";
 
   if (!intent) {
     intent = parseIntentFromRules(trimmed, categories);
@@ -56,6 +57,7 @@ export async function runShopAssistant(
       products: [],
       suggestions: ASSISTANT_QUICK_SUGGESTIONS,
       engine,
+      intent,
     };
   }
 
@@ -84,5 +86,6 @@ export async function runShopAssistant(
     products: products.map(toPayload),
     suggestions: ASSISTANT_QUICK_SUGGESTIONS,
     engine,
+    intent,
   };
 }

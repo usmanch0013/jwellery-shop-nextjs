@@ -1,6 +1,6 @@
 export default function PaymentBadges() {
   return (
-    <div className="mt-8 border-t border-[#e8e2d4] pt-6">
+    <div className="mt-8 border-t border-border-warm pt-6">
       <p className="mb-4 text-center text-[10px] font-medium uppercase tracking-[0.16em] text-[#9a958c]">
         Guarantee safe &amp; secure checkout
       </p>

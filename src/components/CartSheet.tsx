@@ -45,7 +45,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
             <Link
               href="/shop"
               onClick={() => onOpenChange(false)}
-              className="inline-flex items-center justify-center bg-primary hover:bg-emerald-dark text-white px-6 py-3 text-sm font-medium transition-colors"
+              className="site-btn bg-primary text-white hover:bg-emerald-dark normal-case tracking-normal text-sm"
             >
               Continue Shopping
             </Link>

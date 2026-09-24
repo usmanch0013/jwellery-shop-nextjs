@@ -164,7 +164,7 @@ export default function ShopAssistantWidget() {
       >
         <div
           className={cn(
-            "flex w-[min(100vw-1.25rem,24rem)] flex-col overflow-hidden rounded-[5px] border border-white/10 bg-[#141414] text-white shadow-2xl transition-all duration-200 sm:w-[24rem]",
+            "flex w-[min(100vw-1.25rem,24rem)] flex-col overflow-hidden rounded-[5px] border border-white/10 bg-charcoal text-white shadow-2xl transition-all duration-200 sm:w-[24rem]",
             open
               ? "pointer-events-auto max-h-[min(78vh,640px)] opacity-100"
               : "pointer-events-none max-h-0 opacity-0"
@@ -174,7 +174,7 @@ export default function ShopAssistantWidget() {
           aria-hidden={!open}
         >
           <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3">
-            <div className="flex size-9 items-center justify-center rounded-full bg-[#0B3D35] text-champagne">
+            <div className="flex size-9 items-center justify-center rounded-full bg-emerald text-champagne">
               <Sparkles className="size-4" />
             </div>
             <div className="min-w-0 flex-1">
@@ -189,7 +189,7 @@ export default function ShopAssistantWidget() {
             >
               <ShoppingBag className="size-[18px]" strokeWidth={1.6} />
               {totalItems > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-champagne text-[9px] font-bold text-[#141414]">
+                <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-champagne text-[9px] font-bold text-charcoal">
                   {totalItems}
                 </span>
               )}
@@ -221,7 +221,7 @@ export default function ShopAssistantWidget() {
                     className={cn(
                       "max-w-[92%] rounded-[5px] px-3 py-2 text-[13px] leading-relaxed",
                       msg.role === "user"
-                        ? "bg-[#0B3D35] text-white"
+                        ? "bg-emerald text-white"
                         : "bg-white/8 text-white/90"
                     )}
                   >
@@ -238,7 +238,7 @@ export default function ShopAssistantWidget() {
                       >
                         <Link
                           href={productPath(product)}
-                          className="relative size-16 shrink-0 overflow-hidden rounded-[5px] bg-[#f2efe3]"
+                          className="relative size-16 shrink-0 overflow-hidden rounded-[5px] bg-cream"
                           onClick={() => setOpen(false)}
                         >
                           {product.image ? (
@@ -265,7 +265,7 @@ export default function ShopAssistantWidget() {
                           <button
                             type="button"
                             disabled={product.soldOut}
-                            className="site-btn inline-flex w-full items-center justify-center gap-1 bg-white py-1.5 text-[11px] font-semibold text-[#141414] hover:bg-champagne disabled:opacity-50"
+                            className="site-btn inline-flex w-full items-center justify-center gap-1 bg-white py-1.5 text-[11px] font-semibold text-charcoal hover:bg-champagne disabled:opacity-50"
                             onClick={() => addToCart(asProduct(product), 1)}
                           >
                             <Plus className="size-3.5" />
@@ -335,7 +335,7 @@ export default function ShopAssistantWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "fixed z-[49] flex items-center gap-2 rounded-[5px] bg-[#141414] px-3.5 py-2.5 text-white shadow-lg ring-1 ring-white/10 transition hover:bg-[#1f1f1f]",
+          "fixed z-[49] flex items-center gap-2 rounded-[5px] bg-charcoal px-3.5 py-2.5 text-white shadow-lg ring-1 ring-white/10 transition hover:bg-[#1f1f1f]",
           open && "ring-champagne/40"
         )}
         style={{

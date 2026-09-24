@@ -32,7 +32,7 @@ export default function MarqueeBar({
     <div
       className={
         isDark
-          ? "overflow-hidden border-t border-white/10 bg-[#0B3D35] py-3.5"
+          ? "overflow-hidden border-t border-white/10 bg-emerald py-3.5"
           : "bg-background overflow-hidden py-4 border-t border-border"
       }
     >

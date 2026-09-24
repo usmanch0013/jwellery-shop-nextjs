@@ -190,9 +190,9 @@ function AsideCard({
   aside: MegaPanelConfig["aside"];
 }) {
   const tones = {
-    green: "bg-[#0B3D35] text-white",
-    gold: "bg-[#3d3428] text-white",
-    rose: "bg-[#6F112B] text-white",
+    green: "bg-emerald text-white",
+    gold: "bg-champagne-dark text-white",
+    rose: "bg-burgundy text-white",
   };
   return (
     <div className={`mt-6 hidden rounded-[5px] p-4 lg:block ${tones[aside.tone]}`}>
@@ -206,33 +206,25 @@ function CategoryTiles({
   categories,
   config,
   onClose,
-  compact,
 }: {
   categories: CategoryInfo[];
   config: MegaPanelConfig;
   onClose: () => void;
-  compact?: boolean;
 }) {
-  const visible = categories.filter((c) => c.productCount > 0);
+  const visible = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+
   return (
-    <div
-      className={cn(
-        "grid gap-3",
-        compact
-          ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"
-          : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-      )}
-    >
+    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7">
       {visible.map((cat) => (
         <Link
           key={cat.slug}
           href={config.categoryHref(cat.slug)}
-          className="group overflow-hidden rounded-[5px] bg-white ring-1 ring-[#e8e2d4] transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-md hover:ring-[#c9a96e]/50"
+          className="group overflow-hidden rounded-[5px] bg-white ring-1 ring-border-warm transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-sm hover:ring-champagne/50"
           onClick={onClose}
         >
-          <div className="relative aspect-[4/5] bg-[#f2efe3]">
+          <div className="relative aspect-square bg-cream">
             {config.badge ? (
-              <span className="absolute top-2 left-2 z-[1] rounded-[5px] bg-[#6F112B] px-1.5 py-0.5 text-[8px] font-semibold uppercase tracking-wide text-white">
+              <span className="absolute top-1 left-1 z-[1] rounded-[3px] bg-burgundy px-1 py-0.5 text-[7px] font-semibold uppercase tracking-wide text-white">
                 {config.badge}
               </span>
             ) : null}
@@ -241,69 +233,19 @@ function CategoryTiles({
                 src={cat.image}
                 alt={cat.name}
                 fill
-                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                sizes="(max-width: 1280px) 20vw, 180px"
+                className="object-cover object-[center_22%] transition-transform duration-500 group-hover:scale-105"
+                sizes="96px"
               />
             ) : (
-              <div className="flex h-full items-center justify-center px-2 text-center text-[11px] text-[#888]">
+              <div className="flex h-full items-center justify-center px-1 text-center text-[9px] leading-tight text-ink-soft">
                 {cat.name}
               </div>
             )}
           </div>
-          <div className="px-2.5 py-2.5">
-            <p className="text-[12px] font-medium text-[#2c2c2c] group-hover:text-[#0B3D35]">
+          <div className="px-1.5 py-1.5">
+            <p className="line-clamp-2 text-[10px] font-medium leading-tight text-charcoal group-hover:text-emerald">
               {cat.name}
             </p>
-            <p className="text-[10px] text-[#888]">
-              {config.categoryHint} · {cat.productCount} items
-            </p>
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function CollectionMegaGrid({
-  categories,
-  config,
-  onClose,
-}: {
-  categories: CategoryInfo[];
-  config: MegaPanelConfig;
-  onClose: () => void;
-}) {
-  const visible = categories.filter((c) => c.productCount > 0);
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {visible.map((cat) => (
-        <Link
-          key={cat.slug}
-          href={config.categoryHref(cat.slug)}
-          className="group relative flex min-h-[200px] overflow-hidden rounded-[5px] bg-[#f2efe3] ring-1 ring-[#e8e2d4] transition-shadow hover:shadow-lg lg:min-h-[240px]"
-          onClick={onClose}
-        >
-          {cat.image ? (
-            <Image
-              src={cat.image}
-              alt={cat.name}
-              fill
-              className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-              sizes="(max-width: 1024px) 50vw, 33vw"
-            />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
-          <div className="relative mt-auto p-5 text-white">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-champagne/90">
-              Collection
-            </p>
-            <p className="mt-1 font-serif text-xl">{cat.name}</p>
-            {cat.description ? (
-              <p className="mt-1 line-clamp-2 text-[12px] text-white/80">
-                {cat.description}
-              </p>
-            ) : null}
-            <p className="mt-2 text-[11px] text-white/70">{cat.productCount} pieces</p>
           </div>
         </Link>
       ))}
@@ -331,30 +273,10 @@ export function HeaderMegaDropdown({
       role="dialog"
       aria-label={`${item.label} menu`}
     >
-      <div className="mx-auto max-w-[var(--site-max)] px-[var(--site-px)] py-8 lg:py-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-[#efe9dc] pb-5">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#0B3D35]">
-              {item.label}
-            </p>
-            <h3 className="mt-1 font-serif text-2xl text-[#2c2c2c] lg:text-[1.75rem]">
-              {config.title}
-            </h3>
-            <p className="mt-1 max-w-xl text-[13px] text-[#666]">{config.subtitle}</p>
-          </div>
-          <Link
-            href={item.href}
-            className="site-btn inline-flex shrink-0 gap-1.5 bg-[#0B3D35] px-6 text-white hover:bg-[#092f29]"
-            onClick={onClose}
-          >
-            {config.cta}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
+      <div className="mx-auto max-w-[var(--site-max)] px-[var(--site-px)] py-6 lg:py-8">
         <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
           <aside>
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#888]">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-soft">
               {config.sidebarTitle}
             </p>
             <ul className="space-y-1">
@@ -362,7 +284,7 @@ export function HeaderMegaDropdown({
                 <li key={link.href + link.label}>
                   <Link
                     href={link.href}
-                    className="group flex items-center justify-between rounded-[5px] py-2 text-[13px] text-[#444] transition-colors hover:text-[#0B3D35]"
+                    className="group flex items-center justify-between rounded-[5px] py-2 text-[13px] text-ink-muted transition-colors hover:text-emerald"
                     onClick={onClose}
                   >
                     {link.label}
@@ -375,24 +297,24 @@ export function HeaderMegaDropdown({
           </aside>
 
           <div className="min-w-0">
-            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#888]">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-soft">
               {config.categoriesTitle}
             </p>
-            <div className="max-h-[min(58vh,560px)] overflow-y-auto pr-1">
-              {config.layout === "collections" ? (
-                <CollectionMegaGrid
-                  categories={categories}
-                  config={config}
-                  onClose={onClose}
-                />
-              ) : (
-                <CategoryTiles
-                  categories={categories}
-                  config={config}
-                  onClose={onClose}
-                />
-              )}
+            <div className="max-h-[min(62vh,600px)] overflow-y-auto pr-1">
+              <CategoryTiles
+                categories={categories}
+                config={config}
+                onClose={onClose}
+              />
             </div>
+            <Link
+              href={item.href}
+              className="site-btn mt-5 inline-flex w-full items-center justify-center gap-1.5 bg-emerald px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-emerald-dark sm:w-auto"
+              onClick={onClose}
+            >
+              {config.cta}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </div>
@@ -421,7 +343,7 @@ export function HeaderNavTriggers({
       "border-b-2 border-transparent",
       overHero && !activeId
         ? "text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.65)] hover:border-champagne/80 hover:text-champagne"
-        : "text-[#2c2c2c]/85 hover:border-[#0B3D35]/40 hover:text-[#0B3D35]",
+        : "text-charcoal/85 hover:border-emerald/40 hover:text-emerald",
       highlight && "border-champagne text-champagne"
     );
 
@@ -518,15 +440,6 @@ export function MobileNavMega({
             </button>
             {expanded && config && (
               <div className="space-y-3 pb-4">
-                <p className="text-[12px] font-medium text-[#0B3D35]">{config.title}</p>
-                <p className="text-[12px] text-muted-foreground">{config.subtitle}</p>
-                <Link
-                  href={item.href}
-                  className="site-btn inline-flex bg-[#0B3D35] px-4 text-white"
-                  onClick={onNavigate}
-                >
-                  {config.cta}
-                </Link>
                 <div className="flex flex-wrap gap-2">
                   {config.sidebarLinks.slice(0, 4).map((link) => (
                     <Link
@@ -539,20 +452,28 @@ export function MobileNavMega({
                     </Link>
                   ))}
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {categories
-                    .filter((c) => c.productCount > 0)
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[...categories]
+                    .sort((a, b) => a.name.localeCompare(b.name))
                     .map((cat) => (
                       <Link
                         key={cat.slug}
                         href={config.categoryHref(cat.slug)}
-                        className="rounded-[5px] bg-[#faf8f3] px-2 py-2 text-[11px]"
+                        className="rounded-[5px] bg-surface-warm px-1.5 py-1.5 text-center text-[10px] leading-tight"
                         onClick={onNavigate}
                       >
                         {cat.name}
                       </Link>
                     ))}
                 </div>
+                <Link
+                  href={item.href}
+                  className="site-btn inline-flex w-full items-center justify-center gap-1.5 bg-emerald px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wide text-white"
+                  onClick={onNavigate}
+                >
+                  {config.cta}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             )}
           </div>

@@ -18,24 +18,29 @@ interface ShopPageProps {
     sort?: string;
     filter?: string;
     max?: string;
+    min?: string;
     category?: string;
+    q?: string;
   }>;
 }
 
 export default async function ShopPage({ searchParams }: ShopPageProps) {
   const params = await searchParams;
-  const page = Number(params.page) || 1;
+  const page = 1;
   const sort = (params.sort as ProductSort) || "newest";
   const category = params.category;
   const maxPrice = params.max ? Number(params.max) : undefined;
+  const minPrice = params.min ? Number(params.min) : undefined;
 
   const [result, categories] = await Promise.all([
     getProducts({
       page,
       sort,
       category: category && category !== "all" ? category : undefined,
+      minPrice,
       maxPrice,
       filter: params.filter as "new" | "bestseller" | "sale" | "featured" | undefined,
+      search: params.q?.trim() || undefined,
     }),
     getCategories(),
   ]);

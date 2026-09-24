@@ -17,7 +17,7 @@ export default async function CustomerReviews({
       </h2>
 
       {reviews.length === 0 ? (
-        <p className="text-center text-[#888] text-sm mb-8">
+        <p className="text-center text-ink-soft text-sm mb-8">
           Be the first to write a review.
         </p>
       ) : (

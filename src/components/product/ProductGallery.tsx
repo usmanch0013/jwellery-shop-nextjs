@@ -11,6 +11,30 @@ interface ProductGalleryProps {
   productCode?: string;
 }
 
+function useImageDimensions(src: string, resetKey: number) {
+  const [dims, setDims] = useState<{ width: number; height: number } | null>(
+    null
+  );
+
+  useEffect(() => {
+    setDims(null);
+    if (!src) return;
+
+    const img = new window.Image();
+    img.onload = () => {
+      if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+        setDims({
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        });
+      }
+    };
+    img.src = src;
+  }, [src, resetKey]);
+
+  return dims;
+}
+
 export default function ProductGallery({
   images,
   productName,
@@ -21,6 +45,8 @@ export default function ProductGallery({
   const [imageKey, setImageKey] = useState(0);
   const thumbListRef = useRef<HTMLDivElement>(null);
   const gallery = images.length > 0 ? images : ["/placeholder.jpg"];
+  const activeSrc = gallery[activeIndex];
+  const imageDims = useImageDimensions(activeSrc, imageKey);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -50,32 +76,39 @@ export default function ProductGallery({
     }
   };
 
+  const renderWidth = imageDims?.width ?? 900;
+  const renderHeight = imageDims?.height ?? 1200;
+
   return (
     <>
       <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[88px_minmax(0,1fr)] lg:items-start lg:gap-5">
         <button
           type="button"
           onClick={() => setLightboxOpen(true)}
-          className="product-zeesy-main-image group relative order-1 aspect-[3/4] w-full min-w-0 cursor-zoom-in overflow-hidden rounded-[16px] bg-[#f2efe3] lg:order-2"
+          className="product-zeesy-main-image group order-1 w-full min-w-0 cursor-zoom-in text-left lg:order-2"
           aria-label="Zoom product image"
         >
-          <Image
-            key={`${gallery[activeIndex]}-${imageKey}`}
-            src={gallery[activeIndex]}
-            alt={productName}
-            fill
-            className="product-zeesy-image-fade object-contain p-2 sm:p-3"
-            priority
-            sizes="(max-width: 1024px) 100vw, 42vw"
-          />
-          <span className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-[10px] font-light uppercase tracking-[0.28em] text-white/90 drop-shadow-sm">
-            SHE Collection
-          </span>
-          {productCode && (
-            <span className="pointer-events-none absolute bottom-3 left-1/2 max-w-[90%] -translate-x-1/2 truncate text-[9px] tracking-wide text-white/70 drop-shadow-sm">
-              {productCode}
+          <span className="relative block w-full overflow-hidden rounded-[16px] bg-cream">
+            <Image
+              key={`${activeSrc}-${imageKey}`}
+              src={activeSrc}
+              alt={productName}
+              width={renderWidth}
+              height={renderHeight}
+              className="product-zeesy-image-fade block h-auto w-full"
+              style={{ width: "100%", height: "auto" }}
+              priority
+              sizes="(max-width: 1024px) 100vw, 42vw"
+            />
+            <span className="pointer-events-none absolute left-1/2 top-4 -translate-x-1/2 text-[10px] font-light uppercase tracking-[0.28em] text-white/90 drop-shadow-sm">
+              SHE Collection
             </span>
-          )}
+            {productCode && (
+              <span className="pointer-events-none absolute bottom-3 left-1/2 max-w-[90%] -translate-x-1/2 truncate text-[9px] tracking-wide text-white/70 drop-shadow-sm">
+                {productCode}
+              </span>
+            )}
+          </span>
         </button>
 
         <div className="order-2 min-w-0 lg:order-1">
@@ -83,7 +116,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("up")}
-              className="mb-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mb-2 lg:flex"
+              className="mb-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-cream text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-ink lg:mb-2 lg:flex"
               aria-label="Previous images"
             >
               <ChevronUp className="h-4 w-4" strokeWidth={1.75} />
@@ -91,7 +124,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("left")}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] lg:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-cream text-[#8a8680] lg:hidden"
               aria-label="Scroll thumbnails left"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -107,7 +140,7 @@ export default function ProductGallery({
                   key={`${src}-${index}`}
                   type="button"
                   onClick={() => selectImage(index)}
-                  className={`relative aspect-[3/4] w-[4.25rem] shrink-0 overflow-hidden rounded-[12px] border bg-[#f2efe3] transition-[border-color,opacity] duration-200 sm:w-[4.75rem] lg:w-full lg:rounded-[16px] ${
+                  className={`relative aspect-[3/4] w-[4.25rem] shrink-0 overflow-hidden rounded-[12px] border bg-cream transition-[border-color,opacity] duration-200 sm:w-[4.75rem] lg:w-full lg:rounded-[16px] ${
                     activeIndex === index
                       ? "border-[1.5px] border-[#1a1a1a]"
                       : "border border-transparent opacity-90 hover:opacity-100"
@@ -119,7 +152,7 @@ export default function ProductGallery({
                     src={src}
                     alt=""
                     fill
-                    className="object-contain p-0.5"
+                    className="object-cover object-[center_22%]"
                     sizes="88px"
                   />
                 </button>
@@ -129,7 +162,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("right")}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] lg:hidden"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] bg-cream text-[#8a8680] lg:hidden"
               aria-label="Scroll thumbnails right"
             >
               <ChevronRight className="h-4 w-4" />
@@ -137,7 +170,7 @@ export default function ProductGallery({
             <button
               type="button"
               onClick={() => scrollThumbs("down")}
-              className="mt-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-[#f2efe3] text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-[#3b3933] lg:mt-2 lg:flex"
+              className="mt-0 hidden h-7 w-7 shrink-0 items-center justify-center rounded-[5px] bg-cream text-[#8a8680] transition-colors hover:bg-[#ebe6d8] hover:text-ink lg:mt-2 lg:flex"
               aria-label="Next images"
             >
               <ChevronDown className="h-4 w-4" strokeWidth={1.75} />
@@ -154,17 +187,19 @@ export default function ProductGallery({
           <button
             type="button"
             onClick={() => setLightboxOpen(false)}
-            className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-[5px] bg-white/90 text-[#3b3933] shadow-lg"
+            className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-[5px] bg-white/90 text-ink shadow-lg"
             aria-label="Close zoom"
           >
             <X className="h-5 w-5" />
           </button>
-          <div className="relative h-[min(82dvh,920px)] w-full overflow-hidden rounded-[16px] bg-[#f2efe3]">
+          <div className="relative w-full overflow-hidden rounded-[16px] bg-cream">
             <Image
-              src={gallery[activeIndex]}
+              src={activeSrc}
               alt={productName}
-              fill
-              className="object-contain p-3 sm:p-4"
+              width={renderWidth}
+              height={renderHeight}
+              className="block h-auto max-h-[min(88vh,960px)] w-full"
+              style={{ width: "100%", height: "auto" }}
               sizes="90vw"
             />
           </div>

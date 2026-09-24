@@ -1,5 +1,7 @@
 /** Central brand constants — SHE Collection (sheco.pk) */
 
+export { BRAND_COLORS } from "@/lib/brand/colors";
+
 export const BRAND = {
   name: "SHE Collection",
   shortName: "SHE",

@@ -28,7 +28,8 @@ export type ShopAssistantResponse = {
   products: AssistantProductPayload[];
   suggestions: string[];
   /** Which backend answered (for debugging / transparency). */
-  engine: "rules" | "openai";
+  engine: "rules" | "openai" | "gemini" | "groq";
+  intent?: ProductSearchIntent;
 };
 
 export type ProductSearchIntent = {

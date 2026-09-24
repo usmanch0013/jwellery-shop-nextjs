@@ -52,14 +52,14 @@ export default function WhatsAppWidget() {
     >
       <div
         className={cn(
-          "pointer-events-none max-w-[220px] rounded-xl border border-[#0B3D35]/10 bg-white px-3.5 py-2.5 text-right shadow-lg transition-all duration-200",
+          "pointer-events-none max-w-[220px] rounded-xl border border-emerald/10 bg-white px-3.5 py-2.5 text-right shadow-lg transition-all duration-200",
           labelOpen
             ? "translate-y-0 opacity-100"
             : "translate-y-1 opacity-0 sm:opacity-0"
         )}
         aria-hidden={!labelOpen}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-wide text-[#0B3D35]">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald">
           Order on WhatsApp
         </p>
         <p className="mt-0.5 text-[12px] leading-snug text-muted-foreground">

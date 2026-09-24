@@ -44,7 +44,7 @@ export default function ProductShowcase({
     variant === "alt" ? "bg-[#F6F1E8]" : "bg-white";
 
   const viewAllButtonClass =
-    "site-btn mt-6 w-full gap-2 border border-[#d8d0c0] bg-white text-[#0B3D35] transition-colors hover:border-[#0B3D35] hover:bg-[#0B3D35] hover:text-white";
+    "site-btn mt-6 w-full gap-2 border border-[#d8d0c0] bg-white text-emerald transition-colors hover:border-emerald hover:bg-emerald hover:text-white";
 
   return (
     <section className={`py-8 sm:py-10 lg:py-14 ${sectionBg}`}>
@@ -82,18 +82,18 @@ export default function ProductShowcase({
             <div className="flex shrink-0 items-center gap-2">
               <Link
                 href={href}
-                className="mr-1 inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.14em] text-[#0B3D35] transition-colors hover:text-champagne"
+                className="mr-1 inline-flex items-center gap-1 text-xs font-medium uppercase tracking-[0.14em] text-emerald transition-colors hover:text-champagne"
               >
                 {viewAllLabel}
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
               <CarouselPrevious
                 variant="outline"
-                className="static inset-auto h-8 w-8 translate-x-0 translate-y-0 rounded-[5px] border-[#e8e2d4] bg-white text-[#3b3933] shadow-none disabled:opacity-30"
+                className="static inset-auto h-8 w-8 translate-x-0 translate-y-0 rounded-[5px] border-border-warm bg-white text-ink shadow-none disabled:opacity-30"
               />
               <CarouselNext
                 variant="outline"
-                className="static inset-auto h-8 w-8 translate-x-0 translate-y-0 rounded-[5px] border-[#e8e2d4] bg-white text-[#3b3933] shadow-none disabled:opacity-30"
+                className="static inset-auto h-8 w-8 translate-x-0 translate-y-0 rounded-[5px] border-border-warm bg-white text-ink shadow-none disabled:opacity-30"
               />
             </div>
           </div>

@@ -106,7 +106,7 @@ export default function HeroSection({
         </motion.div>
 
         <div
-          className="absolute inset-0 bg-[#0B3D35]/20 mix-blend-multiply"
+          className="absolute inset-0 bg-emerald/20 mix-blend-multiply"
           aria-hidden
         />
         <div
@@ -121,7 +121,7 @@ export default function HeroSection({
           className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60"
           aria-hidden
         />
-        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#0B3D35]/90 via-[#0B3D35]/40 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-emerald/90 via-emerald/40 to-transparent" />
       </div>
 
       <div

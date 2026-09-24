@@ -10,7 +10,7 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
       <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col items-start justify-between gap-3 sm:mb-10 sm:flex-row sm:items-end">
           <div>
-            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.28em] text-[#0B3D35]/70">
+            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.28em] text-emerald/70">
               Journal
             </p>
             <h2 className="font-serif text-xl text-foreground sm:text-2xl lg:text-[28px]">
@@ -22,7 +22,7 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
           </div>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-[#0B3D35] transition-colors hover:text-champagne sm:text-xs"
+            className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-[0.14em] text-emerald transition-colors hover:text-champagne sm:text-xs"
           >
             View all
             <ArrowRight className="h-3.5 w-3.5" />
@@ -30,13 +30,13 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
         </div>
 
         {posts.length === 0 ? (
-          <div className="rounded-2xl border border-[#e8e2d4] bg-white px-6 py-12 text-center">
+          <div className="rounded-2xl border border-border-warm bg-white px-6 py-12 text-center">
             <p className="text-sm text-muted-foreground">
               New stories are on the way. Visit the blog for jewellery tips and inspiration.
             </p>
             <Link
               href="/blog"
-              className="site-btn mt-4 bg-[#0B3D35] px-5 text-white"
+              className="site-btn mt-4 bg-emerald px-5 text-white"
             >
               Open blog
             </Link>
@@ -49,7 +49,7 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
                 href={`/blog/${post.slug}`}
                 className="group overflow-hidden rounded-2xl bg-white ring-1 ring-[#efe9dc] transition-shadow hover:shadow-md"
               >
-                <div className="relative aspect-[3/2] overflow-hidden bg-[#f2efe3]">
+                <div className="relative aspect-[3/2] overflow-hidden bg-cream">
                   {post.featured_image ? (
                     <Image
                       src={post.featured_image}
@@ -69,13 +69,13 @@ export default function BlogSection({ posts }: { posts: BlogPostCard[] }) {
                   <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
                     {formatBlogDate(post.published_at)}
                   </p>
-                  <h3 className="mt-1.5 font-serif text-[17px] leading-snug text-[#3b3933] group-hover:underline">
+                  <h3 className="mt-1.5 font-serif text-[17px] leading-snug text-ink group-hover:underline">
                     {post.title}
                   </h3>
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
                     {post.excerpt}
                   </p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-[#0B3D35]">
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-emerald">
                     Read more <ArrowRight className="h-3 w-3" />
                   </span>
                 </div>

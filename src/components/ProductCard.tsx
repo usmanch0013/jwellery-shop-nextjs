@@ -52,12 +52,12 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
       }}
       onMouseLeave={() => setActiveImage(primaryImage)}
     >
-      <div className="relative aspect-[3/4] overflow-hidden rounded-[16px] bg-[#f2efe3]">
+      <div className="relative aspect-[3/4] overflow-hidden rounded-[16px] bg-cream">
         <Link
           href={productHref}
           className={cn(
             "absolute inset-x-0 top-0 z-0 block",
-            showQuickView ? "bottom-8 lg:bottom-0" : "bottom-0"
+            showQuickView ? "bottom-11 lg:bottom-0" : "bottom-0"
           )}
         >
           {thumbnails.map((src) => {
@@ -97,7 +97,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             </span>
           )}
           {product.isNew && !product.soldOut && (
-            <span className="rounded-md bg-[#6F112B] px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
+            <span className="rounded-md bg-burgundy px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
               New
             </span>
           )}
@@ -118,7 +118,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
             "absolute right-3 top-3 z-[2] rounded-[5px] p-1.5 transition-colors",
             wished
               ? "bg-rose-500 text-white"
-              : "bg-white/90 text-[#3b3933] hover:bg-white"
+              : "bg-white/90 text-ink hover:bg-white"
           )}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -137,9 +137,9 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               onQuickView?.(product);
             }}
             className={cn(
-              "absolute inset-x-0 bottom-0 z-[3] w-full bg-[#6F112B] text-[12px] font-medium leading-8 text-white transition-[transform,opacity] duration-300 ease-out",
+              "absolute inset-x-2 bottom-2.5 z-[3] rounded-[5px] bg-burgundy py-1.5 text-[12px] font-medium leading-snug text-white transition-[transform,opacity] duration-300 ease-out",
               "opacity-100",
-              "lg:translate-y-full lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
+              "lg:inset-x-2 lg:bottom-2.5 lg:translate-y-[calc(100%+0.75rem)] lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
             )}
           >
             Quick view
@@ -152,22 +152,22 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           href={productHref}
           className="block px-0.5 text-center transition-all duration-300 lg:group-hover:pointer-events-none lg:group-hover:translate-y-1 lg:group-hover:opacity-0"
         >
-          <h3 className="mb-1.5 text-[14px] font-normal leading-snug text-[#3b3933] group-hover:no-underline hover:underline">
+          <h3 className="mb-1.5 text-[14px] font-normal leading-snug text-ink group-hover:no-underline hover:underline">
             {product.name}
           </h3>
           <div className="flex justify-center">
             <StarRating rating={product.rating ?? 5} reviews={product.reviews} />
           </div>
           <div className="mt-1.5 flex flex-wrap items-center justify-center gap-2">
-            <p className="text-[15px] font-semibold text-[#3b3933]">
+            <p className="text-[15px] font-semibold text-ink">
               {formatPrice(product.price)}
             </p>
             {onSale && product.originalPrice && (
-              <p className="text-[13px] text-[#888] line-through">
+              <p className="text-[13px] text-ink-soft line-through">
                 {formatPrice(product.originalPrice)}
               </p>
             )}
-            <span className="inline-flex items-center gap-1 rounded border border-[#efebdd] px-1.5 py-0.5 text-[10px] text-[#888]">
+            <span className="inline-flex items-center gap-1 rounded border border-[#efebdd] px-1.5 py-0.5 text-[10px] text-ink-soft">
               🇵🇰 PKR
             </span>
           </div>
@@ -185,10 +185,10 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
                 setActiveImage(thumb);
               }}
               className={cn(
-                "relative h-[72px] w-[54px] shrink-0 overflow-hidden rounded-[10px] bg-[#f2efe3] shadow-sm ring-1 transition-all duration-200",
+                "relative h-[72px] w-[54px] shrink-0 overflow-hidden rounded-[10px] bg-cream shadow-sm ring-1 transition-all duration-200",
                 activeImage === thumb
                   ? "ring-[#3b3933]"
-                  : "ring-[#e8e2d4] hover:ring-[#3b3933]/60"
+                  : "ring-border-warm hover:ring-[#3b3933]/60"
               )}
               aria-label={`View image ${i + 1}`}
             >

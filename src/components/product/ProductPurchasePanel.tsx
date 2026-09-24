@@ -8,18 +8,21 @@ import { formatPrice } from "@/lib/products/format";
 import { discountPercent, isOnSale, normalizeSalePrices } from "@/lib/products/sale";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { splitDescriptionAndFaq } from "@/lib/products/description-faq";
+import { formatShortDescription } from "@/lib/products/short-description";
 import { sanitizeHtml } from "@/lib/security/sanitize-html";
 import { toast } from "sonner";
 import PaymentBadges from "./PaymentBadges";
 import { cn } from "@/lib/utils";
 import { whatsAppUrl } from "@/lib/whatsapp";
+import { BRAND_COLORS } from "@/lib/brand/colors";
 
 interface ProductPurchasePanelProps {
   product: Product;
   onVariationChange?: (variation: ProductVariation | null) => void;
 }
 
-const BURGUNDY = "#6F112B";
+const BURGUNDY = BRAND_COLORS.burgundy;
 
 function variationLabel(variation: ProductVariation) {
   const attrs = variation.attributes ?? {};
@@ -58,6 +61,7 @@ export default function ProductPurchasePanel({
   );
   const [quantity, setQuantity] = useState(1);
   const [descOpen, setDescOpen] = useState(false);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const router = useRouter();
@@ -74,6 +78,11 @@ export default function ProductPurchasePanel({
   useEffect(() => {
     setQuantity(1);
   }, [selectedVariationId]);
+
+  useEffect(() => {
+    setOpenFaqIndex(null);
+    setDescOpen(false);
+  }, [product.id]);
 
   useEffect(() => {
     onVariationChange?.(selectedVariation);
@@ -117,18 +126,26 @@ export default function ProductPurchasePanel({
 
   const onSale = isOnSale(displayProduct);
   const salePercent = discountPercent(displayProduct);
-  const descriptionHtml = sanitizeHtml(product.description);
+  const { descriptionHtml: rawDescriptionHtml, faqs: productFaqs } = useMemo(
+    () => splitDescriptionAndFaq(product.description),
+    [product.description]
+  );
+  const descriptionHtml = sanitizeHtml(rawDescriptionHtml);
+  const shortDescriptionText = useMemo(
+    () => formatShortDescription(product.shortDescription),
+    [product.shortDescription]
+  );
 
   return (
-    <div className="w-full font-sans text-[#3b3933]">
+    <div className="w-full font-sans text-ink">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="font-sans text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-[#3b3933] sm:text-[24px] lg:text-[26px]">
+          <h1 className="font-sans text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-ink sm:text-[24px] lg:text-[26px]">
             {product.name}
           </h1>
-          {product.shortDescription && (
-            <p className="mt-2 text-[14px] leading-relaxed text-[#5c5852]">
-              {product.shortDescription}
+          {shortDescriptionText && (
+            <p className="mt-2 max-w-[52ch] text-[14px] leading-[1.65] text-ink-muted">
+              {shortDescriptionText}
             </p>
           )}
         </div>
@@ -139,7 +156,7 @@ export default function ProductPurchasePanel({
             "mt-1 shrink-0 rounded-[5px] p-2 transition-colors",
             wished
               ? "bg-rose-500 text-white"
-              : "border border-[#e8e2d4] text-[#3b3933] hover:border-[#3b3933]"
+              : "border border-border-warm text-ink hover:border-[#3b3933]"
           )}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -152,12 +169,12 @@ export default function ProductPurchasePanel({
       </div>
 
       <div className="mt-3 flex flex-wrap items-center gap-2.5">
-        <p className="font-sans text-[20px] font-medium leading-none text-[#3b3933] lg:text-[22px]">
+        <p className="font-sans text-[20px] font-medium leading-none text-ink lg:text-[22px]">
           {formatPrice(displayProduct.price)}
         </p>
         {onSale && displayProduct.originalPrice && (
           <>
-            <p className="text-[16px] text-[#888] line-through">
+            <p className="text-[16px] text-ink-soft line-through">
               {formatPrice(displayProduct.originalPrice)}
             </p>
             {salePercent > 0 && (
@@ -171,7 +188,7 @@ export default function ProductPurchasePanel({
 
       {hasVariations && (
         <div className="mt-6 space-y-2.5">
-          <p className="text-[14px] font-semibold text-[#3b3933]">Options</p>
+          <p className="text-[14px] font-semibold text-ink">Options</p>
           <div className="flex flex-wrap gap-2">
             {variations.map((variation) => {
               const active = variation.id === selectedVariationId;
@@ -185,8 +202,8 @@ export default function ProductPurchasePanel({
                   className={cn(
                     "rounded-[5px] border px-3 py-1.5 text-[12px] font-medium transition-colors",
                     active
-                      ? "border-[#6F112B] bg-[#6F112B] text-white"
-                      : "border-[#e8e2d4] bg-white text-[#3b3933] hover:border-[#6F112B]/40",
+                      ? "border-burgundy bg-burgundy text-white"
+                      : "border-border-warm bg-white text-ink hover:border-burgundy/40",
                     outOfStock && "cursor-not-allowed opacity-40"
                   )}
                 >
@@ -212,13 +229,13 @@ export default function ProductPurchasePanel({
         <p className="mt-3.5 text-[13px] text-[#e53935]">Sold out</p>
       )}
 
-      <div className="mt-7 border-y border-[#e8e2d4]">
+      <div className="mt-7 border-y border-border-warm">
         <button
           type="button"
           onClick={() => setDescOpen((o) => !o)}
           className="flex w-full items-center justify-between py-[18px] text-left"
         >
-          <span className="text-[14px] font-medium text-[#3b3933]">
+          <span className="text-[14px] font-medium text-ink">
             Description
           </span>
           <span className="relative flex h-3.5 w-3.5 items-center justify-center">
@@ -234,7 +251,7 @@ export default function ProductPurchasePanel({
         <div className="product-zeesy-accordion" data-open={descOpen}>
           <div className="overflow-hidden">
             <div
-              className="prose prose-sm max-w-none pb-5 text-[14px] leading-[1.7] text-[#5c5852]"
+              className="prose prose-sm max-w-none pb-5 text-[14px] leading-[1.7] text-ink-muted"
               dangerouslySetInnerHTML={{ __html: descriptionHtml }}
             />
             {product.material && (
@@ -244,17 +261,60 @@ export default function ProductPurchasePanel({
         </div>
       </div>
 
+      {productFaqs.length > 0 && (
+        <div className="border-b border-border-warm">
+          <p className="py-[18px] text-[14px] font-medium text-ink">
+            Frequently Asked Questions
+          </p>
+          <div className="divide-y divide-[#e8e2d4] border-t border-border-warm">
+            {productFaqs.map((faq, index) => {
+              const open = openFaqIndex === index;
+              return (
+                <div key={`${index}-${faq.question.slice(0, 24)}`}>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenFaqIndex(open ? null : index)
+                    }
+                    className="flex w-full items-center justify-between gap-3 py-4 text-left"
+                  >
+                    <span className="text-[13px] font-medium leading-snug text-ink">
+                      {faq.question}
+                    </span>
+                    <span className="relative flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                      <span className="absolute h-px w-3.5 bg-[#3b3933]" />
+                      <span
+                        className={`absolute h-3.5 w-px bg-[#3b3933] transition-transform duration-200 ease-out ${
+                          open ? "scale-y-0" : "scale-y-100"
+                        }`}
+                      />
+                    </span>
+                  </button>
+                  <div className="product-zeesy-accordion" data-open={open}>
+                    <div className="overflow-hidden">
+                      <p className="pb-4 text-[13px] leading-[1.7] text-ink-muted">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {!displayProduct.soldOut && (
         <div className="mt-7">
           <div className="flex items-center justify-between">
-            <span className="text-[14px] font-semibold text-[#3b3933]">
+            <span className="text-[14px] font-semibold text-ink">
               Quantity
             </span>
-            <div className="flex h-9 w-[100px] items-center justify-between rounded-[5px] border border-[#e8e2d4] bg-[#fffdf5]">
+            <div className="flex h-9 w-[100px] items-center justify-between rounded-[5px] border border-border-warm bg-[#fffdf5]">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="flex h-9 w-8 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                className="flex h-9 w-8 items-center justify-center text-ink transition-opacity hover:opacity-60 disabled:opacity-30"
                 disabled={quantity <= 1}
                 aria-label="Decrease quantity"
               >
@@ -268,7 +328,7 @@ export default function ProductPurchasePanel({
                 onClick={() =>
                   setQuantity((q) => Math.min(stockCount, q + 1))
                 }
-                className="flex h-9 w-8 items-center justify-center text-[#3b3933] transition-opacity hover:opacity-60 disabled:opacity-30"
+                className="flex h-9 w-8 items-center justify-center text-ink transition-opacity hover:opacity-60 disabled:opacity-30"
                 disabled={quantity >= stockCount}
                 aria-label="Increase quantity"
               >
@@ -290,7 +350,7 @@ export default function ProductPurchasePanel({
             <button
               type="button"
               onClick={handleBuyNow}
-              className="flex h-10 w-full items-center justify-center rounded-[5px] border bg-transparent text-[13px] font-medium transition-colors duration-200 hover:bg-[#6F112B]/5"
+              className="flex h-10 w-full items-center justify-center rounded-[5px] border bg-transparent text-[13px] font-medium transition-colors duration-200 hover:bg-burgundy/5"
               style={{ borderColor: BURGUNDY, color: BURGUNDY }}
             >
               Buy it now
