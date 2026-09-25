@@ -23,8 +23,8 @@ import {
   getMediaLibraryAction,
   syncProductMediaAction,
   updateMediaAction,
-  uploadMediaFileAction,
 } from "@/actions/admin/media";
+import { uploadMediaFileClient } from "@/lib/admin/upload-media-client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -127,26 +127,27 @@ export default function MediaLibraryClient({
     setError("");
 
     let uploaded = 0;
-    for (const file of list) {
-      const formData = new FormData();
-      formData.set("file", file);
-      if (uploadAlt.trim()) formData.set("altText", uploadAlt.trim());
-      const result = await uploadMediaFileAction(formData);
-      if (result.error) {
-        setError(result.error);
-        break;
+    try {
+      for (const file of list) {
+        const result = await uploadMediaFileClient(file, uploadAlt);
+        if (!result.ok) {
+          setError(result.error);
+          break;
+        }
+        uploaded += 1;
       }
-      uploaded += 1;
-    }
 
-    if (uploaded > 0) {
-      await refreshLibrary();
-      toast.success(
-        uploaded === 1 ? "Image uploaded" : `${uploaded} images uploaded`
-      );
+      if (uploaded > 0) {
+        await refreshLibrary();
+        toast.success(
+          uploaded === 1 ? "Image uploaded" : `${uploaded} images uploaded`
+        );
+      }
+    } catch {
+      setError("Upload failed. Check your connection and try again.");
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   }
 
   async function handleSync() {

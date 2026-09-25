@@ -18,8 +18,8 @@ import {
   addMediaAction,
   getMediaLibraryAction,
   updateMediaAction,
-  uploadMediaFileAction,
 } from "@/actions/admin/media";
+import { uploadMediaFileClient } from "@/lib/admin/upload-media-client";
 import { cn } from "@/lib/utils";
 
 export type MediaPick = { url: string; altText?: string | null; id?: string };
@@ -104,26 +104,28 @@ export function MediaPickerModal({
     setUploadingFile(true);
     setError("");
     let uploaded = 0;
-    for (const file of list) {
-      const formData = new FormData();
-      formData.set("file", file);
-      if (uploadAlt.trim()) formData.set("altText", uploadAlt.trim());
-      const result = await uploadMediaFileAction(formData);
-      if (result.error) {
-        setError(result.error);
-        break;
+    try {
+      for (const file of list) {
+        const result = await uploadMediaFileClient(file, uploadAlt);
+        if (!result.ok) {
+          setError(result.error);
+          break;
+        }
+        uploaded += 1;
       }
-      uploaded += 1;
-    }
-    if (uploaded > 0) {
-      const res = await getMediaLibraryAction();
-      setItems(res.items as DbMediaAsset[]);
-      if (!multiple && res.items[0]) {
-        setSelected([res.items[0].url]);
-        setSelectedAlt(res.items[0].alt_text ?? uploadAlt);
+      if (uploaded > 0) {
+        const res = await getMediaLibraryAction();
+        setItems(res.items as DbMediaAsset[]);
+        if (!multiple && res.items[0]) {
+          setSelected([res.items[0].url]);
+          setSelectedAlt(res.items[0].alt_text ?? uploadAlt);
+        }
       }
+    } catch {
+      setError("Upload failed. Check your connection and try again.");
+    } finally {
+      setUploadingFile(false);
     }
-    setUploadingFile(false);
   }
 
   async function handleConfirm(urls = selected, alt = selectedAlt) {
