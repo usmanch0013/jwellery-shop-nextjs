@@ -12,6 +12,8 @@ type ShopPriceRangeSliderProps = {
   max: number;
   onCommit: (min: number, max: number) => void;
   variant?: "light" | "dark";
+  /** Tighter layout for shop filter bar */
+  compact?: boolean;
 };
 
 function clamp(value: number, low: number, high: number) {
@@ -33,6 +35,7 @@ export default function ShopPriceRangeSlider({
   max,
   onCommit,
   variant = "light",
+  compact = false,
 }: ShopPriceRangeSliderProps) {
   const [low, setLow] = useState(min);
   const [high, setHigh] = useState(max);
@@ -54,22 +57,30 @@ export default function ShopPriceRangeSlider({
   const highPct = (high / SHOP_PRICE_CAP) * 100;
 
   return (
-    <div className="space-y-4">
+    <div className={cn(compact ? "space-y-1.5" : "space-y-4")}>
       <div
         className={cn(
-          "flex items-center justify-between gap-2 text-[13px]",
+          "flex items-center justify-between gap-2",
+          compact ? "text-[11px]" : "text-[13px]",
           dark ? "text-champagne" : "text-ink"
         )}
       >
         <span className="font-semibold tracking-wide">
           {formatPrice(low)} – {formatPrice(high)}
         </span>
-        <span className={cn("text-[10px]", dark ? "text-white/45" : "text-ink-soft")}>
-          Drag to refine
-        </span>
+        {!compact && (
+          <span className={cn("text-[10px]", dark ? "text-white/45" : "text-ink-soft")}>
+            Drag to refine
+          </span>
+        )}
       </div>
 
-      <div className="shop-price-range-rail relative py-5">
+      <div
+        className={cn(
+          "shop-price-range-rail relative",
+          compact ? "my-0.5" : "my-3"
+        )}
+      >
         <div className="pointer-events-none absolute top-1/2 right-0 left-0 h-2 -translate-y-1/2">
           <div
             className={cn(
@@ -107,7 +118,7 @@ export default function ShopPriceRangeSlider({
             apply(v, high);
           }}
           className={cn(
-            "shop-price-range-thumb absolute inset-x-0 top-0 z-[2] h-10 w-full cursor-grab appearance-none bg-transparent active:cursor-grabbing",
+            "shop-price-range-thumb absolute inset-x-0 z-[2] w-full cursor-grab appearance-none bg-transparent active:cursor-grabbing",
             dark ? "shop-price-range-thumb--dark" : "shop-price-range-thumb--light"
           )}
           aria-label="Minimum price"
@@ -127,18 +138,24 @@ export default function ShopPriceRangeSlider({
             apply(low, v);
           }}
           className={cn(
-            "shop-price-range-thumb absolute inset-x-0 top-0 z-[3] h-10 w-full cursor-grab appearance-none bg-transparent active:cursor-grabbing",
+            "shop-price-range-thumb absolute inset-x-0 z-[3] w-full cursor-grab appearance-none bg-transparent active:cursor-grabbing",
             dark ? "shop-price-range-thumb--dark" : "shop-price-range-thumb--light"
           )}
           aria-label="Maximum price"
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
+      <div
+        className={cn(
+          compact
+            ? "flex items-center gap-2"
+            : "grid grid-cols-2 gap-3"
+        )}
+      >
+        <label className={cn(compact ? "flex items-center gap-1.5" : "block")}>
           <span
             className={cn(
-              "mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em]",
+              compact ? "shrink-0 text-[9px] font-semibold uppercase" : "mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em]",
               dark ? "text-white/50" : "text-ink-soft"
             )}
           >
@@ -153,17 +170,20 @@ export default function ShopPriceRangeSlider({
             onChange={(e) => setLow(Number(e.target.value) || 0)}
             onBlur={() => apply(low, high)}
             className={cn(
-              "w-full rounded-[5px] border px-3 py-2.5 text-[13px] outline-none transition-colors",
+              "rounded-[5px] border outline-none transition-colors",
+              compact
+                ? "w-[4.75rem] px-2 py-1 text-[11px]"
+                : "w-full px-3 py-2.5 text-[13px]",
               dark
                 ? "border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:border-champagne/50"
                 : "border-border-warm bg-white text-ink focus:border-emerald/50"
             )}
           />
         </label>
-        <label className="block">
+        <label className={cn(compact ? "flex items-center gap-1.5" : "block")}>
           <span
             className={cn(
-              "mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em]",
+              compact ? "shrink-0 text-[9px] font-semibold uppercase" : "mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.14em]",
               dark ? "text-white/50" : "text-ink-soft"
             )}
           >
@@ -180,7 +200,10 @@ export default function ShopPriceRangeSlider({
             }
             onBlur={() => apply(low, high)}
             className={cn(
-              "w-full rounded-[5px] border px-3 py-2.5 text-[13px] outline-none transition-colors",
+              "rounded-[5px] border outline-none transition-colors",
+              compact
+                ? "w-[4.75rem] px-2 py-1 text-[11px]"
+                : "w-full px-3 py-2.5 text-[13px]",
               dark
                 ? "border-white/10 bg-white/5 text-white placeholder:text-white/30 focus:border-champagne/50"
                 : "border-border-warm bg-white text-ink focus:border-emerald/50"

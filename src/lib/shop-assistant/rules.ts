@@ -1,17 +1,10 @@
 import type { CategoryInfo } from "@/types";
+import { greetingReply, isGreetingOrThanks } from "./greetings";
+import {
+  extractMaxPriceFromText,
+  extractMinPriceFromText,
+} from "./parse-price-intent";
 import type { ProductSearchIntent } from "./types";
-
-function extractMaxPrice(text: string): number | undefined {
-  const under = text.match(
-    /(?:under|below|less than|upto|up to|max|budget)\s*(?:rs\.?|pkr)?\s*([\d,]+)/i
-  );
-  if (under) return Number(under[1].replace(/,/g, ""));
-  const onlyNum = text.match(/\b([\d]{3,6})\s*(?:rs|pkr)?\b/i);
-  if (onlyNum && /sasta|cheap|budget|affordable/i.test(text)) {
-    return Number(onlyNum[1]);
-  }
-  return undefined;
-}
 
 export function parseIntentFromRules(
   message: string,
@@ -19,6 +12,11 @@ export function parseIntentFromRules(
 ): ProductSearchIntent {
   const text = message.toLowerCase().trim();
   const intent: ProductSearchIntent = {};
+
+  if (isGreetingOrThanks(message)) {
+    intent.reply = greetingReply(message);
+    return intent;
+  }
 
   if (
     /best\s*sell|bestsell|top\s*sell|popular|trending|customer\s*fav/i.test(text)
@@ -57,17 +55,25 @@ export function parseIntentFromRules(
     ) {
       intent.category = cat.slug;
       intent.reply = `Showing ${cat.name} from our catalogue.`;
-      const max = extractMaxPrice(text);
+      const max = extractMaxPriceFromText(text);
       if (max) intent.maxPrice = max;
       return intent;
     }
   }
 
-  const maxPrice = extractMaxPrice(text);
-  if (maxPrice) {
-    intent.maxPrice = maxPrice;
+  const maxPrice = extractMaxPriceFromText(text);
+  const minPrice = extractMinPriceFromText(text);
+  if (maxPrice != null || minPrice != null) {
+    if (maxPrice != null) intent.maxPrice = maxPrice;
+    if (minPrice != null) intent.minPrice = minPrice;
     intent.sort = "price_asc";
-    intent.reply = `Pieces under Rs. ${maxPrice.toLocaleString("en-PK")}:`;
+    if (maxPrice != null && minPrice == null) {
+      intent.reply = `Pieces under Rs. ${maxPrice.toLocaleString("en-PK")} — price filter applied below.`;
+    } else if (minPrice != null && maxPrice == null) {
+      intent.reply = `Pieces from Rs. ${minPrice.toLocaleString("en-PK")} upward.`;
+    } else if (minPrice != null && maxPrice != null) {
+      intent.reply = `Between Rs. ${minPrice.toLocaleString("en-PK")} and Rs. ${maxPrice.toLocaleString("en-PK")}.`;
+    }
     return intent;
   }
 
@@ -93,8 +99,7 @@ export function parseIntentFromRules(
     intent.search = message.trim();
     intent.reply = `Results for “${message.trim()}”:`;
   } else {
-    intent.reply =
-      "Tell me what you’re looking for — e.g. best sellers, new earrings, or party sets under 3000.";
+    intent.reply = greetingReply(message);
   }
 
   return intent;

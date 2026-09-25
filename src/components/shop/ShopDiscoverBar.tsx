@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowUpDown,
   Grid3x3,
@@ -20,38 +20,14 @@ import { cn } from "@/lib/utils";
 import ShopPriceRangeSlider, {
   SHOP_PRICE_CAP,
 } from "@/components/shop/ShopPriceRangeSlider";
+import { SHOP_FILTER_AI_PLACEHOLDERS } from "@/lib/shop-assistant/copy";
 
 const MOOD_FILTERS = [
-  {
-    id: "all",
-    label: "Everything",
-    hint: "Full catalogue",
-    icon: Grid3x3,
-  },
-  {
-    id: "new",
-    label: "New in",
-    hint: "Latest drops",
-    icon: Sparkles,
-  },
-  {
-    id: "bestseller",
-    label: "Best loved",
-    hint: "Top picks",
-    icon: TrendingUp,
-  },
-  {
-    id: "featured",
-    label: "Editorial",
-    hint: "Curated",
-    icon: Star,
-  },
-  {
-    id: "sale",
-    label: "On sale",
-    hint: "Special prices",
-    icon: Tag,
-  },
+  { id: "all", label: "Everything", icon: Grid3x3 },
+  { id: "new", label: "New in", icon: Sparkles },
+  { id: "bestseller", label: "Best loved", icon: TrendingUp },
+  { id: "featured", label: "Editorial", icon: Star },
+  { id: "sale", label: "On sale", icon: Tag },
 ] as const;
 
 const SORT_OPTIONS = [
@@ -76,11 +52,51 @@ type ShopDiscoverBarProps = {
   onAssistantIntent: (intent: ProductSearchIntent) => void;
 };
 
-const AI_PLACEHOLDERS = [
-  "Bridal necklace under 5000 PKR",
-  "Best selling earrings for party",
-  "New arrivals — gold tone bangles",
-];
+function ShopFilterSelect({
+  id,
+  label,
+  icon: Icon,
+  value,
+  onChange,
+  children,
+  variant = "dark",
+}: {
+  id: string;
+  label: string;
+  icon: typeof Layers;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+  variant?: "dark" | "light";
+}) {
+  const dark = variant === "dark";
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1.5 rounded-[5px] border px-2 py-0.5",
+        dark
+          ? "border-white/10 bg-white/5"
+          : "border-border-warm bg-white"
+      )}
+    >
+      <Icon
+        className={cn("size-3 shrink-0", dark ? "text-champagne/80" : "text-emerald/80")}
+      />
+      <label className="sr-only" htmlFor={id}>{label}</label>
+      <select
+        id={id}
+        className={cn(
+          "max-w-[10.5rem] cursor-pointer bg-transparent py-1 text-[11px] font-medium outline-none sm:max-w-[11.5rem]",
+          dark ? "text-white" : "text-ink"
+        )}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      >
+        {children}
+      </select>
+    </div>
+  );
+}
 
 export default function ShopDiscoverBar({
   categories,
@@ -100,7 +116,14 @@ export default function ShopDiscoverBar({
   const [aiLoading, setAiLoading] = useState(false);
   const [aiReply, setAiReply] = useState<string | null>(null);
   const [placeholder] = useState(
-    () => AI_PLACEHOLDERS[Math.floor(Math.random() * AI_PLACEHOLDERS.length)]
+    () =>
+      SHOP_FILTER_AI_PLACEHOLDERS[
+        Math.floor(Math.random() * SHOP_FILTER_AI_PLACEHOLDERS.length)
+      ]
+  );
+
+  const sortedCategories = [...categories].sort((a, b) =>
+    a.name.localeCompare(b.name)
   );
 
   const priceFiltered = priceMin > 0 || priceMax < SHOP_PRICE_CAP;
@@ -109,10 +132,6 @@ export default function ShopDiscoverBar({
     activeFilter !== "all" ||
     priceFiltered ||
     activeSort !== "newest";
-
-  const sortedCategories = [...categories].sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
 
   async function askStyleAssistant() {
     const text = aiQuery.trim();
@@ -138,7 +157,7 @@ export default function ShopDiscoverBar({
       }
     } catch {
       setAiReply(
-        "AI is busy — try mood cards below or use the SHE AI chat button."
+        "AI is busy — try mood chips below or use the SHE AI chat button."
       );
     } finally {
       setAiLoading(false);
@@ -146,58 +165,66 @@ export default function ShopDiscoverBar({
   }
 
   return (
-    <div className="shop-ai-filter mb-10 overflow-hidden rounded-[5px] shadow-[0_16px_48px_rgba(11,61,53,0.12)]">
-      <div className="relative bg-charcoal px-4 py-4 sm:px-6 sm:py-5">
+    <div className="shop-ai-filter mb-6 overflow-hidden rounded-[5px] shadow-[0_12px_36px_rgba(11,61,53,0.1)]">
+      <div className="relative bg-charcoal px-3 py-3 sm:px-5 sm:py-3.5">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          className="pointer-events-none absolute inset-0 opacity-[0.3]"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.25), transparent 55%), radial-gradient(ellipse 60% 50% at 0% 100%, rgba(11,61,53,0.5), transparent 50%)",
+              "radial-gradient(ellipse 80% 60% at 100% 0%, rgba(201,169,110,0.22), transparent 55%)",
           }}
         />
-        <div className="relative flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-start gap-3">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-[5px] bg-gradient-to-br from-emerald to-charcoal ring-1 ring-champagne/30">
-              <Wand2 className="size-5 text-champagne" strokeWidth={1.75} />
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span className="flex size-9 shrink-0 items-center justify-center rounded-[5px] bg-gradient-to-br from-emerald to-charcoal ring-1 ring-champagne/30">
+              <Wand2 className="size-4 text-champagne" strokeWidth={1.75} />
             </span>
-            <div>
-              <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-champagne/90">
+            <div className="min-w-0">
+              <p className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-[0.2em] text-champagne/90">
                 <Sparkles className="size-3" />
                 SHE style assistant
               </p>
-              <p className="mt-1 font-serif text-lg text-white sm:text-xl">
+              <p className="font-serif text-base leading-tight text-white sm:text-lg">
                 Refine your perfect piece
-              </p>
-              <p className="mt-0.5 text-[12px] text-white/55">
-                Smart filters — same intelligence as SHE AI
               </p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2 rounded-[5px] border border-white/10 bg-white/5 px-2 py-1">
-              <ArrowUpDown className="size-3.5 text-champagne/80" />
-              <label className="sr-only" htmlFor="shop-sort">Sort</label>
-              <select
-                id="shop-sort"
-                className="max-w-[10rem] cursor-pointer bg-transparent py-1.5 text-[11px] font-medium text-white outline-none"
-                value={activeSort}
-                onChange={(e) => onSort(e.target.value)}
-              >
-                {SORT_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value} className="text-charcoal">
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <ShopFilterSelect
+              id="shop-category"
+              label="Category"
+              icon={Layers}
+              value={activeCategory}
+              onChange={onCategory}
+            >
+              <option value="all" className="text-charcoal">All categories</option>
+              {sortedCategories.map((cat) => (
+                <option key={cat.slug} value={cat.slug} className="text-charcoal">
+                  {cat.name}
+                </option>
+              ))}
+            </ShopFilterSelect>
+            <ShopFilterSelect
+              id="shop-sort"
+              label="Sort"
+              icon={ArrowUpDown}
+              value={activeSort}
+              onChange={onSort}
+            >
+              {SORT_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value} className="text-charcoal">
+                  {o.label}
+                </option>
+              ))}
+            </ShopFilterSelect>
             {hasActive && (
               <button
                 type="button"
                 onClick={onClearAll}
-                className="inline-flex items-center gap-1.5 rounded-[5px] border border-champagne/35 bg-champagne/10 px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-champagne transition-colors hover:bg-champagne/20"
+                className="inline-flex items-center gap-1 rounded-[5px] border border-champagne/35 bg-champagne/10 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-champagne transition-colors hover:bg-champagne/20"
               >
-                <X className="size-3.5" />
+                <X className="size-3" />
                 Reset
               </button>
             )}
@@ -205,32 +232,26 @@ export default function ShopDiscoverBar({
         </div>
 
         <form
-          className="relative mt-4"
+          className="relative mt-2.5"
           onSubmit={(e) => {
             e.preventDefault();
             void askStyleAssistant();
           }}
         >
-          <div
-            className="flex items-center gap-2 rounded-[5px] border border-white/12 bg-white/6 px-3 py-2 ring-1 ring-champagne/15 backdrop-blur-sm focus-within:border-champagne/35 focus-within:ring-champagne/30"
-          >
-            <Sparkles
-              className="size-4 shrink-0 text-champagne/80"
-              strokeWidth={1.75}
-            />
+          <div className="flex items-center gap-2 rounded-[5px] border border-white/12 bg-white/6 px-2.5 py-1.5 ring-1 ring-champagne/15 focus-within:border-champagne/35">
             <input
               value={aiQuery}
               onChange={(e) => setAiQuery(e.target.value)}
               placeholder={placeholder}
               maxLength={500}
               disabled={aiLoading}
-              className="min-w-0 flex-1 bg-transparent text-[13px] text-white placeholder:text-white/40 outline-none"
+              className="min-w-0 flex-1 bg-transparent text-[12px] text-white placeholder:text-white/40 outline-none sm:text-[13px]"
               aria-label="Describe what you are looking for"
             />
             <button
               type="submit"
               disabled={aiLoading || !aiQuery.trim()}
-              className="inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-champagne px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-charcoal transition-opacity hover:opacity-90 disabled:opacity-40"
+              className="inline-flex shrink-0 items-center gap-1 rounded-[5px] bg-champagne px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-charcoal disabled:opacity-40"
             >
               {aiLoading ? (
                 <Loader2 className="size-3.5 animate-spin" />
@@ -240,115 +261,69 @@ export default function ShopDiscoverBar({
               Ask AI
             </button>
           </div>
+          <p className="mt-1.5 text-[10px] leading-snug text-white/45">
+            Examples:{" "}
+            <span className="text-white/55">
+              “2000 se kam”, “best sellers”, “bridal under 5000”
+            </span>
+            — mood &amp; price slider update automatically.
+          </p>
           {aiReply && (
-            <p
-              className="mt-2 text-[12px] leading-relaxed text-champagne/90"
-              role="status"
-            >
+            <p className="mt-1 text-[11px] leading-snug text-champagne/90" role="status">
               {aiReply}
             </p>
           )}
         </form>
       </div>
 
-      <div className="border-t border-border-warm/80 bg-surface-warm p-4 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-8">
-          <div>
-            <p className="mb-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald">
-              <Sparkles className="size-3.5" />
-              Curated for you
-            </p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5 lg:gap-2.5">
-              {MOOD_FILTERS.map((f) => {
-                const Icon = f.icon;
-                const active = activeFilter === f.id;
-                return (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => onFilter(f.id)}
+      <div className="border-t border-border-warm/80 bg-surface-warm px-3 py-2.5 sm:px-4">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-emerald">
+            Mood
+          </span>
+          {MOOD_FILTERS.map((f) => {
+              const Icon = f.icon;
+              const active = activeFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => onFilter(f.id)}
+                  className={cn(
+                    "inline-flex items-center gap-1 rounded-[5px] border px-2 py-1 text-[10px] font-medium transition-colors sm:text-[11px]",
+                    active
+                      ? "border-champagne/45 bg-emerald text-white"
+                      : "border-border-warm bg-white text-ink hover:border-emerald/30"
+                  )}
+                >
+                  <Icon
                     className={cn(
-                      "group flex min-h-[4.5rem] flex-col justify-between rounded-[5px] border p-3 text-left transition-all duration-300",
-                      active
-                        ? "border-champagne/50 bg-gradient-to-br from-emerald via-emerald-dark to-charcoal text-white shadow-[0_8px_24px_rgba(11,61,53,0.35)]"
-                        : "border-border-warm bg-white text-ink hover:border-emerald/25 hover:shadow-md"
+                      "size-3 shrink-0",
+                      active ? "text-champagne" : "text-emerald/75"
                     )}
-                  >
-                    <Icon
-                      className={cn(
-                        "size-4 transition-colors",
-                        active ? "text-champagne" : "text-emerald/70"
-                      )}
-                      strokeWidth={1.75}
-                    />
-                    <div>
-                      <p className="text-[11px] font-semibold leading-tight">
-                        {f.label}
-                      </p>
-                      <p
-                        className={cn(
-                          "mt-0.5 text-[9px] leading-tight",
-                          active ? "text-white/55" : "text-ink-soft"
-                        )}
-                      >
-                        {f.hint}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+                    strokeWidth={1.75}
+                  />
+                  {f.label}
+                </button>
+              );
+            })}
 
-          <div className="rounded-[5px] border border-emerald/15 bg-gradient-to-br from-charcoal via-charcoal to-emerald p-4 shadow-inner sm:p-5">
-            <p className="mb-4 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-champagne/90">
-              <Layers className="size-3.5" />
-              Price intelligence
-            </p>
+          <div
+            className="mx-0.5 hidden h-7 w-px shrink-0 bg-border-warm md:block"
+            aria-hidden
+          />
+
+          <div className="w-full min-w-[min(100%,17rem)] flex-1 basis-full rounded-[5px] border border-emerald/12 bg-gradient-to-r from-charcoal to-emerald/90 px-2.5 py-1.5 sm:basis-[min(100%,20rem)] sm:py-2 md:basis-auto md:min-w-[14rem]">
+            <span className="mb-0.5 block text-[9px] font-semibold uppercase tracking-[0.16em] text-champagne/90">
+              Price
+            </span>
             <ShopPriceRangeSlider
               min={priceMin}
               max={priceMax}
               onCommit={onPriceRange}
               variant="dark"
+              compact
             />
-          </div>
-        </div>
-
-        <div className="mt-6 border-t border-border-warm pt-6">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-ink-soft">
-            Categories
-          </p>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => onCategory("all")}
-              className={cn(
-                "rounded-[5px] px-3.5 py-2 text-[11px] font-medium transition-all",
-                activeCategory === "all"
-                  ? "bg-emerald text-white shadow-sm ring-1 ring-champagne/30"
-                  : "bg-white text-ink-muted ring-1 ring-[#e5dfd0] hover:ring-emerald/30"
-              )}
-            >
-              All
-            </button>
-            {sortedCategories.map((cat) => {
-              const active = activeCategory === cat.slug;
-              return (
-                <button
-                  key={cat.slug}
-                  type="button"
-                  onClick={() => onCategory(cat.slug)}
-                  className={cn(
-                    "rounded-[5px] px-3.5 py-2 text-[11px] font-medium transition-all",
-                    active
-                      ? "bg-emerald text-white shadow-sm ring-1 ring-champagne/30"
-                      : "bg-white text-ink-muted ring-1 ring-[#e5dfd0] hover:ring-emerald/30"
-                  )}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
           </div>
         </div>
       </div>

@@ -7,6 +7,14 @@ export type LlmEngine = "openai" | "gemini" | "groq";
 
 type LlmResult = { intent: ProductSearchIntent; engine: LlmEngine } | null;
 
+function geminiApiKey(): string | undefined {
+  return (
+    process.env.GEMINI_API_KEY?.trim() ||
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+    undefined
+  );
+}
+
 function historyMessages(history: AssistantHistoryItem[]) {
   return history.slice(-6).map((h) => ({
     role: h.role,
@@ -62,11 +70,16 @@ async function callGemini(
   categories: CategoryInfo[],
   history: AssistantHistoryItem[]
 ): Promise<ProductSearchIntent | null> {
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const apiKey = geminiApiKey();
   if (!apiKey) return null;
 
-  const model =
-    process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+  const configured = process.env.GEMINI_MODEL?.trim();
+  const modelCandidates = [
+    configured,
+    "gemini-2.5-flash",
+    "gemini-3.8-flash",
+  ].filter((m, i, arr) => m && arr.indexOf(m) === i) as string[];
+
   const system = buildAssistantSystemPrompt(categories);
 
   const contents: { role: string; parts: { text: string }[] }[] = [];
@@ -79,23 +92,36 @@ async function callGemini(
   }
   contents.push({ role: "user", parts: [{ text: message }] });
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: system }] },
-      contents,
-      generationConfig: {
-        temperature: 0.35,
-        responseMimeType: "application/json",
-      },
-    }),
+  const body = JSON.stringify({
+    systemInstruction: { parts: [{ text: system }] },
+    contents,
+    generationConfig: {
+      temperature: 0.35,
+      responseMimeType: "application/json",
+    },
   });
 
-  if (!res.ok) {
-    console.error("shop-assistant Gemini error:", res.status, await res.text());
+  let res: Response | null = null;
+  let lastError = "";
+
+  for (const model of modelCandidates) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+    });
+    if (res.ok) break;
+    lastError = await res.text();
+    if (res.status !== 404) break;
+  }
+
+  if (!res?.ok) {
+    console.error(
+      "shop-assistant Gemini error:",
+      res?.status ?? "no-response",
+      lastError
+    );
     return null;
   }
 
