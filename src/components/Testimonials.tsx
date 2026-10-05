@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import {
@@ -11,10 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { testimonials as defaultTestimonials } from "@/data/site";
 import type { CmsTestimonial } from "@/lib/cms/types";
-import "jarallax/dist/jarallax.css";
 
 const BG_IMAGE_DEFAULT = "/testimonial-bg-cignet.jpg";
-const PARALLAX_SPEED = 0.5; // Cignet ElementsKit: ekit_section_parallax_bg_speed
 
 function Stars({ count = 5 }: { count?: number }) {
   return (
@@ -51,7 +49,6 @@ export default function Testimonials({
   title?: string;
   backgroundImage?: string;
 }) {
-  const sectionRef = useRef<HTMLElement>(null);
   const [api, setApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -72,42 +69,11 @@ export default function Testimonials({
     };
   }, [api, onSelect]);
 
-  // Jarallax — same library Cignet uses for fixed bg + scroll parallax
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    let cancelled = false;
-
-    import("jarallax").then(({ jarallax }) => {
-      if (cancelled) return;
-
-      jarallax(section, {
-        speed: PARALLAX_SPEED,
-        imgSrc: backgroundImage,
-        imgSize: "cover",
-        imgPosition: "center center",
-      });
-    });
-
-    return () => {
-      cancelled = true;
-      import("jarallax").then(({ jarallax }) => {
-        jarallax(section, "destroy");
-      });
-    };
-  }, [backgroundImage]);
-
   return (
-    <section
-      ref={sectionRef}
-      className="jarallax relative z-0 overflow-hidden py-[60px] lg:py-[120px]"
-    >
-      {/* Jarallax injects background; hidden img satisfies SSR + no-JS fallback */}
-      <img
-        className="jarallax-img pointer-events-none"
-        src={backgroundImage}
-        alt=""
+    <section className="relative z-0 overflow-hidden py-[60px] lg:py-[120px]">
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 bg-cover bg-center bg-fixed"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
         aria-hidden
       />
 
