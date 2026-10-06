@@ -11,7 +11,10 @@ export async function refreshCategoryProductCounts(
     const { count } = await admin
       .from("products")
       .select("*", { count: "exact", head: true })
-      .eq("category_id", category.id);
+      .eq("category_id", category.id)
+      // Storefront counts must reflect what visitors can actually buy —
+      // drafts are not live products.
+      .eq("status", "published");
 
     await admin
       .from("categories")

@@ -292,7 +292,12 @@ export async function getCategories() {
 
   return data.map((row) => {
     const countRow = row.products as { count: number }[] | null;
-    const productCount = countRow?.[0]?.count ?? 0;
+    const embedCount = countRow?.[0]?.count;
+    // The embedded count comes back null/empty when the join fails under
+    // RLS — fall back to the stored column instead of silently showing 0
+    // for categories that do have products.
+    const productCount =
+      typeof embedCount === "number" ? embedCount : (row.product_count ?? 0);
     return {
       ...mapDbCategory(row),
       productCount,
