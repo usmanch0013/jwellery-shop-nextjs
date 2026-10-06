@@ -6,7 +6,6 @@ import CmsPageView from "@/components/cms/CmsPageView";
 import { getCmsPage, getCmsPages, getCmsSiteSettings } from "@/lib/cms/queries";
 import { normalizePageSections } from "@/lib/cms/page-sections";
 import { RESERVED_PAGE_SLUGS } from "@/lib/cms/page-utils";
-import { BRAND } from "@/lib/brand";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -22,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const page = await getCmsPage(slug);
   if (!page) return { title: "Page not found" };
   return {
-    title: page.seo_title ?? `${page.title} | ${BRAND.name}`,
+    title: page.seo_title ?? page.title,
     description: page.seo_description ?? undefined,
   };
 }

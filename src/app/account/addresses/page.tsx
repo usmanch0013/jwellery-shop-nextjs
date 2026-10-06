@@ -3,7 +3,7 @@ import AddressForm from "@/components/account/AddressForm";
 import AddressListClient from "@/components/account/AddressListClient";
 import { UserCard, UserPageHeader } from "@/components/account/UserShell";
 
-export const metadata = { title: "Addresses | SHE Collection" };
+export const metadata = { title: "Addresses" };
 
 export default async function AccountAddressesPage() {
   const addresses = await getAddresses();

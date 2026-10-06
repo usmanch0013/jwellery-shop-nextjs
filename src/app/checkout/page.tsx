@@ -1,7 +1,7 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 
-export const metadata = { title: "Checkout | SHE Collection" };
+export const metadata = { title: "Checkout" };
 
 export default function CheckoutPage() {
   return (

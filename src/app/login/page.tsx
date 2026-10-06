@@ -1,7 +1,7 @@
 import LoginForm from "@/components/auth/LoginForm";
 import { getSupabaseConfigIssue } from "@/lib/supabase/config";
 
-export const metadata = { title: "Login | SHE Collection" };
+export const metadata = { title: "Login" };
 
 export default async function LoginPage({
   searchParams,

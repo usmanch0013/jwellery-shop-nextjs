@@ -6,7 +6,7 @@ import type { ProductSort } from "@/lib/products/types";
 import { BRAND } from "@/lib/brand";
 
 export const metadata: Metadata = {
-  title: `Shop Artificial Jewellery | ${BRAND.name}`,
+  title: "Shop Artificial Jewellery",
   description:
     `Browse necklace sets, earrings, bangles, bridal & everyday artificial jewellery at ${BRAND.domain}. Contemporary Pakistani designs since ${BRAND.foundedYear}.`,
   alternates: { canonical: "/shop" },

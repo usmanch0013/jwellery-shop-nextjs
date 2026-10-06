@@ -1,6 +1,6 @@
 import TrackOrderClient from "@/components/orders/TrackOrderClient";
 
-export const metadata = { title: "Track Order | SHE Collection" };
+export const metadata = { title: "Track Order" };
 
 interface TrackOrderPageProps {
   searchParams: Promise<{ order?: string }>;

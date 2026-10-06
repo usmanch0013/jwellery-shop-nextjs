@@ -5,7 +5,7 @@ import { formatBlogDate } from "@/lib/blog/format";
 import { ArrowRight } from "lucide-react";
 
 export const metadata = {
-  title: "Blog | SHE Collection",
+  title: "Blog",
   description: "Jewellery care tips, styling guides, and fashion inspiration.",
 };
 

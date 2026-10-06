@@ -12,7 +12,7 @@ interface SearchPageProps {
   }>;
 }
 
-export const metadata = { title: "Search | SHE Collection" };
+export const metadata = { title: "Search" };
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
