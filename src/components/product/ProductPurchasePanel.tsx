@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Minus, Plus, Heart } from "lucide-react";
+import Link from "next/link";
+import { Minus, Plus, Heart, Banknote, Truck, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Product, ProductVariation } from "@/types";
 import { formatPrice } from "@/lib/products/format";
@@ -370,6 +371,26 @@ export default function ProductPurchasePanel({
           <PaymentBadges />
         </div>
       )}
+
+      {/* Verified against the store's own policies: COD (Shipping Policy
+          §4), nationwide courier delivery, 7-day return/exchange window
+          (Refund Policy §1). */}
+      <ul className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border-warm pt-5 text-[12.5px] text-ink-muted">
+        <li className="flex items-center gap-1.5">
+          <Banknote className="h-4 w-4 shrink-0 text-emerald" strokeWidth={1.75} />
+          Cash on Delivery available
+        </li>
+        <li className="flex items-center gap-1.5">
+          <Truck className="h-4 w-4 shrink-0 text-emerald" strokeWidth={1.75} />
+          Nationwide delivery
+        </li>
+        <li className="flex items-center gap-1.5">
+          <RotateCcw className="h-4 w-4 shrink-0 text-emerald" strokeWidth={1.75} />
+          <Link href="/refund-policy" className="transition-colors hover:text-ink hover:underline">
+            7-day returns &amp; exchange
+          </Link>
+        </li>
+      </ul>
     </div>
   );
 }

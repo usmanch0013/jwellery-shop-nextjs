@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Clock, Mail, MapPin } from "lucide-react";
 import type { CategoryInfo } from "@/types";
 import type { CmsNavLink, CmsSiteSettings } from "@/lib/cms/types";
 import { BRAND } from "@/lib/brand";
@@ -41,6 +42,32 @@ export default function Footer({
             <p className="text-sm text-muted-foreground leading-relaxed">
               {brandDescription}
             </p>
+            {/* Contact details come from CMS site settings (no phone by design). */}
+            <ul className="mt-5 space-y-2.5 text-sm text-muted-foreground">
+              {(site?.email ?? BRAND.email) && (
+                <li className="flex items-start gap-2">
+                  <Mail className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <a
+                    href={`mailto:${site?.email ?? BRAND.email}`}
+                    className="transition-colors hover:text-primary"
+                  >
+                    {site?.email ?? BRAND.email}
+                  </a>
+                </li>
+              )}
+              {site?.address && (
+                <li className="flex items-start gap-2">
+                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <span>{site.address}</span>
+                </li>
+              )}
+              {site?.hours && (
+                <li className="flex items-start gap-2">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+                  <span>{site.hours}</span>
+                </li>
+              )}
+            </ul>
           </div>
 
           <div>
