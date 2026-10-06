@@ -21,6 +21,14 @@ import { shippingAddressSchema } from "@/lib/validations/commerce";
 
 const STEPS = ["Shipping", "Payment", "Review"] as const;
 
+// Bank transfer details come from env — never invent placeholder values.
+// When they are not configured, the checkout says so instead of showing
+// fake account numbers to customers.
+const BANK_NAME = process.env.NEXT_PUBLIC_BANK_NAME;
+const BANK_ACCOUNT_NUMBER = process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER;
+const BANK_IBAN = process.env.NEXT_PUBLIC_BANK_IBAN;
+const BANK_DETAILS_CONFIGURED = Boolean(BANK_IBAN);
+
 type CheckoutFormState = {
   fullName: string;
   phone: string;
@@ -82,7 +90,7 @@ export default function CheckoutForm() {
 
   function validatePayment(): string | null {
     if (
-      (form.paymentMethod === "bank_transfer" ||
+      ((form.paymentMethod === "bank_transfer" && BANK_DETAILS_CONFIGURED) ||
         form.paymentMethod === "jazzcash" ||
         form.paymentMethod === "easypaisa") &&
       !form.paymentReference.trim()
@@ -330,29 +338,38 @@ export default function CheckoutForm() {
 
             {form.paymentMethod === "bank_transfer" && (
               <div className="rounded-lg bg-muted p-4 text-sm space-y-1">
-                <p>
-                  <strong>Bank:</strong>{" "}
-                  {process.env.NEXT_PUBLIC_BANK_NAME ?? "HBL"}
-                </p>
-                <p>
-                  <strong>Account:</strong>{" "}
-                  {process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ??
-                    "12345678901234"}
-                </p>
-                <p>
-                  <strong>IBAN:</strong>{" "}
-                  {process.env.NEXT_PUBLIC_BANK_IBAN ?? "PK00HABB0000000000123456"}
-                </p>
-                <div className="pt-2">
-                  <Label>Transaction Reference</Label>
-                  <Input
-                    value={form.paymentReference}
-                    onChange={(e) =>
-                      setForm({ ...form, paymentReference: e.target.value })
-                    }
-                    placeholder="Enter bank transaction ID"
-                  />
-                </div>
+                {BANK_DETAILS_CONFIGURED ? (
+                  <>
+                    {BANK_NAME && (
+                      <p>
+                        <strong>Bank:</strong> {BANK_NAME}
+                      </p>
+                    )}
+                    {BANK_ACCOUNT_NUMBER && (
+                      <p>
+                        <strong>Account:</strong> {BANK_ACCOUNT_NUMBER}
+                      </p>
+                    )}
+                    <p>
+                      <strong>IBAN:</strong> {BANK_IBAN}
+                    </p>
+                    <div className="pt-2">
+                      <Label>Transaction Reference</Label>
+                      <Input
+                        value={form.paymentReference}
+                        onChange={(e) =>
+                          setForm({ ...form, paymentReference: e.target.value })
+                        }
+                        placeholder="Enter bank transaction ID"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <p>
+                    Bank transfer is not available at the moment. Please choose
+                    a different payment method to continue.
+                  </p>
+                )}
               </div>
             )}
 
