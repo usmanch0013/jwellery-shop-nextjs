@@ -35,6 +35,9 @@ const SOURCE_LABELS: Record<string, string> = {
   manual: "Manual",
 };
 
+/** Render the library in pages so 150+ images don't stall the page. */
+const MEDIA_PAGE_SIZE = 30;
+
 function resolveSource(item: DbMediaAsset): string {
   if (item.source && SOURCE_LABELS[item.source]) {
     return SOURCE_LABELS[item.source];
@@ -61,6 +64,7 @@ export default function MediaLibraryClient({
   const [title, setTitle] = useState("");
   const [uploadAlt, setUploadAlt] = useState("");
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -90,6 +94,13 @@ export default function MediaLibraryClient({
       return haystack.includes(q);
     });
   }, [items, search]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / MEDIA_PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
+  const pagedItems = filtered.slice(
+    (currentPage - 1) * MEDIA_PAGE_SIZE,
+    currentPage * MEDIA_PAGE_SIZE
+  );
 
   async function refreshLibrary() {
     const res = await getMediaLibraryAction();
@@ -361,7 +372,10 @@ export default function MediaLibraryClient({
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
                 placeholder="Search media..."
                 className="pl-9"
               />
@@ -377,7 +391,7 @@ export default function MediaLibraryClient({
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {filtered.map((item) => (
+              {pagedItems.map((item) => (
                 <button
                   key={item.id}
                   type="button"
@@ -407,6 +421,39 @@ export default function MediaLibraryClient({
                   </span>
                 </button>
               ))}
+            </div>
+          )}
+
+          {filtered.length > MEDIA_PAGE_SIZE && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border/50 px-5 py-3">
+              <p className="text-sm text-muted-foreground">
+                Page {currentPage} of {pageCount} · Showing{" "}
+                {(currentPage - 1) * MEDIA_PAGE_SIZE + 1}–
+                {Math.min(currentPage * MEDIA_PAGE_SIZE, filtered.length)} of{" "}
+                {filtered.length} items
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                >
+                  Previous
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={currentPage >= pageCount}
+                  onClick={() =>
+                    setPage((p) => Math.min(pageCount, p + 1))
+                  }
+                >
+                  Next
+                </Button>
+              </div>
             </div>
           )}
         </AdminCard>
