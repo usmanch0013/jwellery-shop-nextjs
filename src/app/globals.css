@@ -11,16 +11,17 @@
   --champagne: #c9a96e;
   --champagne-dark: #b89858;
   --ivory: #f7f3ea;
-  --cream: #f2efe3;
+  --cream: #e8d5a8;
   --surface-warm: #faf8f3;
-  --charcoal: #202321;
+  --charcoal: #1a1a1a;
   --ink: #3b3933;
-  --ink-muted: #5c5852;
+  --ink-muted: #6b6560;
   --ink-soft: #888888;
   --burgundy: #6f112b;
+  --sale: #e11d48;
   --burgundy-dark: #5a0e23;
-  --rose: #c98f96;
-  --sage: #a8b9a6;
+  --rose: #c9a96e;
+  --sage: #b89858;
   --border-warm: #e8e2d4;
   --border-warm-light: #efe9dc;
 
@@ -31,8 +32,8 @@
   --primary-foreground: #ffffff;
   --secondary: var(--champagne);
   --secondary-foreground: var(--charcoal);
-  --accent: var(--burgundy);
-  --accent-foreground: #ffffff;
+  --accent: var(--champagne);
+  --accent-foreground: #1a1a1a;
   --muted: var(--surface-warm);
   --muted-foreground: var(--ink-muted);
   --border: var(--border-warm);
@@ -82,6 +83,7 @@ body {
   --color-gold-dark: var(--champagne-dark);
   --color-rose-gold: var(--rose);
   --color-burgundy: var(--burgundy);
+  --color-sale: var(--sale);
   --color-burgundy-dark: var(--burgundy-dark);
   --color-cream: var(--cream);
   --color-surface-warm: var(--surface-warm);
@@ -336,7 +338,7 @@ body {
   --zeesy-bg: var(--background);
   --zeesy-text: var(--ink);
   --zeesy-border: var(--border-warm);
-  --zeesy-accent: var(--burgundy);
+  --zeesy-accent: var(--emerald);
   --zeesy-muted: var(--ink-soft);
   font-family: var(--font-sans), system-ui, sans-serif;
   color: var(--zeesy-text);

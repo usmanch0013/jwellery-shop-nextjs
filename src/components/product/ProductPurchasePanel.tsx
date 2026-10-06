@@ -23,7 +23,7 @@ interface ProductPurchasePanelProps {
   onVariationChange?: (variation: ProductVariation | null) => void;
 }
 
-const BURGUNDY = BRAND_COLORS.burgundy;
+const EMERALD = BRAND_COLORS.emerald;
 
 function variationLabel(variation: ProductVariation) {
   const attrs = variation.attributes ?? {};
@@ -156,7 +156,7 @@ export default function ProductPurchasePanel({
           className={cn(
             "mt-1 shrink-0 rounded-[5px] p-2 transition-colors",
             wished
-              ? "bg-rose-500 text-white"
+              ? "bg-champagne text-white"
               : "border border-border-warm text-ink hover:border-[#3b3933]"
           )}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
@@ -179,7 +179,7 @@ export default function ProductPurchasePanel({
               {formatPrice(displayProduct.originalPrice)}
             </p>
             {salePercent > 0 && (
-              <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white">
+              <span className="rounded-md bg-sale px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wider text-white">
                 Sale -{salePercent}%
               </span>
             )}
@@ -203,8 +203,8 @@ export default function ProductPurchasePanel({
                   className={cn(
                     "rounded-[5px] border px-3 py-1.5 text-[12px] font-medium transition-colors",
                     active
-                      ? "border-burgundy bg-burgundy text-white"
-                      : "border-border-warm bg-white text-ink hover:border-burgundy/40",
+                      ? "border-emerald bg-emerald text-white"
+                      : "border-border-warm bg-white text-ink hover:border-emerald/40",
                     outOfStock && "cursor-not-allowed opacity-40"
                   )}
                 >
@@ -343,7 +343,7 @@ export default function ProductPurchasePanel({
               type="button"
               onClick={handleAddToCart}
               className="flex h-10 w-full items-center justify-center rounded-[5px] text-[13px] font-medium text-[#fffdf5] transition-opacity duration-200 hover:opacity-90"
-              style={{ backgroundColor: BURGUNDY }}
+              style={{ backgroundColor: EMERALD }}
             >
               Add to cart
             </button>
@@ -351,8 +351,8 @@ export default function ProductPurchasePanel({
             <button
               type="button"
               onClick={handleBuyNow}
-              className="flex h-10 w-full items-center justify-center rounded-[5px] border bg-transparent text-[13px] font-medium transition-colors duration-200 hover:bg-burgundy/5"
-              style={{ borderColor: BURGUNDY, color: BURGUNDY }}
+              className="flex h-10 w-full items-center justify-center rounded-[5px] border bg-transparent text-[13px] font-medium transition-colors duration-200 hover:bg-emerald/5"
+              style={{ borderColor: EMERALD, color: EMERALD }}
             >
               Buy it now
             </button>

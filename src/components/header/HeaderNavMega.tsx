@@ -192,7 +192,7 @@ function AsideCard({
   const tones = {
     green: "bg-emerald text-white",
     gold: "bg-champagne-dark text-white",
-    rose: "bg-burgundy text-white",
+    rose: "bg-champagne text-emerald-dark",
   };
   return (
     <div className={`mt-6 hidden rounded-[5px] p-4 lg:block ${tones[aside.tone]}`}>
@@ -224,7 +224,7 @@ function CategoryTiles({
         >
           <div className="relative aspect-square bg-cream">
             {config.badge ? (
-              <span className="absolute top-1 left-1 z-[1] rounded-[3px] bg-burgundy px-1 py-0.5 text-[7px] font-semibold uppercase tracking-wide text-white">
+              <span className="absolute top-1 left-1 z-[1] rounded-[3px] bg-emerald px-1 py-0.5 text-[7px] font-semibold uppercase tracking-wide text-white">
                 {config.badge}
               </span>
             ) : null}

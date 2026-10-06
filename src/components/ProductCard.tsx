@@ -92,12 +92,12 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
 
         <div className="pointer-events-none absolute left-3 top-3 z-[2] flex flex-col gap-1.5">
           {onSale && (
-            <span className="rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+            <span className="rounded-md bg-sale px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
               Sale {salePercent > 0 ? `-${salePercent}%` : ""}
             </span>
           )}
           {product.isNew && !product.soldOut && (
-            <span className="rounded-md bg-burgundy px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
+            <span className="rounded-md bg-emerald px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">
               New
             </span>
           )}
@@ -117,7 +117,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
           className={cn(
             "absolute right-3 top-3 z-[2] rounded-[5px] p-1.5 transition-colors",
             wished
-              ? "bg-rose-500 text-white"
+              ? "bg-champagne text-white"
               : "bg-white/90 text-ink hover:bg-white"
           )}
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
@@ -137,7 +137,7 @@ export default function ProductCard({ product, onQuickView }: ProductCardProps) 
               onQuickView?.(product);
             }}
             className={cn(
-              "absolute inset-x-2 bottom-2.5 z-[3] rounded-[5px] bg-burgundy py-1.5 text-[12px] font-medium leading-snug text-white transition-[transform,opacity] duration-300 ease-out",
+              "absolute inset-x-2 bottom-2.5 z-[3] rounded-[5px] bg-emerald py-1.5 text-[12px] font-medium leading-snug text-white transition-[transform,opacity] duration-300 ease-out",
               "opacity-100",
               "lg:inset-x-2 lg:bottom-2.5 lg:translate-y-[calc(100%+0.75rem)] lg:opacity-0 lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
             )}

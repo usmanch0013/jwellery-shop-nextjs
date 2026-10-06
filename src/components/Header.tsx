@@ -185,7 +185,7 @@ export default function Header({
                 >
                   <Heart className="h-[18px] w-[18px]" strokeWidth={1.6} />
                   {wishlistItems.length > 0 && (
-                    <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500 text-[8px] text-white">
+                    <span className="absolute top-1 right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-emerald text-[8px] text-white">
                       {wishlistItems.length}
                     </span>
                   )}

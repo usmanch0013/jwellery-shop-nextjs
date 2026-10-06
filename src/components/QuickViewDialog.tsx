@@ -73,7 +73,7 @@ export default function QuickViewDialog({
                 </p>
               )}
               {onSale && (
-                <span className="bg-rose-600 text-white text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                <span className="bg-sale text-white text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-sm">
                   Sale {salePercent > 0 ? `-${salePercent}%` : ""}
                 </span>
               )}
@@ -88,7 +88,7 @@ export default function QuickViewDialog({
             ) : (
               <button
                 onClick={handleAdd}
-                className="flex h-10 items-center justify-center gap-2 rounded-[5px] bg-burgundy text-[13px] text-[#fffdf5] transition-colors hover:opacity-90"
+                className="flex h-10 items-center justify-center gap-2 rounded-[5px] bg-emerald text-[13px] text-[#fffdf5] transition-colors hover:opacity-90"
               >
                 <Plus className="w-4 h-4" />
                 Add to cart
