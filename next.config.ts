@@ -48,6 +48,18 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        // Canonical host is the apex domain (see BRAND.siteUrl) — send all
+        // www traffic there permanently so the site is not duplicated.
+        source: "/:path*",
+        has: [{ type: "host", value: "www.sheco.pk" }],
+        destination: "https://sheco.pk/:path*",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
