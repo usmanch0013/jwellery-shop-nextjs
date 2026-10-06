@@ -7,6 +7,7 @@ import {
   Layout,
   MessageSquareQuote,
   Navigation,
+  Percent,
 } from "lucide-react";
 import { AdminPageHeader } from "@/components/admin/AdminShell";
 
@@ -22,6 +23,12 @@ const CMS_MODULES = [
     title: "Homepage",
     description: "Hero, sections, video, trust bar, FAQ headings",
     icon: Home,
+  },
+  {
+    href: "/admin/cms/homepage#sale-popup",
+    title: "Sale Popup",
+    description: "Promo popup shown to visitors — offer text, coupon & timing",
+    icon: Percent,
   },
   {
     href: "/admin/cms/pages",

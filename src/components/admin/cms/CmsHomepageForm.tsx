@@ -552,10 +552,10 @@ export default function CmsHomepageForm({
           </div>
         </div>
 
-        <div className="admin-card p-5 space-y-4">
+        <div id="sale-popup" className="admin-card p-5 space-y-4 scroll-mt-24">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h3 className="text-sm font-semibold">Sale popup</h3>
+              <h3 className="text-sm font-semibold">Sale Popup (Promo Popup)</h3>
               <p className="text-[12px] text-[var(--admin-text-subdued)]">
                 Offer modal on the storefront. Bump version when you change the sale so visitors see it again.
               </p>
