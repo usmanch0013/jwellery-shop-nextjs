@@ -20,6 +20,7 @@ import {
   type CommerceSummary,
   type DashboardPeriods,
 } from "@/lib/admin/analytics";
+import { grossSales } from "@/lib/admin/metrics";
 
 export {
   countsAsRevenue,
@@ -548,6 +549,7 @@ export async function getAdminCustomers(): Promise<AdminCustomer[]> {
   ]);
 
   const customerMap = new Map<string, AdminCustomer>();
+  const customerOrders = new Map<string, DbOrder[]>();
 
   for (const order of (orders ?? []) as DbOrder[]) {
     const addr = order.shipping_address ?? {};
@@ -556,7 +558,9 @@ export async function getAdminCustomers(): Promise<AdminCustomer[]> {
       : `guest:${order.guest_email ?? order.guest_phone ?? order.id}`;
 
     const existing = customerMap.get(key);
-    const spent = (existing?.totalSpent ?? 0) + order.total;
+    const rows = customerOrders.get(key) ?? [];
+    rows.push(order);
+    customerOrders.set(key, rows);
     const count = (existing?.ordersCount ?? 0) + 1;
 
     customerMap.set(key, {
@@ -566,7 +570,7 @@ export async function getAdminCustomers(): Promise<AdminCustomer[]> {
       email: order.guest_email ?? addr.email ?? existing?.email ?? null,
       phone: order.guest_phone ?? addr.phone ?? existing?.phone ?? null,
       ordersCount: count,
-      totalSpent: spent,
+      totalSpent: existing?.totalSpent ?? 0,
       lastOrderAt:
         !existing?.lastOrderAt || order.created_at > existing.lastOrderAt
           ? order.created_at
@@ -592,6 +596,13 @@ export async function getAdminCustomers(): Promise<AdminCustomer[]> {
       if (profile.full_name) c.name = profile.full_name;
       if (profile.phone) c.phone = profile.phone;
     }
+  }
+
+  // "Total spent" follows the canonical gross-sales definition
+  // (non-cancelled orders) from lib/admin/metrics.ts, so customer totals
+  // reconcile with the Gross sales figure on Dashboard/Analytics.
+  for (const [key, customer] of customerMap) {
+    customer.totalSpent = grossSales(customerOrders.get(key) ?? []);
   }
 
   return Array.from(customerMap.values()).sort((a, b) => {

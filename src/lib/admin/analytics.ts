@@ -3,6 +3,12 @@ import type {
   PaymentMethod,
   PaymentStatus,
 } from "@/lib/database.types";
+import {
+  averageOrderValue as canonicalAverageOrderValue,
+  grossSales,
+  isPaidSale,
+  pendingRevenue,
+} from "@/lib/admin/metrics";
 
 export type AnalyticsOrderRow = {
   total?: number | null;
@@ -19,19 +25,9 @@ const ACTIVE_STATUSES: OrderStatus[] = [
   "delivered",
 ];
 
-/** Revenue counts only after payment is received or COD order is confirmed+. */
+/** Revenue ("Total sales") counts only paid orders — see lib/admin/metrics.ts. */
 export function countsAsRevenue(order: AnalyticsOrderRow): boolean {
-  if (order.status === "cancelled") return false;
-  if (order.payment_status === "refunded") return false;
-  if (order.payment_status === "paid") return true;
-  if (order.payment_status === "cod_pending") {
-    return (
-      order.status !== "pending" &&
-      order.status !== undefined &&
-      order.status !== null
-    );
-  }
-  return false;
+  return isPaidSale(order);
 }
 
 export function countsAsPendingPayment(order: AnalyticsOrderRow): boolean {
@@ -89,7 +85,7 @@ export function sumEarned(
 export function sumPendingValue(
   orders: AnalyticsOrderRow[] | null | undefined
 ): number {
-  return sumBy(orders, countsAsPendingPayment);
+  return pendingRevenue(orders);
 }
 
 export function sumCancelledValue(
@@ -107,7 +103,7 @@ export function sumRefundedValue(
 export function sumGrossSales(
   orders: AnalyticsOrderRow[] | null | undefined
 ): number {
-  return sumBy(orders, countsAsActiveOrder);
+  return grossSales(orders);
 }
 
 export function countOrders(
@@ -132,9 +128,7 @@ export function countByStatus(
 export function averageOrderValue(
   orders: AnalyticsOrderRow[] | null | undefined
 ): number {
-  const active = orders?.filter(countsAsActiveOrder) ?? [];
-  if (!active.length) return 0;
-  return Math.round(sumGrossSales(active) / active.length);
+  return canonicalAverageOrderValue(orders);
 }
 
 function startOfDay(date: Date): Date {
