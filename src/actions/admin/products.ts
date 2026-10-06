@@ -198,7 +198,7 @@ export async function createProductAction(formData: FormData) {
 
   const admin = await getAdminClient();
   const data = parsed.data;
-  const slug = data.slug || slugify(data.name);
+  const slug = slugify(data.slug || data.name);
   const stock = data.stock;
   const soldOut = data.soldOut || stock <= 0;
   const sortOrder = await nextProductSortOrder(admin);
@@ -252,7 +252,7 @@ export async function updateProductAction(id: string, formData: FormData) {
 
   const admin = await getAdminClient();
   const data = parsed.data;
-  const slug = data.slug || slugify(data.name);
+  const slug = slugify(data.slug || data.name);
   const stock = data.stock;
   const soldOut = data.soldOut || stock <= 0;
 

@@ -35,9 +35,12 @@ function isUuid(value: string): boolean {
 }
 
 function productLookupFilter(identifier: string): string {
+  // PostgREST `or` filter values containing spaces/commas must be quoted,
+  // otherwise the filter fails to parse and the product is not found (404).
+  const quoted = `"${identifier.replace(/"/g, "")}"`;
   const filters = [
-    `slug.eq.${identifier}`,
-    `legacy_id.eq.${identifier}`,
+    `slug.eq.${quoted}`,
+    `legacy_id.eq.${quoted}`,
   ];
   if (isUuid(identifier)) {
     filters.push(`id.eq.${identifier}`);
