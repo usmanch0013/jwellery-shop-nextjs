@@ -41,11 +41,20 @@ export function buildSiteMetadata(overrides?: {
       siteName: BRAND.name,
       title,
       description,
+      images: [
+        {
+          url: absoluteUrl("/she-hero-poster.jpg"),
+          width: 1280,
+          height: 720,
+          alt: `${BRAND.name} — artificial jewellery in Pakistan`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [absoluteUrl("/she-hero-poster.jpg")],
     },
     robots: overrides?.noIndex
       ? { index: false, follow: false }
