@@ -169,7 +169,9 @@ export async function getProducts(
     return emptyPage(page, limit);
   }
 
-  const products = (data as DbProduct[]).map(mapDbProductToProduct);
+  // The untyped Supabase client cannot infer explicit column lists, so
+  // cast via unknown (rows are mapped through mapDbProductToProduct).
+  const products = (data as unknown as DbProduct[]).map(mapDbProductToProduct);
   const ids = products.map((p) => p.id);
   if (ids.length > 0) {
     const { data: gallery } = await supabase
