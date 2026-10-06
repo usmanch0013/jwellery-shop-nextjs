@@ -26,7 +26,7 @@ const CMS_MODULES = [
   {
     href: "/admin/cms/pages",
     title: "Pages",
-    description: "WordPress-style page list + Elementor visual editor",
+    description: "Page list and visual editor for store pages",
     icon: FileText,
     featured: true,
   },
@@ -63,10 +63,8 @@ export default function CmsHubPage() {
         <div>
           <p className="text-sm font-semibold text-[#004c3f]">Content management system</p>
           <p className="mt-1 text-[13px] text-[#006e52]">
-            Edit pages, homepage, navigation and site settings from here. For new
-            installs run migrations <code className="text-xs">009_cms.sql</code>,{" "}
-            <code className="text-xs">010_security_hardening.sql</code>, and{" "}
-            <code className="text-xs">011_security_fixes.sql</code> in Supabase.
+            Edit pages, homepage, navigation and site settings from here.
+            Changes you save go live on your store right away.
           </p>
         </div>
       </div>

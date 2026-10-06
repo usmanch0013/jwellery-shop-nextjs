@@ -54,16 +54,8 @@ export default function AdminSettingsPage() {
           <AdminInfoRow key={email} label="Admin email" value={email} />
         ))}
         <p className="mt-3 text-[12px] text-[var(--admin-text-subdued)]">
-          Add more admins via <code>ADMIN_EMAILS</code> environment variable in
-          Netlify, comma-separated.
-        </p>
-      </AdminCard>
-
-      <AdminCard title="Database migrations">
-        <p className="text-[13px] text-[var(--admin-text-subdued)]">
-          Run pending SQL migrations in Supabase for invoices, order tracking,
-          and timeline features. File:{" "}
-          <code className="text-xs">008_order_commerce_advanced.sql</code>
+          To give another person admin access, ask your developer to add their
+          email to the admin list.
         </p>
       </AdminCard>
     </div>

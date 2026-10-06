@@ -62,9 +62,9 @@ export default async function AdminInvoicePage({
         </div>
         {migrationHint && (
           <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 print:hidden">
-            Invoice is shown from order data. Run migration{" "}
-            <code className="text-xs">008_order_commerce_advanced.sql</code> in
-            Supabase to save invoices permanently.
+            This invoice was generated from the order data because it could
+            not be saved. You can still print it — if this message keeps
+            appearing, please contact your developer.
           </p>
         )}
         <PrintInvoiceButton />
