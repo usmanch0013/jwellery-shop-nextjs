@@ -27,7 +27,7 @@ export function mapDbProductToProduct(row: DbProduct): Product {
     legacyId: row.legacy_id ?? undefined,
     sku: row.sku ?? undefined,
     name: row.name,
-    description: row.description,
+    description: row.description ?? "",
     shortDescription: row.short_description ?? undefined,
     price,
     originalPrice,

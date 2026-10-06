@@ -9,6 +9,12 @@ export interface ProductQueryParams {
   maxPrice?: number;
   filter?: "new" | "bestseller" | "sale" | "featured";
   search?: string;
+  /**
+   * "card" fetches only the columns a product card renders (no long
+   * description / search vector), which keeps listing payloads small.
+   * Default keeps the full row.
+   */
+  fields?: "full" | "card";
 }
 
 export interface PaginatedProducts {

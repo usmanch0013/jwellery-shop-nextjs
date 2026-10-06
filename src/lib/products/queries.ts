@@ -96,6 +96,7 @@ function filterStaticProducts(params: ProductQueryParams): PaginatedProducts {
     ...p,
     stock: p.stock ?? 50,
     slug: p.slug ?? p.id,
+    ...(params.fields === "card" ? { description: "" } : {}),
   }));
 
   return {
@@ -119,9 +120,16 @@ export async function getProducts(
   const from = (page - 1) * limit;
   const to = from + limit - 1;
 
+  // Card listings (e.g. homepage sections) don't render descriptions, so
+  // skip the long-text columns to keep the RSC payload small.
+  const selectColumns =
+    params.fields === "card"
+      ? "id, slug, legacy_id, sku, name, price, original_price, material, stock, sold_out, is_new, is_bestseller, is_featured, rating_avg, review_count, image, hover_image, sort_order, created_at, updated_at, categories!inner(slug, name)"
+      : "*, categories!inner(slug, name)";
+
   let query = supabase
     .from("products")
-    .select("*, categories!inner(slug, name)", { count: "exact" })
+    .select(selectColumns, { count: "exact" })
     .eq("status", "published");
 
   if (params.category) {
