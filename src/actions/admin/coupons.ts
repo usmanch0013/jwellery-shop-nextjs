@@ -48,6 +48,12 @@ export async function saveCouponAction(formData: FormData): Promise<void> {
   revalidatePath("/admin/coupons");
 }
 
+/** Update an existing coupon — same validated save path as create. */
+export async function updateCouponAction(formData: FormData): Promise<void> {
+  if (!formData.get("id")) return;
+  return saveCouponAction(formData);
+}
+
 export async function deleteCouponFormAction(formData: FormData): Promise<void> {
   const id = formData.get("id") as string;
   if (!id) return;

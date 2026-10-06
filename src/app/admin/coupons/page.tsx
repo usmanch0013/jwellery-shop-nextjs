@@ -1,5 +1,10 @@
+import Link from "next/link";
 import { getAdminCoupons } from "@/lib/admin/queries";
-import { saveCouponAction, deleteCouponFormAction } from "@/actions/admin/coupons";
+import {
+  saveCouponAction,
+  updateCouponAction,
+  deleteCouponFormAction,
+} from "@/actions/admin/coupons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,8 +23,14 @@ import {
 const selectClass =
   "w-full h-10 rounded-xl border border-border/70 bg-background px-3 text-sm";
 
-export default async function AdminCouponsPage() {
+export default async function AdminCouponsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ edit?: string }>;
+}) {
   const coupons = await getAdminCoupons();
+  const { edit } = await searchParams;
+  const editing = edit ? coupons.find((c) => c.id === edit) : undefined;
 
   return (
     <div className="space-y-6">
@@ -28,45 +39,95 @@ export default async function AdminCouponsPage() {
         description="Create and manage discount codes"
       />
 
-      <AdminCard title="Create coupon" description="Add a new promotional code">
+      <AdminCard
+        title={editing ? `Edit coupon — ${editing.code}` : "Create coupon"}
+        description={
+          editing
+            ? "Update this promotional code"
+            : "Add a new promotional code"
+        }
+      >
         <form
-          action={saveCouponAction}
+          key={editing?.id ?? "create"}
+          action={editing ? updateCouponAction : saveCouponAction}
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
+          {editing && <input type="hidden" name="id" value={editing.id} />}
           <div className="space-y-2">
             <Label>Code</Label>
-            <Input name="code" placeholder="WELCOME10" required />
+            <Input
+              name="code"
+              placeholder="WELCOME10"
+              required
+              defaultValue={editing?.code ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label>Type</Label>
-            <select name="type" className={selectClass} defaultValue="percent">
+            <select
+              name="type"
+              className={selectClass}
+              defaultValue={editing?.type ?? "percent"}
+            >
               <option value="percent">Percent</option>
               <option value="fixed">Fixed amount</option>
             </select>
           </div>
           <div className="space-y-2">
             <Label>Value</Label>
-            <Input name="value" type="number" required />
+            <Input
+              name="value"
+              type="number"
+              required
+              defaultValue={editing?.value ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label>Min order (Rs.)</Label>
-            <Input name="minOrder" type="number" defaultValue={0} />
+            <Input
+              name="minOrder"
+              type="number"
+              defaultValue={editing?.min_order ?? 0}
+            />
           </div>
           <div className="space-y-2">
             <Label>Usage limit</Label>
-            <Input name="usageLimit" type="number" placeholder="Unlimited" />
+            <Input
+              name="usageLimit"
+              type="number"
+              placeholder="Unlimited"
+              defaultValue={editing?.usage_limit ?? ""}
+            />
           </div>
           <div className="space-y-2">
             <Label>Expires at</Label>
-            <Input name="expiresAt" type="datetime-local" />
+            <Input
+              name="expiresAt"
+              type="datetime-local"
+              defaultValue={editing?.expires_at?.slice(0, 16) ?? ""}
+            />
           </div>
           <label className="flex items-center gap-2 text-sm self-end pb-2">
-            <input type="checkbox" name="isActive" defaultChecked />
+            <input
+              type="checkbox"
+              name="isActive"
+              defaultChecked={editing ? editing.is_active : true}
+            />
             Active
           </label>
-          <Button type="submit" className="self-end">
-            Create coupon
-          </Button>
+          <div className="flex items-end gap-2">
+            <Button type="submit" className="self-end">
+              {editing ? "Save changes" : "Create coupon"}
+            </Button>
+            {editing && (
+              <Link
+                href="/admin/coupons"
+                className="inline-flex h-10 items-center rounded-xl border border-border/70 px-4 text-sm hover:bg-muted/40"
+              >
+                Cancel
+              </Link>
+            )}
+          </div>
         </form>
       </AdminCard>
 
@@ -109,12 +170,20 @@ export default async function AdminCouponsPage() {
                   </span>
                 </AdminTd>
                 <AdminTd>
-                  <form action={deleteCouponFormAction}>
-                    <input type="hidden" name="id" value={c.id} />
-                    <Button type="submit" variant="outline" size="sm">
-                      Delete
-                    </Button>
-                  </form>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/admin/coupons?edit=${c.id}`}
+                      className="inline-flex h-9 items-center rounded-xl border border-border/70 px-3 text-sm hover:bg-muted/40"
+                    >
+                      Edit
+                    </Link>
+                    <form action={deleteCouponFormAction}>
+                      <input type="hidden" name="id" value={c.id} />
+                      <Button type="submit" variant="outline" size="sm">
+                        Delete
+                      </Button>
+                    </form>
+                  </div>
                 </AdminTd>
               </AdminTr>
             ))}
