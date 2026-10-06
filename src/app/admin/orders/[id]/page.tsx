@@ -44,6 +44,15 @@ export default async function AdminOrderDetailPage({
   const { order, items, payments, events, invoice } = data;
   const addr = order.shipping_address;
 
+  // The stored orders.subtotal can be 0/stale for orders placed before it
+  // was recorded reliably — the line items above are the source of truth,
+  // so the totals box sums price × quantity from them.
+  const itemsSubtotal = items.reduce(
+    (sum, item) => sum + (item.price ?? 0) * (item.quantity ?? 0),
+    0
+  );
+  const subtotal = items.length > 0 ? itemsSubtotal : order.subtotal;
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <AdminPageHeader
@@ -148,7 +157,7 @@ export default async function AdminOrderDetailPage({
               <div className="ml-auto max-w-xs space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>{formatPrice(order.subtotal)}</span>
+                  <span>{formatPrice(subtotal)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping</span>
