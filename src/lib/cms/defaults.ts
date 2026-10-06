@@ -94,7 +94,7 @@ export const DEFAULT_PROMO_POPUP: CmsPromoPopup = {
   productName: "Bridal Necklace Set",
   discountText: "15% OFF",
   description:
-    "Elegant artificial jewellery with premium finishing — perfect for weddings & parties. Update this popup anytime from Admin → Homepage.",
+    "Elegant artificial jewellery with premium finishing — perfect for weddings & parties.",
   imageUrl: "/she-hero-poster.jpg",
   ctaLabel: "Shop this deal",
   ctaHref: "/shop?filter=sale",
