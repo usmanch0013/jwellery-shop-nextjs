@@ -46,6 +46,7 @@ export interface Product {
   isFeatured?: boolean;
   soldOut?: boolean;
   stock?: number;
+  updatedAt?: string;
   variations?: ProductVariation[];
 }
 

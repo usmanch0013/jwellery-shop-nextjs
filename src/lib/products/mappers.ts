@@ -42,6 +42,7 @@ export function mapDbProductToProduct(row: DbProduct): Product {
     isFeatured: row.is_featured,
     soldOut: row.sold_out || row.stock <= 0,
     stock: row.stock,
+    updatedAt: row.updated_at ?? row.created_at,
   };
 }
 

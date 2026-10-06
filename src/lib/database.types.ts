@@ -54,6 +54,7 @@ export interface DbProduct {
   hover_image: string | null;
   sort_order?: number;
   created_at: string;
+  updated_at?: string;
   categories?: DbCategory | null;
 }
 
