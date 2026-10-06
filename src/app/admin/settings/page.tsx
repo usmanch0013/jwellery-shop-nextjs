@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   FREE_SHIPPING_THRESHOLD,
   PAYMENT_METHOD_LABELS,
@@ -23,6 +24,20 @@ export default function AdminSettingsPage() {
         title="Settings"
         description="Store configuration and preferences"
       />
+
+      <AdminCard title="Where to change store settings">
+        <p className="text-sm text-[var(--admin-text-subdued)]">
+          This page shows your current store configuration. To change your
+          store name, contact details, announcement bar, SEO text and other
+          live settings, use Site Settings in the Website CMS.
+        </p>
+        <Link
+          href="/admin/cms/site"
+          className="mt-3 inline-flex h-10 items-center rounded-xl bg-[#008060] px-4 text-sm font-medium text-white hover:bg-[#006e52]"
+        >
+          Open CMS → Site Settings
+        </Link>
+      </AdminCard>
 
       <AdminCard title="Store details">
         <AdminInfoRow label="Store name" value={STORE_INFO.name} />
