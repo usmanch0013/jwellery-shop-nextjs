@@ -52,7 +52,7 @@ const NAV_SECTIONS = [
   {
     label: "Marketing",
     items: [
-      { href: "/admin/coupons", label: "Discounts", icon: Ticket },
+      { href: "/admin/coupons", label: "Coupons", icon: Ticket },
       { href: "/admin/blogs", label: "Blog", icon: FileText },
       { href: "/admin/reviews", label: "Reviews", icon: Star },
     ],
@@ -60,9 +60,8 @@ const NAV_SECTIONS = [
   {
     label: "Store",
     items: [
-      { href: "/admin/cms/pages", label: "Pages", icon: FileText },
       { href: "/admin/cms", label: "Website CMS", icon: Layout },
-      { href: "/admin/messages", label: "Inbox", icon: Mail },
+      { href: "/admin/messages", label: "Messages", icon: Mail },
       { href: "/admin/settings", label: "Settings", icon: Settings },
     ],
   },
