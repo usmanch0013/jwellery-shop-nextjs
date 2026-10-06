@@ -157,7 +157,7 @@ export default function CmsPagesListClient({ pages }: { pages: AdminSitePageRow[
                       {page.source === "coded" && (
                         <span
                           className="inline-flex h-8 w-8 items-center justify-center text-[var(--admin-text-subdued)]"
-                          title="Developer-coded page"
+                          title="System page — managed in its own admin area"
                         >
                           <Code2 className="h-3.5 w-3.5" />
                         </span>

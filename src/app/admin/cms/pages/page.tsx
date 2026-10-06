@@ -15,8 +15,9 @@ export default async function CmsPagesListPage() {
             <h1 className="text-xl font-semibold text-[#202223]">Pages</h1>
           </div>
           <p className="mt-1 max-w-xl text-[13px] text-[var(--admin-text-subdued)]">
-            All website pages in one place. Developer-coded pages stay in code;
-            your client can still edit content with the Builder where enabled.
+            All website pages in one place. Pages marked &ldquo;System&rdquo;
+            are managed in their own admin areas; the rest can be edited here
+            with the Builder.
           </p>
         </div>
         <Link
@@ -31,13 +32,13 @@ export default async function CmsPagesListPage() {
         <p className="font-semibold text-[#004c3f]">How it works</p>
         <ul className="mt-2 list-inside list-disc space-y-1">
           <li>
-            <strong>Builder</strong> — full page from drag & drop (client-friendly)
+            <strong>Builder</strong> — full page built from drag &amp; drop sections
           </li>
           <li>
-            <strong>Hybrid</strong> — you code the layout; client adds/edits sections in Builder
+            <strong>Hybrid</strong> — fixed layout; add or edit sections in the Builder
           </li>
           <li>
-            <strong>Homepage CMS</strong> — homepage hero & sections (not the page builder)
+            <strong>Homepage CMS</strong> — homepage hero &amp; sections (not the page builder)
           </li>
           <li>
             <strong>System</strong> — shop/blog etc. managed in their own admin areas
