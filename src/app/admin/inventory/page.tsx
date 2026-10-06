@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getLowStockProducts } from "@/lib/admin/queries";
+import { getLowStockProducts, LOW_STOCK_THRESHOLD } from "@/lib/admin/queries";
 import { formatPrice } from "@/lib/products/format";
 import {
   AdminEmpty,
@@ -14,13 +14,13 @@ import {
 } from "@/components/admin/AdminShell";
 
 export default async function AdminInventoryPage() {
-  const products = await getLowStockProducts(10);
+  const products = await getLowStockProducts();
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
       <AdminPageHeader
         title="Inventory"
-        description="Products with low or out of stock levels"
+        description={`Low stock (${LOW_STOCK_THRESHOLD} or fewer units left) and out-of-stock products · ${products.length} item${products.length === 1 ? "" : "s"}`}
         actions={
           <Link
             href="/admin/products"

@@ -32,6 +32,13 @@ export {
   buildCommerceSummary,
 } from "@/lib/admin/analytics";
 
+/**
+ * Single low-stock definition for the whole admin:
+ * stock 1..LOW_STOCK_THRESHOLD (and not flagged sold out) = "Low stock";
+ * stock 0 or sold_out flag = "Out of stock".
+ */
+export const LOW_STOCK_THRESHOLD = 5;
+
 export async function getDashboardStats() {
   const admin = await getAdminClient();
 
@@ -55,8 +62,9 @@ export async function getDashboardStats() {
     admin
       .from("products")
       .select("*", { count: "exact", head: true })
-      .lte("stock", 5)
-      .gt("stock", 0),
+      .lte("stock", LOW_STOCK_THRESHOLD)
+      .gt("stock", 0)
+      .eq("sold_out", false),
     admin
       .from("products")
       .select("*", { count: "exact", head: true })
@@ -332,7 +340,7 @@ export async function getAdminProducts(filters: AdminProductFilters = {}) {
   if (filters.flag === "bestseller") query = query.eq("is_bestseller", true);
   if (filters.flag === "featured") query = query.eq("is_featured", true);
   if (filters.flag === "sold_out") query = query.eq("sold_out", true);
-  if (filters.flag === "low_stock") query = query.lte("stock", 5);
+  if (filters.flag === "low_stock") query = query.lte("stock", LOW_STOCK_THRESHOLD);
   if (filters.flag === "sale") query = query.not("original_price", "is", null);
 
   switch (filters.sort) {
@@ -634,12 +642,12 @@ export async function getAdminCustomer(id: string) {
   return { customer, orders: (orders ?? []) as DbOrder[] };
 }
 
-export async function getLowStockProducts(threshold = 5) {
+export async function getLowStockProducts(threshold = LOW_STOCK_THRESHOLD) {
   const admin = await getAdminClient();
   const { data } = await admin
     .from("products")
     .select("id, name, slug, stock, sold_out, price, image, sku")
-    .lte("stock", threshold)
+    .or(`stock.lte.${threshold},sold_out.eq.true`)
     .order("stock", { ascending: true });
   return data ?? [];
 }
