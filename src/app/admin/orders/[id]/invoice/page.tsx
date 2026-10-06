@@ -28,15 +28,24 @@ export default async function AdminInvoicePage({
   if (data.invoice) {
     snapshot = snapshotFromInvoice(data.invoice);
   } else {
-    const result = await generateInvoiceAction(id);
-    const invoiceNumber =
-      result.invoiceNumber ?? buildInvoiceNumber(data.order.order_number);
+    // Generating + persisting the invoice must never break viewing it:
+    // any failure (missing invoices table, action error) falls back to a
+    // snapshot built directly from the order data.
+    let invoiceNumber = buildInvoiceNumber(data.order.order_number);
+    let persisted = false;
+    try {
+      const result = await generateInvoiceAction(id);
+      if (result.invoiceNumber) invoiceNumber = result.invoiceNumber;
+      persisted = result.persisted !== false;
+    } catch {
+      persisted = false;
+    }
     snapshot = buildInvoiceSnapshot(
       data.order,
       data.items as DbOrderItem[],
       invoiceNumber
     );
-    migrationHint = result.persisted === false;
+    migrationHint = !persisted;
   }
 
   return (

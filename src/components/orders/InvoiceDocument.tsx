@@ -8,7 +8,11 @@ export default function InvoiceDocument({
   snapshot: InvoiceSnapshot;
   showPrintHint?: boolean;
 }) {
-  const customer = snapshot.customer;
+  const customer = snapshot.customer ?? {};
+  const items = Array.isArray(snapshot.items) ? snapshot.items : [];
+  const cityLine = [customer.city, customer.province]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <div className="invoice-document bg-white text-foreground">
@@ -53,15 +57,17 @@ export default function InvoiceDocument({
             Bill to
           </p>
           <div className="mt-2 text-sm leading-relaxed">
-            <p className="font-medium">{customer.fullName}</p>
-            <p>{customer.line1}</p>
+            <p className="font-medium">{customer.fullName || "Guest customer"}</p>
+            {customer.line1 && <p>{customer.line1}</p>}
             {customer.line2 && <p>{customer.line2}</p>}
-            <p>
-              {customer.city}, {customer.province}
-              {customer.postalCode ? ` ${customer.postalCode}` : ""}
-            </p>
-            <p className="mt-2">{customer.phone}</p>
-            <p>{customer.email}</p>
+            {cityLine && (
+              <p>
+                {cityLine}
+                {customer.postalCode ? ` ${customer.postalCode}` : ""}
+              </p>
+            )}
+            {customer.phone && <p className="mt-2">{customer.phone}</p>}
+            {customer.email && <p>{customer.email}</p>}
           </div>
         </div>
         <div>
@@ -97,7 +103,7 @@ export default function InvoiceDocument({
           </tr>
         </thead>
         <tbody>
-          {snapshot.items.map((item, i) => (
+          {items.map((item, i) => (
             <tr key={i} className="border-b border-border/50">
               <td className="py-3 pr-4">{item.name}</td>
               <td className="py-3 text-center">{item.quantity}</td>
