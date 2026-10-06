@@ -24,7 +24,9 @@ export async function generateMetadata({
   const product = await getProductBySlug(id);
   if (!product) return { title: "Product not found" };
 
-  const title = `${product.name} | ${BRAND.name}`;
+  // Root layout template appends `| ${BRAND.name}` — keep the page title
+  // bare here so the brand suffix is not duplicated.
+  const title = product.name;
   const description =
     product.description?.replace(/<[^>]+>/g, " ").slice(0, 160).trim() ||
     `Buy ${product.name} — artificial jewellery from ${BRAND.name}. Shop at ${BRAND.domain}.`;
@@ -34,7 +36,7 @@ export async function generateMetadata({
     description,
     alternates: { canonical: `/products/${id}` },
     openGraph: {
-      title,
+      title: `${product.name} | ${BRAND.name}`,
       description,
       url: absoluteUrl(`/products/${id}`),
       images: product.image ? [{ url: product.image }] : undefined,
