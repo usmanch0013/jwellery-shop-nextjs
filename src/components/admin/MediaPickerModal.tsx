@@ -59,7 +59,13 @@ export function MediaPickerModal({
     setError("");
     setLoading(true);
     getMediaLibraryAction()
-      .then((res) => setItems(res.items as DbMediaAsset[]))
+      .then((res) => {
+        if (res.error) setError(res.error);
+        setItems(res.items as DbMediaAsset[]);
+      })
+      .catch(() =>
+        setError("Could not load the media library. Please close and try again.")
+      )
       .finally(() => setLoading(false));
   }, [open]);
 

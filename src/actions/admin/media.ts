@@ -23,7 +23,6 @@ const MAX_BYTES = 10 * 1024 * 1024;
 
 async function listMedia() {
   const admin = await getAdminClient();
-  await syncProductImagesToMediaLibrary(admin).catch(() => 0);
 
   const { data, error } = await admin
     .from("media_library")

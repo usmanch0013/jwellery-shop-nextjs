@@ -1,5 +1,4 @@
 import { getAdminClient } from "@/lib/admin/auth";
-import { syncProductImagesToMediaLibrary } from "@/lib/admin/media-sync";
 import type {
   DbCoupon,
   DbOrder,
@@ -434,7 +433,6 @@ export async function getAdminProductDetails(id: string) {
 
 export async function getAdminMediaLibrary() {
   const admin = await getAdminClient();
-  await syncProductImagesToMediaLibrary(admin).catch(() => 0);
 
   const { data } = await admin
     .from("media_library")

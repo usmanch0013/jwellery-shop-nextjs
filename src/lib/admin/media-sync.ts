@@ -105,21 +105,35 @@ export async function syncProductImagesToMediaLibrary(
 
   if (pending.size === 0) return 0;
 
-  const urls = [...pending.keys()];
-  const { data: existing } = await admin
-    .from("media_library")
-    .select("url")
-    .in("url", urls);
+  // Fetch existing URLs with light, paginated selects of a single column.
+  // A single .in("url", ...) filter with hundreds of URLs produces a request
+  // URL tens of thousands of characters long, which servers and proxies
+  // reject — that is what broke media loading as the catalog grew.
+  const existingUrls = new Set<string>();
+  const PAGE_SIZE = 1000;
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data: page, error } = await admin
+      .from("media_library")
+      .select("url")
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) throw new Error(error.message);
+    for (const row of page ?? []) existingUrls.add(row.url);
+    if (!page || page.length < PAGE_SIZE) break;
+  }
 
-  const existingUrls = new Set((existing ?? []).map((row) => row.url));
   const toInsert = [...pending.values()].filter(
     (item) => !existingUrls.has(item.url)
   );
 
   if (toInsert.length === 0) return 0;
 
-  const { error } = await admin.from("media_library").insert(toInsert);
-  if (error) throw new Error(error.message);
+  const CHUNK_SIZE = 200;
+  for (let i = 0; i < toInsert.length; i += CHUNK_SIZE) {
+    const { error } = await admin
+      .from("media_library")
+      .insert(toInsert.slice(i, i + CHUNK_SIZE));
+    if (error) throw new Error(error.message);
+  }
 
   return toInsert.length;
 }
