@@ -92,7 +92,7 @@ We may update these Terms from time to time. The "Last updated" date at the top 
 
 ## 16. Contact
 
-Questions about these Terms: hello@sheco.pk | +92 300 0000000 | Lahore, Punjab, Pakistan.`,
+Questions about these Terms: hello@sheco.pk | +92 308 4020019 | Lahore, Punjab, Pakistan.`,
   },
 
   privacy: {
@@ -177,7 +177,7 @@ We may update this Privacy Policy periodically. The updated version will be post
 
 Privacy inquiries: hello@sheco.pk
 Address: Lahore, Punjab, Pakistan
-Phone: +92 300 0000000`,
+Phone: +92 308 4020019`,
   },
 
   "refund-policy": {
@@ -253,7 +253,7 @@ Please contact us before initiating a chargeback so we can resolve the issue. Un
 
 ## 12. Contact
 
-Returns & refunds: hello@sheco.pk | +92 300 0000000`,
+Returns & refunds: hello@sheco.pk | +92 308 4020019`,
   },
 
   "shipping-policy": {
@@ -318,7 +318,7 @@ Large orders may ship in multiple parcels at no extra standard shipping cost whe
 
 ## 11. Contact
 
-Shipping support: hello@sheco.pk | +92 300 0000000`,
+Shipping support: hello@sheco.pk | +92 308 4020019`,
   },
 
   "cookie-policy": {

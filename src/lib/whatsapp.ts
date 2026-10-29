@@ -6,7 +6,7 @@ export function getWhatsAppDigits(): string {
   const fromEnv = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, "");
   if (fromEnv) return fromEnv;
   const fromBrand = BRAND.phone.replace(/\D/g, "");
-  return fromBrand || "923000000000";
+  return fromBrand || "923084020019";
 }
 
 export function whatsAppUrl(message: string): string {

@@ -8,7 +8,7 @@ export const BRAND = {
   domain: "sheco.pk",
   siteUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://sheco.pk",
   email: "hello@sheco.pk",
-  phone: "+92 300 0000000",
+  phone: "+92 308 4020019",
   address: "Lahore, Punjab, Pakistan",
   foundedYear: 2017,
   tagline: "Wear Your Art.",
