@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "10mb",
     },
+    // Hostinger's build container has a tight thread/process limit — the
+    // default 63 static-generation workers crash with SIGABRT (os error 11).
+    // Capping build workers keeps `next build` inside the limit.
+    cpus: 2,
   },
   images: {
     remotePatterns: [
