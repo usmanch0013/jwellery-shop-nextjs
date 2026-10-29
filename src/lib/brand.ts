@@ -7,7 +7,7 @@ export const BRAND = {
   shortName: "SHE",
   domain: "sheco.pk",
   siteUrl: process.env.NEXT_PUBLIC_APP_URL ?? "https://sheco.pk",
-  email: "hello@sheco.pk",
+  email: "pksheco@gmail.com",
   phone: "+92 308 4020019",
   address: "Lahore, Punjab, Pakistan",
   foundedYear: 2017,

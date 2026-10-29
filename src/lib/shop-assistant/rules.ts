@@ -91,7 +91,7 @@ export function parseIntentFromRules(
 
   if (/return|refund|exchange/i.test(text)) {
     intent.reply =
-      "Returns and refunds follow our Refund Policy on sheco.pk. Email hello@sheco.pk or WhatsApp us with your order number for help.";
+      "Returns and refunds follow our Refund Policy on sheco.pk. Email pksheco@gmail.com or WhatsApp us with your order number for help.";
     return intent;
   }
 

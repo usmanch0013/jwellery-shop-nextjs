@@ -40,7 +40,7 @@ You must be at least 18 years of age, or the age of majority in your jurisdictio
 
 ## 3. Account registration
 
-When you create an account, you agree to provide accurate, complete, and current information. You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. Notify us immediately at hello@sheco.pk if you suspect unauthorized access.
+When you create an account, you agree to provide accurate, complete, and current information. You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. Notify us immediately at pksheco@gmail.com if you suspect unauthorized access.
 
 ## 4. Products & descriptions
 
@@ -92,7 +92,7 @@ We may update these Terms from time to time. The "Last updated" date at the top 
 
 ## 16. Contact
 
-Questions about these Terms: hello@sheco.pk | +92 308 4020019 | Lahore, Punjab, Pakistan.`,
+Questions about these Terms: pksheco@gmail.com | +92 308 4020019 | Lahore, Punjab, Pakistan.`,
   },
 
   privacy: {
@@ -155,7 +155,7 @@ We implement administrative, technical, and physical safeguards including encryp
 
 ## 8. Your rights
 
-Depending on applicable law, you may have the right to access, correct, delete, or restrict processing of your personal data, and to object to certain processing. To exercise these rights, email hello@sheco.pk with sufficient detail to verify your identity.
+Depending on applicable law, you may have the right to access, correct, delete, or restrict processing of your personal data, and to object to certain processing. To exercise these rights, email pksheco@gmail.com with sufficient detail to verify your identity.
 
 ## 9. Children's privacy
 
@@ -175,7 +175,7 @@ We may update this Privacy Policy periodically. The updated version will be post
 
 ## 13. Contact us
 
-Privacy inquiries: hello@sheco.pk
+Privacy inquiries: pksheco@gmail.com
 Address: Lahore, Punjab, Pakistan
 Phone: +92 308 4020019`,
   },
@@ -215,7 +215,7 @@ If you receive a damaged, defective, or incorrect product, contact us within 48 
 
 ## 5. How to start a return
 
-Email hello@sheco.pk or WhatsApp our support line with:
+Email pksheco@gmail.com or WhatsApp our support line with:
 • Order number
 • Phone number used at checkout
 • Item(s) to return and reason
@@ -253,7 +253,7 @@ Please contact us before initiating a chargeback so we can resolve the issue. Un
 
 ## 12. Contact
 
-Returns & refunds: hello@sheco.pk | +92 308 4020019`,
+Returns & refunds: pksheco@gmail.com | +92 308 4020019`,
   },
 
   "shipping-policy": {
@@ -306,7 +306,7 @@ We offer worldwide shipping to selected countries. International rates and deliv
 
 ## 8. Lost or delayed parcels
 
-If tracking shows no movement for 7+ days domestically or 14+ days internationally, contact hello@sheco.pk with your order number. We will investigate with the courier and offer replacement or refund if the parcel is confirmed lost.
+If tracking shows no movement for 7+ days domestically or 14+ days internationally, contact pksheco@gmail.com with your order number. We will investigate with the courier and offer replacement or refund if the parcel is confirmed lost.
 
 ## 9. Damaged in transit
 
@@ -318,7 +318,7 @@ Large orders may ship in multiple parcels at no extra standard shipping cost whe
 
 ## 11. Contact
 
-Shipping support: hello@sheco.pk | +92 308 4020019`,
+Shipping support: pksheco@gmail.com | +92 308 4020019`,
   },
 
   "cookie-policy": {
@@ -363,6 +363,6 @@ We may update this Cookie Policy. Check this page for the latest version.
 
 ## 7. Contact
 
-Questions: hello@sheco.pk`,
+Questions: pksheco@gmail.com`,
   },
 };
